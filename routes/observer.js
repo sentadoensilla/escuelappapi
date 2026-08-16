@@ -1,0 +1,14 @@
+const express = require('express');
+const router = express.Router();
+const Controller = require('../controllers/ObservadorController');
+const {upload,uploadAlert} = require('../middlware/uploadImages');
+const Auth = require('../middlware/jwtoken');
+
+//OBSERVADOR
+router.post('/sendObservaciones',[Auth.isAuth,Auth.isDirector_and_tecaher],uploadAlert.any(),Controller.observacionesSend);
+router.post('/listObservaciones',[Auth.isAuth,Auth.isAcademico_and_estudiante_and_teacher],upload.none(),Controller.observacionesGiveme);
+router.post('/observacionesDelete',[Auth.isAuth,Auth.isDirector_and_tecaher],upload.none(),Controller.observacionesDelete);
+router.post('/observacionesComms',[Auth.isAuth,Auth.isAcademico_and_estudiante_and_teacher],upload.none(),Controller.observacionesComments);
+router.post('/observacionesCommsList',[Auth.isAuth,Auth.isAcademico_and_estudiante_and_teacher],upload.none(),Controller.observacionesCommentsList);
+
+module.exports = router;

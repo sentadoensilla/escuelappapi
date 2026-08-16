@@ -1,0 +1,33 @@
+# ============================================================
+# Escuelapp API — .gitignore
+# ============================================================
+
+# Node
+node_modules/
+
+# Entorno / secretos (NUNCA subir el .env real)
+.env
+.env.*
+.envsae
+!.env.example
+database/ssl/
+
+# Logs
+*.log
+
+# Datos personales / uploads de usuarios
+public/archivos/
+notas.txt
+observacionesSend.json
+Asistencias_*.xlsx
+
+# Backups / temporales / scratch
+*.este
+*.orig
+*.bk
+*.old
+*.bak
+*.tmp
+package.16.json
+package-lock.json.este
+references/

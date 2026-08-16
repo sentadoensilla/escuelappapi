@@ -1,0 +1,2 @@
+npm install bcrypt body-parser console cors cryptr csv-parse csv-parser dotenv excel4node exceljs express express-useragent fs jose jsonwebtoken moment moment-timezone mongoose multer node-cron nodemailer pg pg-format pg-hstore pg-promise qrcode qrcode-terminal request sequelize socket.io socket.io-redis sticky-session util uuid whatsapp-web.js wwebjs-mongo @socket.io/sticky @socket.io/cluster-adapter
+npm install --save-dev nodemon

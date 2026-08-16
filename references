@@ -1,0 +1,27 @@
+// REQ.USER
+return {
+    isLogged: estaLogeado,
+    token: JSON.parse(window.localStorage.getItem("token")),
+    socketId: window.localStorage.getItem("socketid"),
+    usuarioId: JSON.parse(window.localStorage.getItem("usuarioid")),
+    academicoId: JSON.parse(window.localStorage.getItem("academicoid")),
+    usuarioIndex: JSON.parse(window.localStorage.getItem("usuarioindex")),
+    usuarioNick: JSON.parse(window.localStorage.getItem("usuarionick")),
+    usuarioUnion: JSON.parse(window.localStorage.getItem("usuariounion")),
+    usuarioAnoId: JSON.parse(window.localStorage.getItem("usuarioanoid")),            
+    usuarioNombre: JSON.parse(window.localStorage.getItem("usuarionombre")),
+    usuarioGrado: JSON.parse(window.localStorage.getItem("usuariogrado")),
+    usuarioGrupo: JSON.parse(window.localStorage.getItem("usuariogrupo")),
+    usuarioRollId: JSON.parse(window.localStorage.getItem("usuariorollid")),
+    usuarioRollNombre: JSON.parse(window.localStorage.getItem("usuariorollnombre")),
+    usuarioRollDescripcion: JSON.parse(window.localStorage.getItem("usuariorolldescripcion")),
+    usuarioEmpresaId: JSON.parse(window.localStorage.getItem("empresaid")),
+    empresaLema: JSON.parse(window.localStorage.getItem("empresalema")),
+    empresaEscudo: JSON.parse(window.localStorage.getItem("empresaescudo")),
+    empresaTelefono: JSON.parse(window.localStorage.getItem("empresatelefono")),
+    usuarioEstado: JSON.parse(window.localStorage.getItem("usuarioestado")),
+    usuarioInstitucionNombre: JSON.parse(window.localStorage.getItem("usuarioinstitucionnombre")),
+    // usuarioCampanaWP: JSON.parse(window.localStorage.getItem("campanawhatsapp"))
+}
+
+estudiante,docente,motivo,fecha,lugar,descripcion
