@@ -36,3 +36,6 @@ Asistencias_*.xlsx
 package.16.json
 package-lock.json.este
 references/
+
+# Repo embebido accidental (clone del propio api)
+saescuelappapi/
