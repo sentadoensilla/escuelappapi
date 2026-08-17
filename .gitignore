@@ -15,6 +15,11 @@ database/ssl/
 # Logs
 *.log
 
+# Credenciales de servicios (NUNCA subir: contienen claves privadas)
+utils/notifications/push/*firebase*.json
+utils/notifications/push/*adminsdk*.json
+utils/notifications/push/*serviceaccount*.json
+
 # Datos personales / uploads de usuarios
 public/archivos/
 notas.txt
