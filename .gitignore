@@ -16,9 +16,8 @@ database/ssl/
 *.log
 
 # Credenciales de servicios (NUNCA subir: contienen claves privadas)
-utils/notifications/push/*firebase*.json
-utils/notifications/push/*adminsdk*.json
-utils/notifications/push/*serviceaccount*.json
+# Service accounts de Firebase/Google — cualquiera de estos *.json tiene private_key
+utils/notifications/push/*.json
 
 # Datos personales / uploads de usuarios
 public/archivos/
