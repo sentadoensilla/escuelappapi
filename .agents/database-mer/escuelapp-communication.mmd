@@ -1,0 +1,892 @@
+erDiagram
+    %% Comunicación Escuelapp
+    contact_aetempmess {
+        int aetempmess_estado
+        text aetempmess_guia
+        int aetempmess_id PK
+        text aetempmess_text
+        int aetempmess_type
+    }
+    contact_aetempmesssede {
+        bigint aeinst_id
+        int aetempmesssede_estado
+        text aetempmesssede_guia
+        int aetempmesssede_id PK
+        text aetempmesssede_text
+        int aetempmesstype_id
+    }
+    contact_aetempmesstype {
+        int aetempmesstype_estado
+        int aetempmesstype_id PK
+        text aetempmesstype_text
+    }
+    contact_aetempmessvars {
+        text aetempmessvars_comentario
+        int aetempmessvars_estado
+        int aetempmessvars_id PK
+        varchar(19) aetempmessvars_nombre
+    }
+    contact_emisor {
+        varchar(14) emisor
+        int estado
+        timestamp fecharegistro
+        int idemisor PK
+        bigint idempresa
+        text token
+    }
+    data_aeacudientes {
+        int aeacudientes_id PK
+        varchar(64) aeestudiantes_apellidosacudiente
+        text aeestudiantes_direccionacudiente
+        int aeestudiantes_estado
+        timestamp aeestudiantes_fecharegistro
+        text aeestudiantes_fotoacudiente
+        char(1) aeestudiantes_generoacudiente
+        double aeestudiantes_id
+        varchar(16) aeestudiantes_idenacudiente
+        text aeestudiantes_mailacudiente
+        varchar(64) aeestudiantes_nombresacudiente
+        text aeestudiantes_telefonoacudiente
+        double aeusu_id
+    }
+    data_aeacudientes_old {
+        int aeacudientes_id PK
+        varchar(64) aeestudiantes_apellidosacudiente
+        text aeestudiantes_direccionacudiente
+        int aeestudiantes_estado
+        timestamp aeestudiantes_fecharegistro
+        text aeestudiantes_fotoacudiente
+        char(1) aeestudiantes_generoacudiente
+        double aeestudiantes_id
+        varchar(16) aeestudiantes_idenacudiente
+        text aeestudiantes_mailacudiente
+        varchar(64) aeestudiantes_nombresacudiente
+        text aeestudiantes_telefonoacudiente
+        double aeusu_id
+    }
+    data_aeano {
+        char aeano_calendario
+        varchar(16) aeano_descripcion
+        int aeano_id PK
+        date fecha_fin
+        date fecha_inicio
+    }
+    data_aeasignaciones {
+        int aeanol_id
+        varchar(256) aeasignaciones_asignatura
+        int aeasignaciones_dia
+        text aeasignaciones_enlace
+        int aeasignaciones_estado
+        varchar(64) aeasignaciones_grupo
+        time aeasignaciones_hora
+        time aeasignaciones_horafin
+        double aeasignaciones_id
+        varchar(256) aeasignaciones_utiles
+        double aedocentes_id
+        double aeinst_id
+    }
+    data_aeasistencias {
+        varchar(64) aeasignaciones_asignatura
+        double aeasistencia_id PK
+        double aeasistencias_docente
+        bool aeasistencias_enviado
+        int aeasistencias_estado
+        date aeasistencias_fecha
+        timestamptz aeasistencias_fecharegistro
+        int aeasistencias_llego
+        varchar(32) aeestudiantes_grupo
+        double aeestudiantes_id
+    }
+    data_aeavisos {
+        bigint aeanol_id
+        bool aeavisos_aceptarespuestas
+        text aeavisos_adjunto
+        int aeavisos_alcance
+        text aeavisos_descripcion
+        int aeavisos_estado
+        text aeavisos_estudiantesid
+        timestamp aeavisos_fecha
+        timestamp aeavisos_fechafinalizacion
+        timestamp aeavisos_fechapublicacion
+        varchar[] aeavisos_grupo
+        bigint aeavisos_id PK
+        text aeavisos_titulo
+        bigint aeinst_id
+        bigint aeusu_id
+    }
+    data_aeavisos_comentarios {
+        bigint aeavisos_id
+        text aeavisoscomentarios_descripcion
+        int aeavisoscomentarios_estado
+        timestamp aeavisoscomentarios_fecha
+        bigint aeavisoscomentarios_id PK
+        bigint aeusu_id
+    }
+    data_aeavisosinternal {
+        double aeanol_id
+        text aeavisosinternal_adjunto
+        text aeavisosinternal_descripcion
+        text aeavisosinternal_docentessid
+        int aeavisosinternal_estado
+        timestamp aeavisosinternal_fecha
+        timestamp aeavisosinternal_fechafinalizacion
+        timestamp aeavisosinternal_fechapublicacion
+        double aeavisosinternal_id PK
+        text aeavisosinternal_titulo
+        double aeinst_id
+        double aeusu_id
+    }
+    data_aeavisosinternal_comentarios {
+        double aeavisosinternal_id
+        text aeavisosinternalcomentarios_descripcion
+        int aeavisosinternalcomentarios_estado
+        timestamp aeavisosinternalcomentarios_fecha
+        double aeavisosinternalcomentarios_id PK
+        double aeusu_id
+    }
+    data_aeayuda {
+        text aeayuda_descripcion
+        text aeayuda_enlace
+        int aeayuda_estado
+        double aeayuda_id PK
+        text aeayuda_para
+        varchar(4) aeayuda_tipointerface
+        text aeayuda_titulo
+        varchar(9) aeayuda_version
+        int aeayuda_vistas
+    }
+    data_aebitacora {
+        double aeanol_id
+        text aebitacora_asignatura
+        bool aebitacora_aviso
+        text aebitacora_descripcion
+        text aebitacora_estudiantesid
+        timestamp aebitacora_fecha
+        varchar[] aebitacora_grupo
+        double aebitacora_id PK
+        double aeinst_id
+        double aeusu_id
+    }
+    data_aebitacora_comentarios {
+        double aebitacora_id
+        text aebitacoracomentarios_descripcion
+        int aebitacoracomentarios_estado
+        timestamp aebitacoracomentarios_fecha
+        double aebitacoracomentarios_id PK
+        double aeusu_id
+    }
+    data_aecaracter {
+        varchar(16) aecaracter_descripcion
+        smallint aecaracter_estado
+        smallint aecaracter_id
+    }
+    data_aecitaciones {
+        bigint aeanol_id
+        text aecitacion_adjunto
+        text aecitacion_descripcion
+        smallint aecitacion_estado
+        timestamp aecitacion_fecha
+        timestamp aecitacion_fecharegistro
+        int aecitacion_id PK
+        varchar aecitacion_lugar
+        bigint aedocentes_id
+        text aeestudiantes_id
+        bigint aeinst_id
+        bigint aemotivo_id
+    }
+    data_aecondiciones {
+        text aecondiciones_acudiente
+        timestamp aecondiciones_fecha
+        double aecondiciones_id PK
+        text aelogdispositivos_model
+        text aelogdispositivos_platform
+        text aelogdispositivos_serial
+        text aelogdispositivos_uuid
+        text aelogdispositivos_version
+    }
+    data_aeconocer {
+        varchar(64) aeconocer_descripcion
+        smallint aeconocer_estado
+        smallint aeconocer_id
+    }
+    data_aeconsultasdocentes {
+        double aeanol_id
+        text aeasignaciones_asignatura
+        text aeconsultasdocentes_descripcion
+        int aeconsultasdocentes_estado
+        timestamp aeconsultasdocentes_fecha
+        double aeconsultasdocentes_id PK
+        bool aeconsultasdocentes_visibilidad
+        double aedocente_id
+        double aeestudiantes_id
+        double aeinst_id
+    }
+    data_aeconsultasdocentes_comentarios {
+        double aeconsultasdocentes_id
+        text aeconsultasdocentescomentarios_descripcion
+        int aeconsultasdocentescomentarios_estado
+        timestamp aeconsultasdocentescomentarios_fecha
+        double aeconsultasdocentescomentarios_id PK
+        double aeusu_id
+    }
+    data_aecronograma {
+        bigint aeano_id
+        text aecronograma_adjunto
+        text aecronograma_descripcion
+        int aecronograma_estado
+        timestamp aecronograma_fechafin
+        timestamp aecronograma_fechainicio
+        timestamp aecronograma_fecharegistro
+        varchar[] aecronograma_grupo
+        int aecronograma_id
+        text aecronograma_responsables
+        text aecronograma_titulo
+        int aecronogramatipoevento_id
+        text aeinst_id
+        bigint aeusu_id
+    }
+    data_aecronograma_alerta {
+        bigint aecronograma_id
+        timestamp aecronogramaalerta_fecha
+        int aecronogramaalerta_id
+    }
+    data_aecronograma_comentarios {
+        bigint aecronograma_id
+        text aecronogramacomentario_descripcion
+        timestamp aecronogramacomentario_fecha
+        int aecronogramacomentario_id
+        bigint aeusu_id
+    }
+    data_aecronograma_tipoevento {
+        varchar(8) aecronogramatipoevento_color
+        text aecronogramatipoevento_descripcion
+        int aecronogramatipoevento_estado
+        int aecronogramatipoevento_id
+    }
+    data_aecue {
+        text aecue_asignatura
+        text aecue_descripcion
+        bool aecue_estado
+        timestamp aecue_fechacreacion
+        int aecue_id
+        varchar(256) aecue_imagen
+        varchar(128) aecue_nombre
+    }
+    data_aediscapacidades {
+        varchar(32) aediscapacidades_descripcion
+        int aediscapacidades_estado
+        int aediscapacidades_id PK
+    }
+    data_aedocentes {
+        varchar(64) aedocentes_apellidos
+        varchar(128) aedocentes_direccion
+        int aedocentes_estado
+        text aedocentes_experiencia
+        text aedocentes_experiencia2
+        text aedocentes_experiencia3
+        text aedocentes_experiencia4
+        date aedocentes_fechanacimiento
+        varchar(128) aedocentes_foto
+        char(1) aedocentes_genero
+        double aedocentes_id PK
+        varchar(32) aedocentes_identificacion
+        varchar(128) aedocentes_mail
+        varchar(64) aedocentes_nombres
+        varchar(32) aedocentes_telefono
+        varchar(128) aedocentes_titulo
+        varchar(128) aedocentes_titulo2
+        varchar(128) aedocentes_titulo3
+        varchar(128) aedocentes_titulo4
+        text aedocentes_url
+        double aeusu_id
+    }
+    data_aeeps {
+        varchar(255) aeeps_administradora
+        varchar(12) aeeps_codigo
+        smallint aeeps_estado
+        int aeeps_id PK
+        varchar(12) aeeps_nit
+        varchar(255) aeeps_nombre
+        varchar(12) aeeps_tipo
+    }
+    data_aeestados {
+        varchar(20) aeestados_descripcion
+        varchar(64) aeestados_icons
+        int aeestados_id PK
+        varchar(64) aeestados_style
+    }
+    data_aeestudiantes {
+        bigint aeacudientes_id
+        int aeano_id
+        varchar(64) aeestudiantes_apellidos
+        varchar(32) aeestudiantes_codigo
+        text aeestudiantes_direccion
+        int aeestudiantes_estado
+        date aeestudiantes_fechanacimiento
+        timestamp aeestudiantes_fecharegistro
+        char(1) aeestudiantes_genero
+        varchar(32) aeestudiantes_grupo
+        int aeestudiantes_id PK
+        varchar(32) aeestudiantes_identificacion
+        text aeestudiantes_mail
+        varchar(64) aeestudiantes_nombres
+        text aeestudiantes_telefono
+        double aeinstitucion_id
+        double aeusu_id
+    }
+    data_aeestudiantes_old {
+        bigint aeacudientes_id
+        int aeano_id
+        varchar(64) aeestudiantes_apellidos
+        varchar(32) aeestudiantes_codigo
+        text aeestudiantes_direccion
+        int aeestudiantes_estado
+        date aeestudiantes_fechanacimiento
+        timestamp aeestudiantes_fecharegistro
+        char(1) aeestudiantes_genero
+        varchar(32) aeestudiantes_grupo
+        int aeestudiantes_id PK
+        varchar(32) aeestudiantes_identificacion
+        text aeestudiantes_mail
+        varchar(64) aeestudiantes_nombres
+        text aeestudiantes_telefono
+        double aeinstitucion_id
+        double aeusu_id
+    }
+    data_aeetnias {
+        varchar(32) aeetnias_descripcion
+        int aeetnias_estado
+        int aeetnias_id PK
+    }
+    data_aeexcusas {
+        bigint aeanol_id
+        bigint aeestudiantes_id
+        text aeexcusas_archivoadjunto
+        text aeexcusas_asignatura
+        timestamp aeexcusas_desde
+        int aeexcusas_estado
+        timestamp aeexcusas_fecha
+        timestamp aeexcusas_hasta
+        int aeexcusas_id PK
+        text aeexcusas_mensaje
+        bigint aeinst_id
+        int aetipoexcusa_id
+    }
+    data_aeexcusas_respuestas {
+        bigint aeexcusas_id
+        text aeexcusasrespuestas_descripcion
+        timestamp aeexcusasrespuestas_fecha
+        int aeexcusasrespuestas_id PK
+        int aeexcusasrespuestas_tipo
+        bigint aeusu_id
+    }
+    data_aegrados {
+        smallint aegrados_codigo
+        varchar(64) aegrados_descripcion
+        smallint aegrados_estado
+        smallint aegrados_id PK
+    }
+    data_aegruposanguineo {
+        varchar(2) aegruposanguineo_descripcion
+        int aegruposanguineo_estado
+        int aegruposanguineo_id PK
+    }
+    data_aeinstituciones {
+        varchar(128) aeinst_direccion
+        text aeinst_escudo
+        text aeinst_facebook
+        varchar(128) aeinst_fax
+        text aeinst_himno
+        double aeinst_id PK
+        text aeinst_instagram
+        text aeinst_lema
+        varchar(128) aeinst_mail
+        text aeinst_manualconvivencia
+        varchar(15) aeinst_nit
+        varchar(128) aeinst_nombre
+        text aeinst_reconocimiento
+        text aeinst_resolrector
+        varchar(128) aeinst_telefono
+        varchar(128) aeinst_telefono2
+        text aeinst_tiktok
+        text aeinst_twitter
+        text aeinst_youtube
+        double aeusu_id
+        varchar(8) calendario
+        varchar(4) codigo
+        smallint codigo_cg1
+        real coordx
+        real coordy
+        varchar(16) zona
+    }
+    data_aeinstituciones_ {
+        varchar(128) aeinst_direccion
+        text aeinst_escudo
+        varchar(128) aeinst_fax
+        text aeinst_himno
+        double aeinst_id PK
+        text aeinst_lema
+        varchar(128) aeinst_mail
+        text aeinst_manualconvivencia
+        varchar(15) aeinst_nit
+        varchar(128) aeinst_nombre
+        text aeinst_reconocimiento
+        text aeinst_resolrector
+        varchar(128) aeinst_telefono
+        varchar(128) aeinst_telefono2
+        double aeusu_id
+    }
+    data_aeinstituciones_conf {
+        double aeinst_id
+        int aeinstconf_anolectivo
+        int aeinstconf_asistencias_umbralweek
+        bool aeinstconf_bitacora_comunications_notifier
+        text aeinstconf_bitacora_comunications_notifier_text
+        bool aeinstconf_comments_receivemail
+        int aeinstconf_excusas_limite
+        double aeinstconf_id PK
+        bool aeinstconf_mobile_comunications_notifier
+        text aeinstconf_mobile_comunications_notifier_text
+        bool aeinstconf_mobile_query
+        text aeinstconf_mobile_query_text
+        varchar(3) aeinstconf_pin_char
+        varchar(3) aeinstconf_pin_number
+        bool aeinstconf_pqr_notifier
+        text aeinstconf_pqr_notifier_text
+    }
+    data_aeinstitucionesss {
+        varchar(128) aeinst_direccion
+        text aeinst_escudo
+        varchar(128) aeinst_fax
+        text aeinst_himno
+        double aeinst_id PK
+        text aeinst_lema
+        varchar(128) aeinst_mail
+        text aeinst_manualconvivencia
+        varchar(15) aeinst_nit
+        varchar(128) aeinst_nombre
+        text aeinst_reconocimiento
+        text aeinst_resolrector
+        varchar(128) aeinst_telefono
+        varchar(128) aeinst_telefono2
+        double aeusu_id
+    }
+    data_aejornada {
+        varchar(32) aejornada_descripcion
+        int aejornada_estado
+        int aejornada_id PK
+    }
+    data_aelog_envios {
+        bigint aeestudiantes_id
+        varchar(20) destino
+        varchar(14) emisor
+        text enviosdetalles
+        timestamp fecharegistro
+        bigint idempresa
+        int idlogenvios PK
+        bigint idreferencia
+        bool sent
+        int tipo
+    }
+    data_aelogdispositivos {
+        timestamp aelogdispositivos_fecha
+        int aelogdispositivos_id PK
+        text aelogdispositivos_ip
+        text aelogdispositivos_model
+        text aelogdispositivos_platform
+        text aelogdispositivos_serial
+        text aelogdispositivos_state
+        text aelogdispositivos_target
+        text aelogdispositivos_uuid
+        text aelogdispositivos_version
+        double aeusu_id
+    }
+    data_aematriculas_academia {
+        int aeestudiantes_id
+        smallint aeestudiantesacademia_colegio_caracter
+        smallint aeestudiantesacademia_colegio_ciudad
+        smallint aeestudiantesacademia_colegio_pais
+        smallint aeestudiantesacademia_colegio_provincia
+        smallint aeestudiantesacademia_conocernos
+        varchar(255) aeestudiantesacademia_conocernos_otro
+        smallint aeestudiantesacademia_gradomatricula
+        int aeestudiantesacademia_id
+        bool aeestudiantesacademia_nuevo
+        bool aeestudiantesacademia_repitente
+    }
+    data_aematriculas_acudientes {
+        varchar(128) aeacudientes_apellidos
+        varchar(255) aeacudientes_celpersonal
+        varchar(64) aeacudientes_empresa
+        varchar(64) aeacudientes_empresacargo
+        varchar(255) aeacudientes_empresadireccion
+        bool aeacudientes_empresario
+        smallint aeacudientes_empresariotipo
+        varchar(255) aeacudientes_empresatelefono
+        int aeacudientes_id
+        varchar(16) aeacudientes_identificacion
+        varchar(128) aeacudientes_mail
+        varchar(128) aeacudientes_nombres
+        varchar(32) aeacudientes_parentezcootro
+        varchar(255) aeacudientes_telresidencia
+        smallint aeacudientes_tipoidentificacion
+        int aeusu_id
+    }
+    data_aematriculas_adjuntos {
+        text adjuntos_certificadomedico
+        text aeadjuntos_cartalaboral
+        text aeadjuntos_contrato
+        text aeadjuntos_documentoacudiente
+        text aeadjuntos_documentoestudiante
+        text aeadjuntos_documentootroestudiante
+        text aeadjuntos_documentoresponsable
+        text aeadjuntos_epsafiliacion
+        text aeadjuntos_facturaservicios
+        timestamptz aeadjuntos_fecharegistro
+        text aeadjuntos_fotoacudiente
+        text aeadjuntos_fotoestudiante
+        text aeadjuntos_fotorespfinanciero
+        int aeadjuntos_id PK
+        text aeadjuntos_pagadamatricula
+        text aeadjuntos_pagadaotroscostos
+        text aeadjuntos_pagare
+        text aeadjuntos_vacunas
+        bigint aeestudiantes_id
+    }
+    data_aematriculas_demografia {
+        int aeestudiantes_id
+        text aeestudiantesdemografia_barrio
+        int aeestudiantesdemografia_cantidadhermanas
+        int aeestudiantesdemografia_cantidadhermanos
+        bool aeestudiantesdemografia_cirugias
+        varchar(255) aeestudiantesdemografia_cirugias_cual
+        int aeestudiantesdemografia_comuna
+        int aeestudiantesdemografia_deptonacimiento
+        bool aeestudiantesdemografia_desplazado
+        text aeestudiantesdemografia_direccion
+        int aeestudiantesdemografia_discapacidad
+        varchar(32) aeestudiantesdemografia_discapacidad_otra
+        int aeestudiantesdemografia_eps
+        int aeestudiantesdemografia_estrato
+        smallint aeestudiantesdemografia_etnia
+        timestamp(6) without time zone aeestudiantesdemografia_fecharegistro
+        int aeestudiantesdemografia_gruposanguineo
+        int aeestudiantesdemografia_id PK
+        int aeestudiantesdemografia_mupionacimiento
+        int aeestudiantesdemografia_paisnacimiento
+        numeric aeestudiantesdemografia_peso
+        char(1) aeestudiantesdemografia_rh
+        bool aeestudiantesdemografia_sisben
+        numeric aeestudiantesdemografia_sisbennivel
+        text aeestudiantesdemografia_talla
+        bool aeestudiantesdemografia_tratamientoterapia
+        varchar(255) aeestudiantesdemografia_tratamientoterapia_cual
+    }
+    data_aematriculas_estudiantes {
+        bigint aeacudientes_id
+        int aeano_id
+        varchar(64) aeestudiantes_apellidos
+        varchar(32) aeestudiantes_codigo
+        text aeestudiantes_direccion
+        smallint aeestudiantes_estado
+        date aeestudiantes_fechanacimiento
+        timestamp(6) without time zone aeestudiantes_fecharegistro
+        char(1) aeestudiantes_genero
+        smallint aeestudiantes_grado
+        varchar(32) aeestudiantes_grupo
+        int aeestudiantes_id PK
+        varchar(32) aeestudiantes_identificacion
+        smallint aeestudiantes_jornada
+        text aeestudiantes_mail
+        varchar(64) aeestudiantes_nombres
+        text aeestudiantes_telefono
+        smallint aeestudiantes_tipodocumento
+        int aeinstitucion_id
+        int aeusu_id
+    }
+    data_aemediciones {
+        text aelogdispositivos_model
+        text aelogdispositivos_platform
+        text aelogdispositivos_serial
+        text aelogdispositivos_source
+        text aelogdispositivos_uuid
+        text aelogdispositivos_version
+        text aemediciones_concepto
+        double aemediciones_estudiante
+        timestamp aemediciones_fecha
+        varchar(32) aemediciones_grupo
+        double aemediciones_id PK
+        double aemediciones_valor
+        text aeusu_id
+    }
+    data_aemotivo {
+        int aeestados_id
+        int aemotivo_id PK
+        varchar aemotivo_nombre
+    }
+    data_aenotificaciones {
+        text aenotificaciones_body
+        text aenotificaciones_data
+        double aenotificaciones_de
+        int aenotificaciones_estado
+        timestamp aenotificaciones_fecha
+        double aenotificaciones_id PK
+        text aenotificaciones_para
+        double aenotificaciones_referencia
+        text aenotificaciones_ruta
+        text aenotificaciones_title
+    }
+    data_aeopcres {
+        text aeopcres_descripcion
+        bool aeopcres_estado
+        int aeopcres_id PK
+        int aeopcres_orden
+        double aeopcres_valor
+        bigint aepre_id
+    }
+    data_aepqr {
+        int aeano_id
+        int aeestados_id
+        int aeinst_id
+        varchar(500) aepqr_adjunto
+        text aepqr_contenido
+        varchar(64) aepqr_email
+        timestamp(6) without time zone aepqr_fecha
+        int aepqr_id PK
+        text aepqr_nombre
+        varchar(13) aepqr_telefono
+        int aepqr_tiposolicitud_id
+        int aepqr_usuario
+    }
+    data_aepqr_respuesta {
+        int aepqr_id
+        varchar(128) aepqr_respuesta_adjunto
+        timestamp(6) without time zone aepqr_respuesta_fecha
+        int aepqr_respuesta_id
+        text aepqr_respuesta_mensaje
+    }
+    data_aepqr_tiposolicitud {
+        varchar(16) aepqr_tiposolicitud_descripcion
+        int aepqr_tiposolicitud_id PK
+        int aepqr_tiposolicitud_vencimiento
+    }
+    data_aepre {
+        bigint aecue_id
+        text aepre_descripcion
+        bool aepre_estado
+        timestamp aepre_fechacreacion
+        bigint aepre_id PK
+        int aepre_orden
+        int aetippre_id
+    }
+    data_aepublicaciones {
+        bigint aeanol_id
+        text aeinst_id
+        bool aepublicaciones_aceptarespuestas
+        text aepublicaciones_adjunto
+        int aepublicaciones_alcance
+        text aepublicaciones_descripcion
+        int aepublicaciones_estado
+        text aepublicaciones_estudiantesid
+        timestamp aepublicaciones_fecha
+        timestamp aepublicaciones_fechafinalizacion
+        timestamp aepublicaciones_fechapublicacion
+        varchar[] aepublicaciones_grupo
+        bigint aepublicaciones_id PK
+        text aepublicaciones_titulo
+        int aepublicacionestipo_id
+        bigint aeusu_id
+    }
+    data_aepublicaciones_alerta {
+        bigint aepublicaciones_id
+        timestamp aepublicacionesalerta_fecha
+        int aepublicacionesalerta_id
+    }
+    data_aepublicaciones_comentarios {
+        bigint aepublicaciones_id
+        text aepublicacionescomentarios_descripcion
+        int aepublicacionescomentarios_estado
+        timestamp aepublicacionescomentarios_fecha
+        bigint aepublicacionescomentarios_id PK
+        bigint aeusu_id
+    }
+    data_aepublicaciones_tipo {
+        varchar(8) aepublicacionestipo_color
+        text aepublicacionestipo_descripcion
+        int aepublicacionestipo_estado
+        int aepublicacionestipo_id
+    }
+    data_aeres {
+        int aeopcres_id
+        bigint aepre_id
+        bigint aeres_id
+        text aeresp_abierta
+        bigint inst_cue_res_id
+    }
+    data_aesolicitud {
+        int aeanol_id
+        int aeinst_id
+        varchar(128) aesolicitud_destino
+        int aesolicitud_estado
+        date aesolicitud_fecha
+        time aesolicitud_hora
+        double aesolicitud_id PK
+        text aesolicitud_mensaje
+        int aetipo_certicado
+        int aeusu_id
+    }
+    data_aetar {
+        varchar(256) aetar_adjunto1
+        varchar(256) aetar_adjunto2
+        varchar(256) aetar_adjunto3
+        text aetar_descripcion
+        int aetar_estado
+        timestamp aetar_fechacreacion
+        bigint aetar_id
+        varchar(128) aetar_nombre
+    }
+    data_aetar_pro {
+        bigint aeanol_id
+        varchar(64) aeasignaciones_asignatura
+        bigint aedocentes_id
+        varchar(32) aeestudiantes_grupo
+        bigint aeinst_id
+        bigint aetar_id
+        int aetar_pro_estado
+        timestamp aetar_pro_fechalimite
+        bigint aetar_pro_id
+    }
+    data_aetar_res {
+        bigint aeestudiantes_id
+        bigint aetar_pro_id
+        varchar(256) aetar_res_adjunto1
+        varchar(256) aetar_res_adjunto2
+        varchar(256) aetar_res_adjunto3
+        bool aetar_res_aprobacion
+        text aetar_res_descripcion
+        int aetar_res_estado
+        timestamp aetar_res_fechaentrega
+        bigint aetar_res_id
+        double aetar_res_resultado
+    }
+    data_aetipint {
+        varchar(64) aetipint_descripcion
+        bool aetipint_estado
+        int aetipint_id PK
+    }
+    data_aetipo_certificado {
+        int aeestado_id
+        varchar aetipocertificado_descripcion
+        bigint aetipocertificado_id PK
+        varchar aetipocertificado_nombre
+    }
+    data_aetipo_envio {
+        int aeestado_id
+        varchar(64) aetipoenvio_descripcion
+        bigint aetipoenvio_id PK
+    }
+    data_aetipodocumento {
+        varchar(64) aetipodocumento_descripcion
+        smallint aetipodocumento_estado
+        smallint aetipodocumento_id
+        varchar(8) aetipodocumento_sigla
+    }
+    data_aetipoempresa {
+        varchar(32) aetipoempresa_descripcion
+        smallint aetipoempresa_estado
+        smallint aetipoempresa_id PK
+    }
+    data_aetipoexcusas {
+        text aetipoexcusa_descripcion
+        int aetipoexcusa_id PK
+        text aetipoexcusa_nombre
+        int aetipoexcusas_estado
+    }
+    data_aetippre {
+        varchar(64) aetippre_descripcion
+        bool aetippre_estado
+        int aetippre_id PK
+    }
+    data_inst_cue {
+        int aeano_id
+        bigint aecue_id
+        varchar(32) aeestudiantes_grupo
+        interval aeinst_cue_duracion
+        int aeinst_cue_estado
+        timestamp aeinst_cue_fechacreacion
+        timestamp aeinst_cue_fechafin
+        timestamp aeinst_cue_fechaini
+        bigint aeinst_cue_id PK
+        int aeinst_cue_intentos
+        bool aeinst_cue_ordenado
+        double aeinst_cue_resultadominimo
+        int aeinst_cue_tipointento
+        double aeinst_id
+        bigint aeusu_id
+    }
+    data_inst_cue_res {
+        bigint aeinst_cue_id
+        double aeusu_id
+        bool inst_cue_res_aprobacion
+        interval inst_cue_res_duracion
+        int inst_cue_res_estado
+        timestamptz inst_cue_res_fechafin
+        timestamptz inst_cue_res_fechaini
+        timestamptz inst_cue_res_fechaintento
+        bigint inst_cue_res_id PK
+        double inst_cue_res_resultado
+    }
+    data_inst_doce {
+        int aeanol_id
+        double aedocentes_id
+        double aeinst_id
+        int inst_doce_estado
+        double inst_doce_id PK
+    }
+    data_tipo_citacion {
+        smallint motivo_estado
+        int motivo_id PK
+        varchar(200) motivo_nombre
+    }
+    contact_aetempmesstype ||--o{ contact_aetempmess : "aetempmess_type -> aetempmesstype_id"
+    data_aeinstituciones ||--o{ contact_aetempmesssede : "aeinst_id -> aeinst_id"
+    contact_aetempmesstype ||--o{ contact_aetempmesssede : "aetempmesstype_id -> aetempmesstype_id"
+    data_aeestados ||--o{ contact_emisor : "estado -> aeestados_id"
+    data_aeinstituciones ||--o{ contact_emisor : "idempresa -> aeinst_id"
+    data_aeavisos ||--o{ data_aeavisos_comentarios : "aeavisos_id -> aeavisos_id"
+    data_aeavisosinternal ||--o{ data_aeavisosinternal_comentarios : "aeavisosinternal_id -> aeavisosinternal_id"
+    data_aebitacora ||--o{ data_aebitacora_comentarios : "aebitacora_id -> aebitacora_id"
+    data_aeano ||--o{ data_aecitaciones : "aeanol_id -> aeano_id"
+    data_aeinstituciones ||--o{ data_aecitaciones : "aeinst_id -> aeinst_id"
+    data_aemotivo ||--o{ data_aecitaciones : "aemotivo_id -> aemotivo_id"
+    data_aeconsultasdocentes ||--o{ data_aeconsultasdocentes_comentarios : "aeconsultasdocentes_id -> aeconsultasdocentes_id"
+    data_aetipoexcusas ||--o{ data_aeexcusas : "aetipoexcusa_id -> aetipoexcusa_id"
+    data_aeexcusas ||--o{ data_aeexcusas_respuestas : "aeexcusas_id -> aeexcusas_id"
+    data_aematriculas_estudiantes ||--o{ data_aematriculas_academia : "aeestudiantes_id -> aeestudiantes_id"
+    data_aecaracter ||--o{ data_aematriculas_academia : "aeestudiantesacademia_colegio_caracter -> aecaracter_id"
+    data_aeconocer ||--o{ data_aematriculas_academia : "aeestudiantesacademia_conocernos -> aeconocer_id"
+    data_aetipoempresa ||--o{ data_aematriculas_acudientes : "aeacudientes_empresariotipo -> aetipoempresa_id"
+    data_aematriculas_estudiantes ||--o{ data_aematriculas_adjuntos : "aeestudiantes_id -> aeestudiantes_id"
+    data_aematriculas_estudiantes ||--o{ data_aematriculas_demografia : "aeestudiantes_id -> aeestudiantes_id"
+    data_aediscapacidades ||--o{ data_aematriculas_demografia : "aeestudiantesdemografia_discapacidad -> aediscapacidades_id"
+    data_aeeps ||--o{ data_aematriculas_demografia : "aeestudiantesdemografia_eps -> aeeps_id"
+    data_aeetnias ||--o{ data_aematriculas_demografia : "aeestudiantesdemografia_etnia -> aeetnias_id"
+    data_aegruposanguineo ||--o{ data_aematriculas_demografia : "aeestudiantesdemografia_gruposanguineo -> aegruposanguineo_id"
+    data_aegrados ||--o{ data_aematriculas_estudiantes : "aeestudiantes_grado -> aegrados_id"
+    data_aeestudiantes ||--o{ data_aematriculas_estudiantes : "aeestudiantes_id -> aeestudiantes_id"
+    data_aejornada ||--o{ data_aematriculas_estudiantes : "aeestudiantes_jornada -> aejornada_id"
+    data_aetipodocumento ||--o{ data_aematriculas_estudiantes : "aeestudiantes_tipodocumento -> aetipodocumento_id"
+    data_aepre ||--o{ data_aeopcres : "aepre_id -> aepre_id"
+    data_aepqr_tiposolicitud ||--o{ data_aepqr : "aepqr_tiposolicitud_id -> aepqr_tiposolicitud_id"
+    data_aepqr ||--o{ data_aepqr_respuesta : "aepqr_id -> aepqr_id"
+    data_aetippre ||--o{ data_aepre : "aetippre_id -> aetippre_id"
+    data_aeano ||--o{ data_aepublicaciones : "aeanol_id -> aeano_id"
+    data_aepublicaciones ||--o{ data_aepublicaciones_alerta : "aepublicaciones_id -> aepublicaciones_id"
+    data_aepublicaciones ||--o{ data_aepublicaciones_comentarios : "aepublicaciones_id -> aepublicaciones_id"
+    data_inst_cue_res ||--o{ data_aeres : "inst_cue_res_id -> inst_cue_res_id"
+    data_aeinstituciones ||--o{ data_aesolicitud : "aeinst_id -> aeinst_id"
+    data_aetar ||--o{ data_aetar_pro : "aetar_id -> aetar_id"
+    data_aetar_pro ||--o{ data_aetar_res : "aetar_pro_id -> aetar_pro_id"
+    data_aecue ||--o{ data_inst_cue : "aecue_id -> aecue_id"
+    data_aeinstituciones ||--o{ data_inst_cue : "aeinst_id -> aeinst_id"
+    data_inst_cue ||--o{ data_inst_cue_res : "aeinst_cue_id -> aeinst_cue_id"

@@ -1,0 +1,1081 @@
+erDiagram
+    %% Dominio académico SAE
+    estadistica_tabhistvis {
+        int chisesta
+        timestamp(6) without time zone chistfech
+        int chistid PK
+        varchar(200) chistpage
+        int cusuaid
+        varchar(20) cusuatip
+    }
+    integration_tabenla {
+        text cenladesc
+        text cenladesccamp
+        text cenladescextr
+        int cenlaesta
+        int cenlaid PK
+    }
+    integration_tabregiacti {
+        date cregiactifech
+        time cregiactihora
+        real cregiactiid PK
+        varchar(15) cregiactiip
+        varchar(16) cregiactinave
+        text cregiactiregi
+        varchar(14) cregiactisecu
+        int cusuaid
+    }
+    logic_tabmenu {
+        text cmenudesc
+        text cmenudest
+        int cmenuesta
+        int cmenuid PK
+        text cmenunomb
+        int cmenuorde
+    }
+    logic_tabopcimenu {
+        text copcimenudesc
+        text copcimenuenla
+        int copcimenuesta
+        text copcimenuicon
+        int copcimenuid PK
+        int copcimenumenu
+        text copcimenunomb
+        int copcimenuorde
+    }
+    logic_tabroll {
+        int cenlaid
+        text crolldesc
+        int crollesta
+        int crollid PK
+        varchar(20) crollnomb
+        text crollpagientr
+    }
+    logic_tabrollopci {
+        int copcimenuid
+        int crollid
+        int crollopciesta
+        int crollopciid PK
+    }
+    logic_tabusua {
+        int cusuaesta
+        int cusuaid PK
+        text cusuallave
+        text cusuanick
+        text cusuanomb
+        int cusuaroll
+    }
+    logic_tabusuaopci {
+        int cusuaopciesta
+        int cusuaopciid PK
+        int cusuaopciopcimenu
+        int cusuaopciusua
+    }
+    observador_tabobsplan {
+        int cestaobsplan
+        int cinstid
+        int cobsplanid PK
+        text cparrobsplan1
+        text cparrobsplan2
+        varchar(100) ctituobsplan
+    }
+    observador_tabresp {
+        int cinstid
+        text cpespdesc
+        varchar(100) cpespnomb
+        int crespesta
+        int crespid PK
+    }
+    observador_tabrespeval {
+        int cevalsubid
+        int cmatrid
+        int cperiid
+        int crespevalesta
+        timestamp(6) without time zone crespevalfech
+        text crespevalhist
+        int crespevalid PK
+        int crespsubid
+    }
+    observador_tabrespobs {
+        int cmatrid
+        int cperiid
+        int crespid
+        text crespobsdesc
+        int crespobsesta
+        timestamp(6) without time zone crespobsfech
+        text crespobshist
+        int crespobsid PK
+    }
+    observador_tabrespsub {
+        int crespid
+        text crespsubdesc
+        int crespsubesta
+        int crespsubid PK
+        varchar(200) crespsubnomb
+    }
+    preescolar_tabpreambi {
+        text cambicode
+        text cambicome
+        text cambidesc
+        int cambiesta
+        int cambiid PK
+    }
+    preescolar_tabpreasig {
+        int cambiid
+        int casigdura
+        int ccursid
+        int cdimeid
+        int cdoceid
+        date cpreasigfechregi
+        time(6) without time zone cpreasiggradfina
+        time(6) without time zone cpreasiggradinic
+        int cpreasigid PK
+        int cpreasigsesta
+    }
+    preescolar_tabpredime {
+        varchar(4) cdimeabre
+        text cdimecode
+        text cdimecome
+        text cdimedesc
+        int cdimeesta
+        int cdimeid PK
+    }
+    preescolar_tabprenota {
+        int ccompid
+        int cmatrid
+        int cperiid
+        int cpreasigid
+        int cprenotaesta
+        date cprenotafech
+        timestamp(6) without time zone cprenotafechregi
+        int cprenotaid PK
+        text cprenotaobse
+        double cprenotavalo
+    }
+    preescolar_tabprenove {
+        int cmatrid
+        int cperiid
+        int cpreasigid
+        int cprenoveesta
+        date cprenovefech
+        timestamp(6) without time zone cprenovefechregi
+        int cprenoveid PK
+        text cprenoveobse
+        int cpretiponoveid
+    }
+    public_aeconsultas {
+        text aeconsultas_contenido
+        int aeconsultas_destino
+        int aeconsultas_estado
+        date aeconsultas_fpublicacion
+        int aeconsultas_id
+        int aeconsultas_usuario
+    }
+    public_aeconsultas_Inst {
+        text aeconsultas_contenido
+        int aeconsultas_destino
+        int aeconsultas_estado
+        date aeconsultas_fpublicacion
+        int aeconsultas_id
+        int aeconsultas_usuario
+    }
+    public_anolperi {
+        text anolperidesc
+        int anolperiesta
+        date anolperifechfina
+        date anolperifechinic
+        timestamp(6) without time zone anolperifechregi
+        int anolperiid PK
+        double anolperivalo
+        int canolid
+        int cinstid
+        int cperiid
+    }
+    public_asigcurs {
+        int asigcursid PK
+        int casigcursesta
+        date casigcursfechregi
+        double casigdura
+        time(6) without time zone casiggradfina
+        time(6) without time zone casiggradinic
+        int casigid
+        int ccursid
+        int cdoceid
+    }
+    public_asigcurscomp {
+        int asigcurscompesta
+        int asigcurscompid
+        int asigcursid
+        int ccompid
+    }
+    public_asigcurscontprog {
+        int asigcurscontprogesta
+        int asigcurscontprogid PK
+        int asigcursid
+        date casigcurscontprogfech
+        timestamp(6) without time zone casigcurscontprogfechregi
+        int ccontprogid
+    }
+    public_avisrolldest {
+        int cavisrolldestesta
+        int cavisrolldestid PK
+        int cavisrollid
+        int cavisusuadest
+        date cavisusuafechfina
+        date cavisusuafechinic
+        timestamp(6) without time zone cavisusuafechregi
+        int crollid
+    }
+    public_contact.aetempmess {
+        int aetempmess_estado
+        text aetempmess_guia
+        int aetempmess_id PK
+        text aetempmess_text
+        int aetempmess_type
+    }
+    public_contact.aetempmesssede {
+        bigint aeinst_id
+        int aetempmess_estado
+        text aetempmess_guia
+        int aetempmess_id PK
+        text aetempmess_text
+        int aetempmess_type
+    }
+    public_contact.aetempmesstype {
+        int aetempmesstype_estado
+        int aetempmesstype_id PK
+        text aetempmesstype_text
+    }
+    public_contact.aetempmessvars {
+        text aetempmessvars_comentario
+        int aetempmessvars_estado
+        int aetempmessvars_id PK
+        varchar(19) aetempmessvars_nombre
+    }
+    public_events {
+        varchar(7) color
+        timestamp fin
+        int id
+        timestamp inicio
+        varchar(255) title
+    }
+    public_instarea {
+        int careaid
+        int cinstareaesta
+        date cinstareafechregi
+        int cinstareaid PK
+        int cinstid
+    }
+    public_sorteo {
+        int id
+        text nombre
+    }
+    public_tabanol {
+        varchar(20) canoldesc
+        int canolesta
+        date canolfina
+        int canolid PK
+        date canolinic
+    }
+    public_tabarea {
+        text careacome
+        text careadesc
+        int careaesta
+        int careaid PK
+    }
+    public_tabareaconf {
+        int canolid
+        int careaconfesta
+        int careaconfid
+        double careaconfvalo
+        int casigid
+        int cgradid
+        int cinstid
+    }
+    public_tabasig {
+        int careaid
+        varchar(4) casigabre
+        text casigdesc
+        int casigesta
+        bool casigeval
+        int casigid PK
+    }
+    public_tabavisroll {
+        int cavisorollusua
+        text cavisrollcont
+        int cavisrollesta
+        timestamp(6) without time zone cavisrollfechregi
+        int cavisrollid PK
+        text cavisrollimag
+        text cavisrolltitu
+    }
+    public_tabavisusua {
+        int cavisorollusua
+        text cavisusuacont
+        int cavisusuadest
+        int cavisusuaesta
+        date cavisusuafechfina
+        date cavisusuafechinic
+        timestamp(6) without time zone cavisusuafechregi
+        int cavisusuaid PK
+        text cavisusuaimag
+        text cavisusuatitu
+    }
+    public_tabcapa {
+        varchar(64) ccapadesc
+        int ccapaesta
+        int ccapaid PK
+    }
+    public_tabcara {
+        varchar(128) ccaradesc
+        int ccaraesta
+        int ccaraid PK
+    }
+    public_tabcarg {
+        text ccargdesc
+        int ccargesta
+        int ccargid PK
+    }
+    public_tabcerti {
+        int ccertiid PK
+        int cinstid
+        text cparra1cert
+        text cparra2cert
+        text ctitucert
+    }
+    public_tabciud {
+        text cciuddesc
+        int cciudgesta
+        int cciudid PK
+        int cdepageogid
+    }
+    public_tabcomp {
+        int careaid
+        int casigid
+        text ccompcodi
+        text ccompdesc
+        int ccompesta
+        int ccompid
+        text ccompobse
+        int ccomptipid
+        text cgradid
+        int cinstid
+    }
+    public_tabcompestu {
+        int asigcurscompid
+        int ccompestuesta
+        timestamp ccompestufechregi
+        int ccompestuid
+        int cmatrid
+        int cperiid
+    }
+    public_tabconf {
+        text cconfdesc
+        int cconfesta
+        int cconfid PK
+    }
+    public_tabconfig {
+        text cconfigemail
+        int cconfigesta
+        int cconfigid PK
+    }
+    public_tabconfigvar {
+        bool cconfaccestu
+        bool cconfbol
+        int cconfpp
+        int cconfvarid PK
+        int cinstid
+    }
+    public_tabcons {
+        int cconsid PK
+        int cinstid
+        text cparra1cons
+        text cparra2cons
+        text ctitucons
+    }
+    public_tabcontprog {
+        int casigid
+        varchar(8) ccontprogcodi
+        text ccontprogdesc
+        int ccontprogesta
+        int ccontprogid PK
+    }
+    public_tabcurs {
+        int canolid
+        int ccurscoor
+        int ccursdire
+        int ccursesta
+        int ccursid PK
+        int ccurslimiestu
+        text ccursnomb
+        int cgradid
+        int cinstid
+        int cjornid
+        int csedeid
+    }
+    public_tabcursem {
+        int anolperiid
+        int ccursemesta
+        int ccursemid PK
+        int ccursid
+    }
+    public_tabdepageog {
+        text cdepageogdesc
+        int cdepageogesta
+        int cdepageogid PK
+    }
+    public_tabdisc {
+        varchar(64) cdiscdesc
+        int cdiscesta
+        int cdiscid PK
+    }
+    public_tabdisci {
+        varchar(4) cdiscabre
+        int cdiscesta
+        int cdisciid PK
+        text cdiscnomb
+    }
+    public_tabdiscinst {
+        int cdisciid
+        int cdiscinstid PK
+        int cestainstdisc
+        int cinstid
+    }
+    public_tabdiscnota {
+        int cdiscinstid
+        timestamp(6) without time zone cdiscnotafech
+        date cdiscnotafechregi
+        int cdiscnotaid PK
+        text cdiscnotaobse
+        double cdiscnotavalo
+        int cestadiscnota
+        int cmatrid
+        int cperiid
+    }
+    public_tabdoce {
+        text cdoceapel
+        text cdoceapel2
+        varchar(30) cdocecelu
+        varchar(100) cdocedire
+        varchar(45) cdoceemai
+        int cdoceesta
+        date cdocefechingr
+        date cdocefechregi
+        text cdocefirm
+        date cdocefnac
+        varchar(100) cdocefoto
+        int cdoceid PK
+        varchar(15) cdoceiden
+        text cdocenomb
+        text cdocenomb2
+        int cdocenombrado
+        int cdocesexo
+        varchar(30) cdocetele
+        int cdocetipoiden
+        int cdocetiposang
+    }
+    public_tabempr {
+        text cemprdesc
+        text cemprdire
+        int cempresta
+        int cemprid PK
+        text cemprpers
+        text cemprtele
+    }
+    public_tabesca {
+        int canolid
+        int cescacualid
+        double cescadesd
+        double cescahast
+        int cescaid PK
+        int cescanaciid
+        int cinstid
+    }
+    public_tabescacual {
+        text cescacualdesc
+        int cescacualesta
+        int cescacualid PK
+    }
+    public_tabescanaci {
+        text cescanacidesc
+        int cescanaciesta
+        int cescanaciid PK
+    }
+    public_tabespeinst {
+        varchar(45) cespeinstdesc
+        int cespeinstesta
+        int cespeinstid PK
+    }
+    public_tabestacurs {
+        text cestacursdesc
+        int cestacursesta
+        int cestacursid PK
+    }
+    public_tabestagene {
+        text cestagenedesc
+        int cestageneid PK
+    }
+    public_tabestagrad {
+        text cestagraddesc
+        int cestagradesta
+        int cestagradid PK
+    }
+    public_tabestr {
+        int cestrdesc
+        int cestresta
+        int cestrid PK
+    }
+    public_tabestu {
+        text cestuapel
+        text cestuapel2
+        text cestudire
+        varchar(45) cestuemai
+        int cestuesta
+        date cestufechnaci
+        text cestufoto
+        int cestugene
+        int cestuid PK
+        varchar(20) cestuiden
+        int cestuidenexpedepa
+        int cestuidenexpemuni
+        int cestuluganacidepa
+        int cestuluganacimuni
+        text cestunomb
+        text cestunomb2
+        text cestutele
+        int cestutiposang
+        int ctipodocuid
+    }
+    public_tabestuacud {
+        text cestuacuddire
+        text cestuacudemai
+        int cestuacudesta
+        int cestuacudid PK
+        text cestuacudiden
+        text cestuacudnomb
+        int cestuacudpare
+        text cestuacudtele
+        int cmatrid
+    }
+    public_tabestuotrodato {
+        varchar(1) cestuotrodatobenehero
+        varchar(1) cestuotrodatobenevete
+        int cestuotrodatocapa
+        int cestuotrodatodisc
+        int cestuotrodatoesta
+        int cestuotrodatoetni
+        int cestuotrodatofuerec
+        varchar(1) cestuotrodatohijomadrhoga
+        int cestuotrodatoid PK
+        varchar(1) cestuotrodatomadrhoga
+        int cestuotrodatonomicbf
+        varchar(1) cestuotrodatoprovpriv
+        varchar(1) cestuotrodatosubs
+        int cmatrid
+    }
+    public_tabestusociecon {
+        int cestusociecondeparesi
+        int cestusocieconesta
+        int cestusocieconestr
+        int cestusocieconid PK
+        int cestusocieconmuniprov
+        int cestusocieconmuniresi
+        int cestusocieconsisb
+        int cestusocieconultidepaexpu
+        int cestusocieconultimuniexpu
+        int cestusocieconvictconf
+        int cestusocieconzonaresi
+        int cestusocieregu
+        int cmatrid
+    }
+    public_tabetni {
+        int cetnicodi
+        text cetnidesc
+        int cetniesta
+        int cetniid PK
+    }
+    public_tabeval {
+        text cevaldesc
+        int cevalesta
+        int cevalid PK
+        varchar(50) cevaltipo
+    }
+    public_tabevalsub {
+        double cevalfin
+        int cevalid
+        double cevalini
+        varchar(100) cevalnomb
+        varchar(4) cevalsigl
+        int cevalsubesta
+        int cevalsubid PK
+        int cinstid
+    }
+    public_tabfirm {
+        int cdoceid
+        int cestafirm
+        varchar(50) cfirmcarg
+        int cfirmid PK
+        int cfirmorde
+        int cfirmtipo
+        int cinstid
+    }
+    public_tabfuenrecu {
+        text cfuenrecudesc
+        int cfuenrecuesta
+        int cfuenrecuid PK
+    }
+    public_tabgrad {
+        int cgradcodi
+        text cgraddesc
+        int cgradesta
+        int cgradid PK
+        text cgradnive
+    }
+    public_tabicbf {
+        int cestaicbf
+        int cicbfid
+        text cnombicbf
+    }
+    public_tabinst {
+        varchar(8) cinstcalendario
+        int cinstcara
+        int cinstciud
+        varchar(20) cinstcodidane
+        real cinstcoordx
+        real cinstcoordy
+        int cinstdepa
+        text cinstdire
+        text cinstemai
+        text cinstescu
+        int cinstesta
+        text cinstfacebook
+        varchar(100) cinstfirm
+        text cinsthimno
+        int cinstid PK
+        text cinstinstagram
+        text cinstlema
+        text cinstmanualconvivencia
+        text cinstnit
+        text cinstnomb
+        int cinstpadre
+        text cinstreconocimiento
+        text cinstresolrector
+        text cinsttele
+        text cinsttiktok
+        text cinsttwitter
+        text cinstyoutube
+        int tabespeinst_cespeinstid
+        int tabmetoinst_cmetoinst
+        int tabzonaresi_czonaresiid
+    }
+    public_tabinstdoce {
+        int canolid
+        int ccargid
+        int cdoceid
+        int cinstdocearp
+        int cinstdocears
+        int cinstdocecaja
+        int cinstdoceeps
+        int cinstdoceesta
+        date cinstdocefechfina
+        date cinstdocefechinic
+        date cinstdocefechregi
+        int cinstdoceid PK
+        int cinstdocesala
+        int cinstid
+        int cjefearea
+        int ctipovincid
+    }
+    public_tabinstreso {
+        text cinstcolcar
+        int cinstdec
+        int cinstid
+        text cinstresodesc
+        int cinstresoid PK
+        int cinsttipar
+    }
+    public_tabinstsede {
+        int cinstid
+        int csedeid PK
+        text csedenomb
+    }
+    public_tabjorn {
+        varchar(20) cjorndesc
+        int cjornesta
+        int cjornid PK
+    }
+    public_tablogcomp {
+        int casigid
+        int ccompid
+        int ccontprogid
+        int cgradid
+        int clogcompid PK
+        timestamp(6) without time zone cnotafechregi
+    }
+    public_tabmatr {
+        int ccursid
+        int cestuid
+        double cmatrdesc
+        int cmatresta
+        date cmatrfech
+        int cmatrianopasacond
+        int cmatrianopasasitu
+        int cmatrid PK
+        int cmatrinst
+        bool cmatrirepi
+        bool cmatrnuevestu
+        double cmatrvaloinsc
+        double cmatrvalopens
+    }
+    public_tabmatrpago {
+        int cmatrid
+        int cmatrpagoesta
+        date cmatrpagofech
+        int cmatrpagoid PK
+        int cmatrpagoperi
+    }
+    public_tabmetoinst {
+        text cmetoinstdesc
+        int cmetoinstesta
+        int cmetoinstid PK
+    }
+    public_tabnota {
+        int asigcursid
+        int ccompid
+        int cmatrid
+        int cnotaesta
+        date cnotafech
+        timestamp(6) without time zone cnotafechregi
+        int cnotaid PK
+        text cnotaobse
+        double cnotavalo
+        int cperiid
+    }
+    public_tabnota2013 {
+        int asigcursid
+        int ccompid
+        int cmatrid
+        int cnotaesta
+        date cnotafech
+        timestamp(6) without time zone cnotafechregi
+        int cnotaid PK
+        text cnotaobse
+        double cnotavalo
+        int cperiid
+    }
+    public_tabnota2014 {
+        int asigcursid
+        int ccompid
+        int cmatrid
+        int cnotaesta
+        date cnotafech
+        timestamp(6) without time zone cnotafechregi
+        int cnotaid PK
+        text cnotaobse
+        double cnotavalo
+        int cperiid
+    }
+    public_tabnota2015 {
+        int asigcursid
+        int ccompid
+        int cmatrid
+        int cnotaesta
+        date cnotafech
+        timestamp(6) without time zone cnotafechregi
+        int cnotaid PK
+        text cnotaobse
+        double cnotavalo
+        int cperiid
+    }
+    public_tabnota2016 {
+        int asigcursid
+        int ccompid
+        int cmatrid
+        int cnotaesta
+        date cnotafech
+        timestamp(6) without time zone cnotafechregi
+        int cnotaid PK
+        text cnotaobse
+        double cnotavalo
+        int cperiid
+    }
+    public_tabnotadef {
+        int asigcursid
+        int cmatrid
+        int cnotadefesta
+        timestamp(6) without time zone cnotadeffech
+        date cnotadeffechregi
+        int cnotadefid PK
+        text cnotadefobse
+        double cnotadefvalo
+        int cperiid
+        int ctipodeseid
+    }
+    public_tabnotahist {
+        int asigcursid
+        int ccompid
+        int cmatrid
+        int cnotaesta
+        date cnotafech
+        timestamp(6) without time zone cnotafechregi
+        int cnotaid PK
+        text cnotaobse
+        double cnotavalo
+        int cperiid
+    }
+    public_tabnove {
+        int asigcursid
+        int cmatrid
+        int cnoveesta
+        date cnovefech
+        timestamp(6) without time zone cnovefechregi
+        int cnoveid PK
+        text cnoveobse
+        int cperiid
+        int ctiponoveid
+    }
+    public_tabpare {
+        text cparedesc
+        int cpareesta
+        int cpareid PK
+    }
+    public_tabpazsalv {
+        int cestapazsal
+        int cinstid
+        text cparrpazsalv1
+        text cparrpazsalv2
+        int cpazsalvid PK
+        varchar(100) ctitupazsalv1
+        varchar(100) ctitupazsalv2
+    }
+    public_tabperi {
+        int cperidesc
+        int cperiesta
+        int cperiid PK
+        text cperinomb
+    }
+    public_tabperival {
+        int canolperiid
+        text cperivaldesc
+        int cperivalesta
+        int cperivalid PK
+    }
+    public_tabpromasig {
+        int asigcursid
+        int canolid
+        int careaid
+        int cpromasigesta
+        int cpromasigid
+        double cpromasigpond
+        double cpromasigprom
+        int cpromoid
+    }
+    public_tabpromdef {
+        int cmatrid
+        int cperiid
+        int cpromdefesta
+        int cpromdefid PK
+        double cpromdefvalo
+        int ctipopromid
+    }
+    public_tabpromo {
+        int cgradodesde
+        int cgradopara
+        bool cpromdef
+        double cpromfin
+        int cpromoesta
+        int cpromoid PK
+    }
+    public_tabresg {
+        text cresgcodi
+        text cresgdesc
+        int cresgesta
+        int cresgid PK
+    }
+    public_tabsexo {
+        text csexodesc
+        int csexoesta
+        int csexoid PK
+    }
+    public_tabsie {
+        int canolid
+        int cinstid
+        bit(1) clibsie
+        int csieesta
+        int csieid PK
+        int ctipodeseid
+        double cvalprosie
+    }
+    public_tabsisb {
+        text csisbdesc
+        int csisbesta
+        int csisbid PK
+    }
+    public_tabsucu {
+        char(1) csucuclas
+        int csucucodi
+        text csucudesc
+        text csucudire
+        int csucuidpunt PK
+        double csuculati
+        double csuculong
+    }
+    public_tabtipodese {
+        text cdesctipodese
+        int cestatipdese
+        int ctipodeseid PK
+    }
+    public_tabtipodocu {
+        text ctipodocudesc
+        int ctipodocuesta
+        int ctipodocuid PK
+    }
+    public_tabtiponota {
+        text ctiponotadesc
+        int ctiponotaesta
+        int ctiponotaid PK
+    }
+    public_tabtiponove {
+        varchar(2) ctiponoveabre
+        text ctiponovedesc
+        int ctiponoveesta
+        int ctiponoveid PK
+    }
+    public_tabtiposang {
+        varchar(20) ctiposangdesc
+        int ctiposangesta
+        int ctiposangid PK
+    }
+    public_tabtiposubs {
+        text ctiposubsdesc
+        int ctiposubsesta
+        int ctiposubsid PK
+    }
+    public_tabtipovinc {
+        text ctipovincdesc
+        int ctipovincesta
+        int ctipovincid PK
+    }
+    public_tabunio {
+        int cacadid
+        int cunioesta
+        int cunioid PK
+        int cusuaid
+    }
+    public_tabutil {
+        int ccursid
+        int cutilcant
+        text cutildesc
+        int cutilid PK
+    }
+    public_tabzonaresi {
+        text czonaresidesc
+        int czonaresiesta
+        int czonaresiid PK
+    }
+    public_tipo_citacion {
+        smallint motivo_estado
+        int motivo_id PK
+        varchar(200) motivo_nombre
+    }
+    public_tabinst ||--o{ observador_tabobsplan : "cinstid -> cinstid"
+    public_tabinst ||--o{ observador_tabresp : "cinstid -> cinstid"
+    public_tabmatr ||--o{ observador_tabrespeval : "cmatrid -> cmatrid"
+    observador_tabrespsub ||--o{ observador_tabrespeval : "crespsubid -> crespsubid"
+    observador_tabresp ||--o{ observador_tabrespobs : "crespid -> crespid"
+    observador_tabresp ||--o{ observador_tabrespsub : "crespid -> crespid"
+    preescolar_tabpreambi ||--o{ preescolar_tabpreasig : "cambiid -> cambiid"
+    public_tabcurs ||--o{ preescolar_tabpreasig : "ccursid -> ccursid"
+    preescolar_tabpredime ||--o{ preescolar_tabpreasig : "cdimeid -> cdimeid"
+    public_tabmatr ||--o{ preescolar_tabprenota : "cmatrid -> cmatrid"
+    preescolar_tabpreasig ||--o{ preescolar_tabprenota : "cpreasigid -> cpreasigid"
+    public_tabmatr ||--o{ preescolar_tabprenove : "cmatrid -> cmatrid"
+    public_anolperi ||--o{ preescolar_tabprenove : "cperiid -> anolperiid"
+    preescolar_tabpreasig ||--o{ preescolar_tabprenove : "cpreasigid -> cpreasigid"
+    public_tabtiponove ||--o{ preescolar_tabprenove : "cpretiponoveid -> ctiponoveid"
+    public_tabanol ||--o{ public_anolperi : "canolid -> canolid"
+    public_tabinst ||--o{ public_anolperi : "cinstid -> cinstid"
+    public_tabperi ||--o{ public_anolperi : "cperiid -> cperiid"
+    public_tabasig ||--o{ public_asigcurs : "casigid -> casigid"
+    public_tabcurs ||--o{ public_asigcurs : "ccursid -> ccursid"
+    public_asigcurs ||--o{ public_asigcurscomp : "asigcursid -> asigcursid"
+    public_tabcomp ||--o{ public_asigcurscomp : "ccompid -> ccompid"
+    public_asigcurs ||--o{ public_asigcurscontprog : "asigcursid -> asigcursid"
+    public_tabcontprog ||--o{ public_asigcurscontprog : "ccontprogid -> ccontprogid"
+    public_tabestagene ||--o{ public_avisrolldest : "cavisrolldestesta -> cestageneid"
+    public_tabavisroll ||--o{ public_avisrolldest : "cavisrollid -> cavisrollid"
+    logic_tabroll ||--o{ public_avisrolldest : "crollid -> crollid"
+    public_contact.aetempmesstype ||--o{ public_contact.aetempmess : "aetempmess_type -> aetempmesstype_id"
+    public_contact.aetempmesstype ||--o{ public_contact.aetempmesssede : "aetempmess_type -> aetempmesstype_id"
+    public_tabarea ||--o{ public_instarea : "careaid -> careaid"
+    public_tabasig ||--o{ public_tabareaconf : "casigid -> casigid"
+    public_tabgrad ||--o{ public_tabareaconf : "cgradid -> cgradid"
+    public_tabinst ||--o{ public_tabareaconf : "cinstid -> cinstid"
+    public_tabarea ||--o{ public_tabasig : "careaid -> careaid"
+    logic_tabusua ||--o{ public_tabavisroll : "cavisorollusua -> cusuaid"
+    public_tabestagene ||--o{ public_tabavisroll : "cavisrollesta -> cestageneid"
+    logic_tabusua ||--o{ public_tabavisusua : "cavisorollusua -> cusuaid"
+    public_tabestagene ||--o{ public_tabavisusua : "cavisusuaesta -> cestageneid"
+    public_tabinst ||--o{ public_tabcerti : "cinstid -> cinstid"
+    public_tabdepageog ||--o{ public_tabciud : "cdepageogid -> cdepageogid"
+    public_asigcurscomp ||--o{ public_tabcompestu : "asigcurscompid -> asigcurscompid"
+    public_tabinst ||--o{ public_tabcons : "cinstid -> cinstid"
+    public_tabanol ||--o{ public_tabcurs : "canolid -> canolid"
+    public_tabgrad ||--o{ public_tabcurs : "cgradid -> cgradid"
+    public_tabinst ||--o{ public_tabcurs : "cinstid -> cinstid"
+    public_tabjorn ||--o{ public_tabcurs : "cjornid -> cjornid"
+    public_tabdisci ||--o{ public_tabdiscinst : "cdisciid -> cdisciid"
+    public_tabdiscinst ||--o{ public_tabdiscnota : "cdiscinstid -> cdiscinstid"
+    public_tabmatr ||--o{ public_tabdiscnota : "cmatrid -> cmatrid"
+    public_tabanol ||--o{ public_tabesca : "canolid -> canolid"
+    public_tabescacual ||--o{ public_tabesca : "cescacualid -> cescacualid"
+    public_tabescanaci ||--o{ public_tabesca : "cescanaciid -> cescanaciid"
+    public_tabinst ||--o{ public_tabesca : "cinstid -> cinstid"
+    public_tabestagene ||--o{ public_tabestu : "cestuesta -> cestageneid"
+    public_tabtipodocu ||--o{ public_tabestu : "ctipodocuid -> ctipodocuid"
+    public_tabpare ||--o{ public_tabestuacud : "cestuacudpare -> cpareid"
+    public_tabmatr ||--o{ public_tabestuacud : "cmatrid -> cmatrid"
+    public_tabcapa ||--o{ public_tabestuotrodato : "cestuotrodatocapa -> ccapaid"
+    public_tabdisc ||--o{ public_tabestuotrodato : "cestuotrodatodisc -> cdiscid"
+    public_tabestagene ||--o{ public_tabestuotrodato : "cestuotrodatoesta -> cestageneid"
+    public_tabetni ||--o{ public_tabestuotrodato : "cestuotrodatoetni -> cetniid"
+    public_tabdepageog ||--o{ public_tabestusociecon : "cestusociecondeparesi -> cdepageogid"
+    public_tabestr ||--o{ public_tabestusociecon : "cestusocieconestr -> cestrid"
+    public_tabciud ||--o{ public_tabestusociecon : "cestusocieconmuniresi -> cciudid"
+    public_tabsisb ||--o{ public_tabestusociecon : "cestusocieconsisb -> csisbid"
+    public_tabmatr ||--o{ public_tabestusociecon : "cmatrid -> cmatrid"
+    public_tabeval ||--o{ public_tabevalsub : "cevalid -> cevalid"
+    public_tabinst ||--o{ public_tabfirm : "cinstid -> cinstid"
+    public_tabestagene ||--o{ public_tabgrad : "cgradesta -> cestageneid"
+    public_tabcara ||--o{ public_tabinst : "cinstcara -> ccaraid"
+    public_tabciud ||--o{ public_tabinst : "cinstciud -> cciudid"
+    public_tabdepageog ||--o{ public_tabinst : "cinstdepa -> cdepageogid"
+    public_tabestagene ||--o{ public_tabinst : "cinstesta -> cestageneid"
+    public_tabestagene ||--o{ public_tabinst : "cinstesta -> cestageneid"
+    public_tabespeinst ||--o{ public_tabinst : "tabespeinst_cespeinstid -> cespeinstid"
+    public_tabmetoinst ||--o{ public_tabinst : "tabmetoinst_cmetoinst -> cmetoinstid"
+    public_tabzonaresi ||--o{ public_tabinst : "tabzonaresi_czonaresiid -> czonaresiid"
+    public_tabanol ||--o{ public_tabinstdoce : "canolid -> canolid"
+    public_tabcarg ||--o{ public_tabinstdoce : "ccargid -> ccargid"
+    public_tabdoce ||--o{ public_tabinstdoce : "cdoceid -> cdoceid"
+    public_tabestagene ||--o{ public_tabinstdoce : "cinstdoceesta -> cestageneid"
+    public_tabinst ||--o{ public_tabinstdoce : "cinstid -> cinstid"
+    public_tabtipovinc ||--o{ public_tabinstdoce : "ctipovincid -> ctipovincid"
+    public_tabinst ||--o{ public_tabinstreso : "cinstid -> cinstid"
+    public_tabcurs ||--o{ public_tabmatr : "ccursid -> ccursid"
+    public_tabmatr ||--o{ public_tabmatrpago : "cmatrid -> cmatrid"
+    public_asigcurs ||--o{ public_tabnota : "asigcursid -> asigcursid"
+    public_tabmatr ||--o{ public_tabnota : "cmatrid -> cmatrid"
+    public_tabmatr ||--o{ public_tabnotadef : "cmatrid -> cmatrid"
+    public_asigcurs ||--o{ public_tabnotahist : "asigcursid -> asigcursid"
+    public_tabmatr ||--o{ public_tabnotahist : "cmatrid -> cmatrid"
+    public_asigcurs ||--o{ public_tabnove : "asigcursid -> asigcursid"
+    public_tabmatr ||--o{ public_tabnove : "cmatrid -> cmatrid"
+    public_anolperi ||--o{ public_tabnove : "cperiid -> anolperiid"
+    public_tabtiponove ||--o{ public_tabnove : "ctiponoveid -> ctiponoveid"
+    public_tabinst ||--o{ public_tabpazsalv : "cinstid -> cinstid"
+    public_anolperi ||--o{ public_tabperival : "canolperiid -> anolperiid"
+    public_tabmatr ||--o{ public_tabpromdef : "cmatrid -> cmatrid"
+    public_anolperi ||--o{ public_tabpromdef : "cperiid -> anolperiid"
+    public_tabinst ||--o{ public_tabsie : "cinstid -> cinstid"
+    public_tabcurs ||--o{ public_tabutil : "ccursid -> ccursid"
