@@ -1,0 +1,158 @@
+Project bdsae2 {
+  database_type: 'PostgreSQL'
+  Note: 'IAM: engine (canónico Escuelapp) + logic (SAE legacy). Consolidación vía migracion.map_usuario.'
+}
+
+Table engine.aemenu {
+  aemenu_descripcion text [not null, note: 'Descripción del menú.']
+  aemenu_estado int [not null, note: 'Estado del menú.']
+  aemenu_icono text [not null, note: 'Icono del menú.']
+  aemenu_id int [pk, not null, note: 'Identificador único del menú.']
+  aemenu_nombre text [not null, note: 'Nombre del menú.']
+  aemenu_orden int [note: 'Orden de visualización del menú.']
+  Note: 'Menús (agrupadores de opciones) de la agenda escolar.'
+}
+
+Table engine.aeopcmenu {
+  aemenu_id int [not null, note: 'Menú padre de la opción (FK a aemenu).']
+  aeopcmenu_descripcion text [not null, note: 'Descripción de la opción.']
+  aeopcmenu_enlace text [not null, note: 'Enlace/ruta de la opción.']
+  aeopcmenu_estado int [not null, note: 'Estado de la opción (1=activo).']
+  aeopcmenu_icono text [not null, note: 'Icono de la opción.']
+  aeopcmenu_id int [pk, not null, note: 'Identificador único de la opción.']
+  aeopcmenu_nombre text [not null, note: 'Nombre de la opción de menú.']
+  aeopcmenu_orden int [not null, note: 'Orden de visualización de la opción.']
+  Note: 'Opciones de menú (páginas/acciones) dentro de cada menú.'
+}
+
+Table engine.aeroll {
+  aeroll_descripcion text [not null, note: 'Descripción del rol.']
+  aeroll_esta int [not null, note: 'Estado del rol.']
+  aeroll_id int [pk, not null, note: 'Identificador único del rol.']
+  aeroll_index text [not null, note: 'Página de inicio a la que redirige el rol.']
+  aeroll_nombre varchar(20) [not null, note: 'Nombre del rol.']
+  Note: 'Roles de la agenda escolar (admin académico, docente, estudiante, acudiente, etc.).'
+}
+
+Table engine.aerollopc {
+  aeopcmenu_id int [not null, note: 'Opción de menú (FK a aeopcmenu).']
+  aeroll_id int [not null, note: 'Rol al que se asigna la opción (FK a aeroll).']
+  aerollopc_estado int [default: '1', note: 'Estado del privilegio (1=activo).']
+  aerollopc_id int [pk, not null, note: 'Identificador único del privilegio.']
+  indexes {
+    (aerollopc_estado, aeopcmenu_id, aeroll_id) [unique]
+  }
+  Note: 'Privilegios por rol: opciones de menú a las que puede acceder cada rol.'
+}
+
+Table engine.aeusu {
+  aeroll_id int [not null, note: 'Rol del usuario (FK a aeroll).']
+  aeusu_estado int [not null, note: 'Estado del usuario.']
+  aeusu_id double [pk, not null, default: 'nextval(\'engine.secuence_aeusu_id\'::regclass)', note: 'Identificador único del usuario.']
+  aeusu_llave text [not null, note: 'Clave/password del usuario.']
+  aeusu_nick text [not null, note: 'Nick/usuario de login (único).']
+  aeusu_nombre text [not null, note: 'Nombre del usuario.']
+  aeusu_token text [note: 'Token de sesión/dispositivo del usuario.']
+  Note: 'Usuarios de la agenda escolar (login).'
+}
+
+Table engine.aeusuopc {
+  aeopcmenu_id int [not null, note: 'Opción de menú (FK a aeopcmenu).']
+  aeusu_id int [not null, note: 'Usuario (FK a aeusu).']
+  aeusuopc_estado int [default: '1', note: 'Estado del privilegio (1=activo).']
+  aeusuopc_id int [pk, not null, note: 'Identificador único del privilegio.']
+  indexes {
+    (aeopcmenu_id, aeusu_id, aeusuopc_estado) [unique]
+  }
+  Note: 'Privilegios por usuario: opciones de menú adicionales asignadas a un usuario específico.'
+}
+
+Table engine.aeusuresetpass {
+  aeusu_id double [not null, note: 'Usuario que solicita el cambio (FK a aeusu).']
+  aeusures_dirip varchar(32) [note: 'IP desde donde se generó la solicitud.']
+  aeusures_estado int [default: '8', note: 'Estado de la solicitud.']
+  aeusures_fechageneracion timestamp [not null, note: 'Fecha de generación de la solicitud.']
+  aeusures_fechalink timestamp [note: 'Fecha en que se usó el enlace.']
+  aeusures_fechavence timestamp [not null, note: 'Fecha de vencimiento del enlace.']
+  aeusures_id int [pk, not null, note: 'Identificador único de la solicitud.']
+  aeusures_llavenew text [note: 'Nueva clave propuesta.']
+  aeusures_llavepre text [not null, note: 'Clave anterior (verificación).']
+  Note: 'Solicitudes de restablecimiento de contraseña de los usuarios.'
+}
+
+Table engine.aeusuroll {
+  aeacad_referencia bigint [note: 'Referencia académica asociada (docente, estudiante o acudiente).']
+  aeanol_id int [note: 'Año lectivo en el que aplica el rol.']
+  aeinst_id int [note: 'Institución en la que aplica el rol.']
+  aeroll_id int [not null, note: 'Rol asignado (FK a aeroll).']
+  aeusu_id bigint [not null, note: 'Usuario (FK a aeusu).']
+  aeusuroll_estado int [default: '1', note: 'Estado de la relación (1=activo).']
+  aeusuroll_fecharegistro timestamptz [default: 'CURRENT_TIMESTAMP', note: 'Fecha de registro de la relación.']
+  aeusuroll_id int [pk, not null, default: 'nextval(\'engine.secuence_aeusuroll_id\'::regclass)', note: 'Identificador único del registro.']
+  Note: 'Relación usuario-rol con alcance por institución y año lectivo (un usuario puede tener varios roles/contextos).'
+}
+
+Table logic.tabmenu {
+  cmenudesc text [not null, note: 'Descripción del menú.']
+  cmenudest text [not null, note: 'Página de destino/inicio del menú.']
+  cmenuesta int [not null, note: 'Estado del menú.']
+  cmenuid int [pk, not null, note: 'Identificador único del menú.']
+  cmenunomb text [not null, note: 'Nombre del menú.']
+  cmenuorde int [note: 'Orden de visualización del menú.']
+  Note: 'Menús (agrupadores de opciones) del sistema administrativo SAE.'
+}
+
+Table logic.tabopcimenu {
+  copcimenudesc text [not null, note: 'Descripción de la opción.']
+  copcimenuenla text [not null, note: 'Enlace/ruta de la opción.']
+  copcimenuesta int [not null, note: 'Estado de la opción.']
+  copcimenuicon text [not null, note: 'Icono de la opción.']
+  copcimenuid int [pk, not null, note: 'Identificador único de la opción.']
+  copcimenumenu int [not null, note: 'Menú padre (FK a tabmenu).']
+  copcimenunomb text [not null, note: 'Nombre de la opción.']
+  copcimenuorde int [not null, note: 'Orden de visualización.']
+  Note: 'Opciones de menú (páginas/acciones) dentro de cada menú del SAE.'
+}
+
+Table logic.tabroll {
+  cenlaid int [not null, note: 'Enlace de integración con la agenda (FK a integration.tabenla).']
+  crolldesc text [not null, note: 'Descripción del rol.']
+  crollesta int [not null, note: 'Estado del rol.']
+  crollid int [pk, not null, note: 'Identificador único del rol.']
+  crollnomb varchar(20) [not null, note: 'Nombre del rol.']
+  crollpagientr text [not null, note: 'Página de inicio del rol.']
+  Note: 'Roles del SAE (administrador, estudiante, docente, institución, acudiente, coordinador, secretaria).'
+}
+
+Table logic.tabrollopci {
+  copcimenuid int [not null, note: 'Opción de menú (FK a tabopcimenu).']
+  crollid int [not null, note: 'Rol (FK a tabroll).']
+  crollopciesta int [default: '1', note: 'Estado del privilegio (1=activo).']
+  crollopciid int [pk, not null, note: 'Identificador único del privilegio.']
+  Note: 'Privilegios por rol: opciones de menú accesibles para cada rol.'
+}
+
+Table logic.tabusua {
+  cusuaesta int [not null, note: 'Estado del usuario.']
+  cusuaid int [pk, not null, note: 'Identificador único del usuario.']
+  cusuallave text [not null, note: 'Clave/password del usuario.']
+  cusuanick text [not null, note: 'Nick/usuario de login.']
+  cusuanomb text [not null, note: 'Nombre del usuario.']
+  cusuaroll int [not null, note: 'Rol del usuario (FK a tabroll).']
+  indexes {
+    (cusuaesta, cusuanick) [unique]
+  }
+  Note: 'Usuarios del SAE (login).'
+}
+
+Table logic.tabusuaopci {
+  cusuaopciesta int [default: '1', note: 'Estado del privilegio (1=activo).']
+  cusuaopciid int [pk, not null, note: 'Identificador único del privilegio.']
+  cusuaopciopcimenu int [not null, note: 'Opción de menú (FK a tabopcimenu).']
+  cusuaopciusua int [not null, note: 'Usuario (FK a tabusua).']
+  Note: 'Privilegios por usuario: opciones de menú adicionales para un usuario específico.'
+}
+
+Ref: engine.aeusuresetpass.aeusu_id > engine.aeusu.aeusu_id // aeresetpk__fkey
+Ref: engine.aeusuroll.aeroll_id > engine.aeroll.aeroll_id // rollusu__fkey
+Ref: engine.aeusuroll.aeusu_id > engine.aeusu.aeusu_id // usuroll__fkey

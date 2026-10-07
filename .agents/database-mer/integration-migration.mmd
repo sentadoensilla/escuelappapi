@@ -1,0 +1,39 @@
+erDiagram
+    %% Integración y migración
+    integration_tabenla {
+        text cenladesc
+        text cenladesccamp
+        text cenladescextr
+        int cenlaesta
+        int cenlaid PK
+    }
+    integration_tabregiacti {
+        date cregiactifech
+        time cregiactihora
+        real cregiactiid PK
+        varchar(15) cregiactiip
+        varchar(16) cregiactinave
+        text cregiactiregi
+        varchar(14) cregiactisecu
+        int cusuaid
+    }
+    migracion_map_docente {
+        double aedocentes_id PK
+        int cdoceid
+    }
+    migracion_map_estudiante {
+        int aeestudiantes_id PK
+        int cestuid
+    }
+    migracion_map_institucion {
+        double aeinst_id PK
+        int cinstid
+    }
+    migracion_map_rol {
+        int aeroll_id
+        int crollid PK
+    }
+    migracion_map_usuario {
+        double aeusu_id
+        int cusuaid PK
+    }

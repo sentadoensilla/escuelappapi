@@ -1,0 +1,3188 @@
+Project bdsae2 {
+  database_type: 'PostgreSQL'
+  Note: 'MER completo de bdsae2 (12 schemas) — SAE + Escuelapp + migracion.'
+}
+
+Table contact.aetempmess {
+  aetempmess_estado int [default: '1', note: 'Estado de la plantilla (1=activo).']
+  aetempmess_guia text [not null, note: 'Guía/instructivo asociado al mensaje.']
+  aetempmess_id int [pk, not null, default: 'nextval(\'contact.aetempmess_aetempmess_id_seq\'::regclass)', note: 'Identificador único de la plantilla.']
+  aetempmess_text text [not null, note: 'Texto de la plantilla del mensaje.']
+  aetempmess_type int [not null, note: 'Tipo de mensaje al que pertenece (FK a aetempmesstype).']
+  Note: 'Plantillas de mensaje de WhatsApp para envíos generales (con guía de destino).'
+}
+
+Table contact.aetempmesssede {
+  aeinst_id bigint [not null, note: 'Institución a la que aplica la plantilla (FK a data.aeinstituciones).']
+  aetempmesssede_estado int [default: '1', note: 'Estado de la plantilla (1=activo).']
+  aetempmesssede_guia text [not null, note: 'Guía/instructivo asociado al mensaje de la sede.']
+  aetempmesssede_id int [pk, not null, default: 'nextval(\'contact.aetempmesssede_aetempmesssede_id_seq\'::regclass)', note: 'Identificador único del registro.']
+  aetempmesssede_text text [not null, note: 'Texto de la plantilla del mensaje de la sede.']
+  aetempmesstype_id int [not null, note: 'Tipo de mensaje al que pertenece (FK a aetempmesstype).']
+  Note: 'Plantillas de mensaje de WhatsApp específicas por institución (sede), reemplazan a las generales.'
+}
+
+Table contact.aetempmesstype {
+  aetempmesstype_estado int [default: '1', note: 'Estado del tipo de mensaje (1=activo).']
+  aetempmesstype_id int [pk, not null, default: 'nextval(\'contact.aetempmesstype_aetempmesstype_id_seq\'::regclass)', note: 'Identificador único del tipo de mensaje.']
+  aetempmesstype_text text [not null, note: 'Texto del tipo de mensaje.']
+  Note: 'Tipos de mensaje/plantilla de WhatsApp disponibles para envío (cada tipo se asocia a un emisor).'
+}
+
+Table contact.aetempmessvars {
+  aetempmessvars_comentario text [not null, note: 'Descripción del uso de la variable en las plantillas.']
+  aetempmessvars_estado int [default: '1', note: 'Estado de la variable (1=activo).']
+  aetempmessvars_id int [pk, not null, default: 'nextval(\'contact.aetempmessvars_aetempmessvars_id_seq\'::regclass)', note: 'Identificador único de la variable.']
+  aetempmessvars_nombre varchar(19) [not null, note: 'Nombre de la variable (ej. {{nombre_estudiante}}).']
+  Note: 'Variables (placeholders) reemplazables dentro de las plantillas de mensaje de WhatsApp.'
+}
+
+Table contact.emisor {
+  emisor varchar(14) [not null, note: 'Número de teléfono del emisor de WhatsApp.']
+  estado int [not null, default: '6', note: 'Estado del emisor (FK a data.aeestados).']
+  fecharegistro timestamp [default: 'CURRENT_TIMESTAMP', note: 'Fecha y hora de registro del emisor.']
+  idemisor int [pk, not null, default: 'nextval(\'contact.emisor_idemisor_seq\'::regclass)', note: 'Identificador único del emisor.']
+  idempresa bigint [not null, note: 'Institución dueña del número de WhatsApp (FK a data.aeinstituciones).']
+  token text [note: 'Token de sesión/autenticación del emisor en WhatsApp.']
+  Note: 'Cuentas/emisores de WhatsApp por institución: número desde el cual se envían los mensajes y su token de sesión.'
+}
+
+Table data.aeacudientes {
+  aeacudientes_id int [pk, not null, note: 'Identificador único del acudiente.']
+  aeestudiantes_apellidosacudiente varchar(64) [note: 'Apellidos del acudiente.']
+  aeestudiantes_direccionacudiente text [note: 'Dirección del acudiente.']
+  aeestudiantes_estado int [default: '1', note: 'Estado del acudiente (1=activo).']
+  aeestudiantes_fecharegistro timestamp [default: 'CURRENT_TIMESTAMP', note: 'Fecha de registro.']
+  aeestudiantes_fotoacudiente text [note: 'Foto del acudiente.']
+  aeestudiantes_generoacudiente char(1) [note: 'Género del acudiente.']
+  aeestudiantes_id double [note: 'Estudiante asociado (FK a aeestudiantes).']
+  aeestudiantes_idenacudiente varchar(16) [note: 'Identificación del acudiente.']
+  aeestudiantes_mailacudiente text [note: 'Correo del acudiente.']
+  aeestudiantes_nombresacudiente varchar(64) [note: 'Nombres del acudiente.']
+  aeestudiantes_telefonoacudiente text [note: 'Teléfono del acudiente.']
+  aeusu_id double [note: 'Usuario de login asociado (FK a engine.aeusu).']
+  Note: 'Acudientes (padres/tutores) de los estudiantes.'
+}
+
+Table data.aeacudientes_old {
+  aeacudientes_id int [pk, not null, note: 'Identificador del acudiente.']
+  aeestudiantes_apellidosacudiente varchar(64) [note: 'Apellidos.']
+  aeestudiantes_direccionacudiente text [note: 'Dirección.']
+  aeestudiantes_estado int [default: '1', note: 'Estado.']
+  aeestudiantes_fecharegistro timestamp [not null, note: 'Fecha de registro.']
+  aeestudiantes_fotoacudiente text [note: 'Foto.']
+  aeestudiantes_generoacudiente char(1) [note: 'Género.']
+  aeestudiantes_id double [note: 'Estudiante asociado.']
+  aeestudiantes_idenacudiente varchar(16) [note: 'Identificación.']
+  aeestudiantes_mailacudiente text [not null, note: 'Correo.']
+  aeestudiantes_nombresacudiente varchar(64) [note: 'Nombres.']
+  aeestudiantes_telefonoacudiente text [not null, note: 'Teléfono.']
+  aeusu_id double [note: 'Usuario de login.']
+  Note: 'Copia/backup de acudientes.'
+}
+
+Table data.aeano {
+  aeano_calendario char [default: '\'z\'::"char"', note: 'Calendario (A/B) del año lectivo.']
+  aeano_descripcion varchar(16) [note: 'Descripción del año lectivo (ej. "2026").']
+  aeano_id int [pk, not null, note: 'Identificador único del año lectivo.']
+  fecha_fin date [note: 'Fecha de finalización del año lectivo.']
+  fecha_inicio date [note: 'Fecha de inicio del año lectivo.']
+  Note: 'Años lectivos para todas las sedes/instituciones en general.'
+}
+
+Table data.aeasignaciones {
+  aeanol_id int [not null, note: 'Año lectivo (FK a aeano).']
+  aeasignaciones_asignatura varchar(256) [not null, note: 'Nombre de la asignatura.']
+  aeasignaciones_dia int [not null, note: 'Día de la semana (índice) de la clase.']
+  aeasignaciones_enlace text [note: 'Enlace virtual de la clase.']
+  aeasignaciones_estado int [default: '1', note: 'Estado de la asignación (1=activo).']
+  aeasignaciones_grupo varchar(64) [not null, note: 'Grupo/salón al que se dicta.']
+  aeasignaciones_hora time [not null, note: 'Hora de inicio de la clase.']
+  aeasignaciones_horafin time [note: 'Hora de fin de la clase.']
+  aeasignaciones_id double [not null, default: 'nextval(\'data.secuence_aeasignaciones_id\'::regclass)', note: 'Identificador único de la asignación.']
+  aeasignaciones_utiles varchar(256) [note: 'Útiles/materiales requeridos.']
+  aedocentes_id double [not null, note: 'Docente a cargo (FK a aedocentes).']
+  aeinst_id double [not null, note: 'Institución (FK a aeinstituciones).']
+  Note: 'Asignaciones académicas: asignatura + docente + grupo + horario.'
+}
+
+Table data.aeasistencias {
+  aeasignaciones_asignatura varchar(64) [not null, note: 'Asignatura.']
+  aeasistencia_id double [pk, not null, note: 'Identificador único del registro de asistencia.']
+  aeasistencias_docente double [not null, note: 'Docente que registra (FK a aedocentes).']
+  aeasistencias_enviado bool [default: 'false', note: 'Si la notificación fue enviada.']
+  aeasistencias_estado int [default: '1', note: 'Estado (1=activo).']
+  aeasistencias_fecha date [not null, note: 'Fecha de la asistencia.']
+  aeasistencias_fecharegistro timestamptz [note: 'Fecha de registro.']
+  aeasistencias_llego int [note: 'Indicador de si llegó/asistió.']
+  aeestudiantes_grupo varchar(32) [not null, note: 'Grupo/salón.']
+  aeestudiantes_id double [not null, note: 'Estudiante (FK a aeestudiantes).']
+  Note: 'Asistencias de los estudiantes registradas por los docentes.'
+}
+
+Table data.aeavisos {
+  aeanol_id bigint [not null, note: 'Año lectivo (FK a aeano).']
+  aeavisos_aceptarespuestas bool [default: 'true', note: 'Si acepta respuestas o no.']
+  aeavisos_adjunto text [note: 'Archivo adjunto.']
+  aeavisos_alcance int [default: '1', note: 'Alcance: 0=docentes, 1=docentes y estudiantes.']
+  aeavisos_descripcion text [not null, note: 'Descripción/cuerpo del aviso.']
+  aeavisos_estado int [default: '1', note: 'Estado del aviso (1=activo).']
+  aeavisos_estudiantesid text [note: 'Estudiantes específicos a los que va dirigido.']
+  aeavisos_fecha timestamp [not null, note: 'Fecha de creación del aviso.']
+  aeavisos_fechafinalizacion timestamp [not null, note: 'Fecha de finalización/vencimiento.']
+  aeavisos_fechapublicacion timestamp [not null, note: 'Fecha de publicación.']
+  aeavisos_grupo varchar[] [note: 'Grupos/salones a los que va dirigido.']
+  aeavisos_id bigint [pk, not null, note: 'Identificador único del aviso.']
+  aeavisos_titulo text [not null, note: 'Título del aviso.']
+  aeinst_id bigint [not null, note: 'Institución (FK a aeinstituciones).']
+  aeusu_id bigint [not null, note: 'Usuario autor (FK a engine.aeusu).']
+  Note: 'Avisos/comunicados publicados por docentes para estudiantes y/o acudientes.'
+}
+
+Table data.aeavisos_comentarios {
+  aeavisos_id bigint [not null, note: 'Aviso al que pertenece (FK a aeavisos).']
+  aeavisoscomentarios_descripcion text [not null, note: 'Texto del comentario.']
+  aeavisoscomentarios_estado int [default: '1', note: 'Estado del comentario (1=activo).']
+  aeavisoscomentarios_fecha timestamp [not null, note: 'Fecha del comentario.']
+  aeavisoscomentarios_id bigint [pk, not null, note: 'Identificador único del comentario.']
+  aeusu_id bigint [not null, note: 'Usuario que comenta.']
+  Note: 'Comentarios/respuestas a los avisos.'
+}
+
+Table data.aeavisosinternal {
+  aeanol_id double [not null, note: 'Año lectivo.']
+  aeavisosinternal_adjunto text [note: 'Archivo adjunto.']
+  aeavisosinternal_descripcion text [not null, note: 'Descripción.']
+  aeavisosinternal_docentessid text [note: 'Docentes destinatarios.']
+  aeavisosinternal_estado int [default: '1', note: 'Estado (1=activo).']
+  aeavisosinternal_fecha timestamp [not null, note: 'Fecha de creación.']
+  aeavisosinternal_fechafinalizacion timestamp [not null, note: 'Fecha de finalización.']
+  aeavisosinternal_fechapublicacion timestamp [not null, note: 'Fecha de publicación.']
+  aeavisosinternal_id double [pk, not null, note: 'Identificador único del aviso interno.']
+  aeavisosinternal_titulo text [not null, note: 'Título.']
+  aeinst_id double [not null, note: 'Institución.']
+  aeusu_id double [not null, note: 'Usuario autor.']
+  Note: 'Avisos internos dirigidos solo a docentes.'
+}
+
+Table data.aeavisosinternal_comentarios {
+  aeavisosinternal_id double [not null, note: 'Aviso interno (FK a aeavisosinternal).']
+  aeavisosinternalcomentarios_descripcion text [not null, note: 'Texto del comentario.']
+  aeavisosinternalcomentarios_estado int [default: '1', note: 'Estado (1=activo).']
+  aeavisosinternalcomentarios_fecha timestamp [not null, note: 'Fecha del comentario.']
+  aeavisosinternalcomentarios_id double [pk, not null, note: 'Identificador único del comentario.']
+  aeusu_id double [not null, note: 'Usuario que comenta.']
+  Note: 'Comentarios a los avisos internos.'
+}
+
+Table data.aeayuda {
+  aeayuda_descripcion text [not null, note: 'Descripción de la ayuda.']
+  aeayuda_enlace text [not null, note: 'Enlace de la ayuda.']
+  aeayuda_estado int [default: '1', note: 'Estado (1=activo).']
+  aeayuda_id double [pk, not null, note: 'Identificador único de la ayuda.']
+  aeayuda_para text [not null, note: 'Roles a los que va dirigida.']
+  aeayuda_tipointerface varchar(4) [not null, note: 'Tipo de interfaz (web/móvil).']
+  aeayuda_titulo text [not null, note: 'Título de la ayuda.']
+  aeayuda_version varchar(9) [note: 'Versión de la ayuda.']
+  aeayuda_vistas int [note: 'Número de vistas de la ayuda.']
+  Note: 'Ayudas/tutoriales del sistema (por rol, interfaz y versión).'
+}
+
+Table data.aebitacora {
+  aeanol_id double [not null, note: 'Año lectivo.']
+  aebitacora_asignatura text [note: 'Asignatura.']
+  aebitacora_aviso bool [note: 'Si genera aviso/comunicado.']
+  aebitacora_descripcion text [note: 'Descripción de la actividad/observación.']
+  aebitacora_estudiantesid text [note: 'Estudiantes a los que aplica.']
+  aebitacora_fecha timestamp [not null, note: 'Fecha del registro.']
+  aebitacora_grupo varchar[] [note: 'Grupos a los que aplica.']
+  aebitacora_id double [pk, not null, note: 'Identificador único del registro de bitácora.']
+  aeinst_id double [not null, note: 'Institución.']
+  aeusu_id double [not null, note: 'Docente que registra (FK a engine.aeusu).']
+  Note: 'Bitácora de clases: registro diario de actividades y observaciones por docente.'
+}
+
+Table data.aebitacora_comentarios {
+  aebitacora_id double [not null, note: 'Registro de bitácora (FK a aebitacora).']
+  aebitacoracomentarios_descripcion text [not null, note: 'Texto del comentario.']
+  aebitacoracomentarios_estado int [default: '1', note: 'Estado (1=activo).']
+  aebitacoracomentarios_fecha timestamp [not null, note: 'Fecha del comentario.']
+  aebitacoracomentarios_id double [pk, not null, note: 'Identificador único del comentario.']
+  aeusu_id double [not null, note: 'Usuario que comenta.']
+  Note: 'Comentarios a los registros de bitácora.'
+}
+
+Table data.aecaracter {
+  aecaracter_descripcion varchar(16) [not null, note: 'Descripción del carácter (Público/Privado).']
+  aecaracter_estado smallint [default: '1', note: 'Estado (1=activo).']
+  aecaracter_id smallint [not null, note: 'Identificador único del carácter.']
+  Note: 'Carácter de la institución (público/privado).'
+}
+
+Table data.aecitaciones {
+  aeanol_id bigint [not null, note: 'Año lectivo (FK a aeano).']
+  aecitacion_adjunto text [note: 'Archivo adjunto.']
+  aecitacion_descripcion text [note: 'Descripción de la citación.']
+  aecitacion_estado smallint [not null, note: 'Estado de la citación.']
+  aecitacion_fecha timestamp [not null, note: 'Fecha y hora de la citación.']
+  aecitacion_fecharegistro timestamp [not null, note: 'Fecha de registro de la citación.']
+  aecitacion_id int [pk, not null, note: 'Identificador único de la citación.']
+  aecitacion_lugar varchar [not null, note: 'Lugar de la citación.']
+  aedocentes_id bigint [note: 'Docente que cita.']
+  aeestudiantes_id text [not null, note: 'Estudiantes citados.']
+  aeinst_id bigint [not null, note: 'Institución (FK a aeinstituciones).']
+  aemotivo_id bigint [not null, note: 'Motivo de la citación (FK a aemotivo).']
+  Note: 'Citaciones a acudientes/estudiantes por motivos de disciplina.'
+}
+
+Table data.aecondiciones {
+  aecondiciones_acudiente text [not null, note: 'Acudiente que acepta.']
+  aecondiciones_fecha timestamp [not null, note: 'Fecha de aceptación.']
+  aecondiciones_id double [pk, not null, note: 'Identificador único del registro.']
+  aelogdispositivos_model text [note: 'Modelo del dispositivo.']
+  aelogdispositivos_platform text [note: 'Plataforma.']
+  aelogdispositivos_serial text [note: 'Serial del dispositivo.']
+  aelogdispositivos_uuid text [note: 'UUID del dispositivo.']
+  aelogdispositivos_version text [note: 'Versión de la app.']
+  Note: 'Aceptación de términos y condiciones por parte de los acudientes (registro del dispositivo).'
+}
+
+Table data.aeconocer {
+  aeconocer_descripcion varchar(64) [not null, note: 'Descripción del medio (Redes sociales, Referidos, etc.).']
+  aeconocer_estado smallint [default: '1', note: 'Estado (1=activo).']
+  aeconocer_id smallint [not null, note: 'Identificador único del medio.']
+  Note: 'Medios por los que se conoció la institución (encuesta de matrícula).'
+}
+
+Table data.aeconsultasdocentes {
+  aeanol_id double [not null, note: 'Año lectivo.']
+  aeasignaciones_asignatura text [not null, note: 'Asignatura sobre la que se consulta.']
+  aeconsultasdocentes_descripcion text [not null, note: 'Texto de la consulta.']
+  aeconsultasdocentes_estado int [default: '1', note: 'Estado (1=activo).']
+  aeconsultasdocentes_fecha timestamp [not null, note: 'Fecha de la consulta.']
+  aeconsultasdocentes_id double [pk, not null, note: 'Identificador único de la consulta.']
+  aeconsultasdocentes_visibilidad bool [default: 'false', note: 'Si la consulta es visible.']
+  aedocente_id double [not null, note: 'Docente destinatario (FK a aedocentes).']
+  aeestudiantes_id double [not null, note: 'Estudiante que consulta (FK a aeestudiantes).']
+  aeinst_id double [not null, note: 'Institución.']
+  Note: 'Consultas de estudiantes/acudientes a los docentes.'
+}
+
+Table data.aeconsultasdocentes_comentarios {
+  aeconsultasdocentes_id double [not null, note: 'Consulta (FK a aeconsultasdocentes).']
+  aeconsultasdocentescomentarios_descripcion text [not null, note: 'Texto del comentario.']
+  aeconsultasdocentescomentarios_estado int [default: '1', note: 'Estado (1=activo).']
+  aeconsultasdocentescomentarios_fecha timestamp [not null, note: 'Fecha del comentario.']
+  aeconsultasdocentescomentarios_id double [pk, not null, note: 'Identificador único del comentario.']
+  aeusu_id double [not null, note: 'Usuario que comenta.']
+  Note: 'Comentarios/respuestas a las consultas de docentes.'
+}
+
+Table data.aecronograma {
+  aeano_id bigint [not null, note: 'Año lectivo.']
+  aecronograma_adjunto text [note: 'Archivo adjunto.']
+  aecronograma_descripcion text [not null, note: 'Descripción del evento.']
+  aecronograma_estado int [default: '1', note: 'Estado (1=activo).']
+  aecronograma_fechafin timestamp [note: 'Fecha de fin del evento.']
+  aecronograma_fechainicio timestamp [not null, note: 'Fecha de inicio del evento.']
+  aecronograma_fecharegistro timestamp [not null, default: 'CURRENT_TIMESTAMP', note: 'Fecha de registro.']
+  aecronograma_grupo varchar[] [note: 'Grupos a los que aplica.']
+  aecronograma_id int [not null, default: 'nextval(\'data.aecronograma_aecronograma_id_seq\'::regclass)', note: 'Identificador único del evento.']
+  aecronograma_responsables text [note: 'Responsables del evento.']
+  aecronograma_titulo text [not null, note: 'Título del evento.']
+  aecronogramatipoevento_id int [default: '1', note: 'Tipo de evento (FK a aecronograma_tipoevento).']
+  aeinst_id text [not null, note: 'Instituciones a las que aplica.']
+  aeusu_id bigint [not null, note: 'Usuario autor.']
+  Note: 'Cronograma de eventos institucionales (académicos, directivos, etc.).'
+}
+
+Table data.aecronograma_alerta {
+  aecronograma_id bigint [not null, note: 'Evento (FK a aecronograma).']
+  aecronogramaalerta_fecha timestamp [not null, default: 'CURRENT_TIMESTAMP', note: 'Fecha de la alerta.']
+  aecronogramaalerta_id int [not null, default: 'nextval(\'data.aecronograma_alerta_aecronogramaalerta_id_seq\'::regclass)', note: 'Identificador único de la alerta.']
+  Note: 'Alertas/recordatorios de eventos del cronograma.'
+}
+
+Table data.aecronograma_comentarios {
+  aecronograma_id bigint [not null, note: 'Evento (FK a aecronograma).']
+  aecronogramacomentario_descripcion text [not null, note: 'Texto del comentario.']
+  aecronogramacomentario_fecha timestamp [default: 'CURRENT_TIMESTAMP', note: 'Fecha del comentario.']
+  aecronogramacomentario_id int [not null, default: 'nextval(\'data.aecronograma_comentarios_aecronogramacomentario_id_seq\'::regclass)', note: 'Identificador único del comentario.']
+  aeusu_id bigint [not null, note: 'Usuario que comenta.']
+  Note: 'Comentarios a los eventos del cronograma.'
+}
+
+Table data.aecronograma_tipoevento {
+  aecronogramatipoevento_color varchar(8) [default: '\'#FBB919\'::character varying', note: 'Color asociado al tipo de evento.']
+  aecronogramatipoevento_descripcion text [not null, note: 'Descripción del tipo de evento.']
+  aecronogramatipoevento_estado int [not null, default: '1', note: 'Estado (1=activo).']
+  aecronogramatipoevento_id int [not null, default: 'nextval(\'data.aecronograma_tipoevento_aecronogramatipoevento_id_seq\'::regclass)', note: 'Identificador único del tipo de evento.']
+  Note: 'Tipos de evento del cronograma (académica, directiva, financiera, etc.).'
+}
+
+Table data.aecue {
+  aecue_asignatura text [note: 'Asignatura(s) a la que aplica.']
+  aecue_descripcion text [not null, note: 'Descripción de la evaluación.']
+  aecue_estado bool [default: 'true', note: 'Estado (true=activo).']
+  aecue_fechacreacion timestamp [not null, note: 'Fecha de creación.']
+  aecue_id int [not null, note: 'Identificador único de la evaluación.']
+  aecue_imagen varchar(256) [note: 'Imagen de la evaluación.']
+  aecue_nombre varchar(128) [not null, note: 'Nombre de la evaluación.']
+  Note: 'Evaluaciones/cuestionarios (bancos de preguntas).'
+}
+
+Table data.aediscapacidades {
+  aediscapacidades_descripcion varchar(32) [not null, note: 'Descripción de la discapacidad.']
+  aediscapacidades_estado int [default: '1', note: 'Estado (1=activo).']
+  aediscapacidades_id int [pk, not null, note: 'Identificador único de la discapacidad.']
+  Note: 'Discapacidades reconocidas (catálogo).'
+}
+
+Table data.aedocentes {
+  aedocentes_apellidos varchar(64) [not null, note: 'Apellidos del docente.']
+  aedocentes_direccion varchar(128) [note: 'Dirección.']
+  aedocentes_estado int [default: '1', note: 'Estado del docente (1=activo).']
+  aedocentes_experiencia text [note: 'Experiencia laboral 1.']
+  aedocentes_experiencia2 text [note: 'Experiencia laboral 2.']
+  aedocentes_experiencia3 text [note: 'Experiencia laboral 3.']
+  aedocentes_experiencia4 text [note: 'Experiencia laboral 4.']
+  aedocentes_fechanacimiento date [note: 'Fecha de nacimiento.']
+  aedocentes_foto varchar(128) [note: 'Foto del docente.']
+  aedocentes_genero char(1) [note: 'Género del docente.']
+  aedocentes_id double [pk, not null, default: 'nextval(\'data.secuence_aedocentes_id\'::regclass)', note: 'Identificador único del docente.']
+  aedocentes_identificacion varchar(32) [not null, note: 'Documento de identificación del docente.']
+  aedocentes_mail varchar(128) [note: 'Correo electrónico (único).']
+  aedocentes_nombres varchar(64) [not null, note: 'Nombres del docente.']
+  aedocentes_telefono varchar(32) [note: 'Teléfono.']
+  aedocentes_titulo varchar(128) [note: 'Título académico 1.']
+  aedocentes_titulo2 varchar(128) [note: 'Título académico 2.']
+  aedocentes_titulo3 varchar(128) [note: 'Título académico 3.']
+  aedocentes_titulo4 varchar(128) [note: 'Título académico 4.']
+  aedocentes_url text [note: 'URL/perfil en línea del docente.']
+  aeusu_id double [not null, note: 'Usuario de login asociado (FK a engine.aeusu).']
+  Note: 'Docentes (usuarios docentes de la agenda).'
+}
+
+Table data.aeeps {
+  aeeps_administradora varchar(255) [note: 'Administradora de la EPS.']
+  aeeps_codigo varchar(12) [note: 'Código de la EPS.']
+  aeeps_estado smallint [default: '1', note: 'Estado de la EPS.']
+  aeeps_id int [pk, not null, note: 'Identificador único de la EPS.']
+  aeeps_nit varchar(12) [note: 'NIT de la EPS.']
+  aeeps_nombre varchar(255) [not null, note: 'Nombre de la EPS.']
+  aeeps_tipo varchar(12) [note: 'Tipo de la EPS.']
+  Note: 'EPS (entidades de salud) para afiliación de estudiantes.'
+}
+
+Table data.aeestados {
+  aeestados_descripcion varchar(20) [note: 'Descripción del estado (Activo, Inactivo, etc.).']
+  aeestados_icons varchar(64) [note: 'Icono asociado al estado.']
+  aeestados_id int [pk, not null, note: 'Identificador único del estado.']
+  aeestados_style varchar(64) [note: 'Estilo CSS asociado al estado.']
+  Note: 'Estados generales usados en los registros de todas las tablas.'
+}
+
+Table data.aeestudiantes {
+  aeacudientes_id bigint [note: 'Acudiente asociado (FK a aeacudientes).']
+  aeano_id int [not null, note: 'Año lectivo (FK a aeano).']
+  aeestudiantes_apellidos varchar(64) [not null, note: 'Apellidos del estudiante.']
+  aeestudiantes_codigo varchar(32) [note: 'Código del estudiante.']
+  aeestudiantes_direccion text [note: 'Dirección.']
+  aeestudiantes_estado int [default: '8', note: 'Estado del estudiante (FK a aeestados).']
+  aeestudiantes_fechanacimiento date [note: 'Fecha de nacimiento.']
+  aeestudiantes_fecharegistro timestamp [default: 'CURRENT_TIMESTAMP', note: 'Fecha de registro.']
+  aeestudiantes_genero char(1) [note: 'Género del estudiante.']
+  aeestudiantes_grupo varchar(32) [not null, note: 'Grupo/salón del estudiante.']
+  aeestudiantes_id int [pk, not null, note: 'Identificador único del estudiante.']
+  aeestudiantes_identificacion varchar(32) [note: 'Documento de identificación.']
+  aeestudiantes_mail text [note: 'Correo electrónico del estudiante.']
+  aeestudiantes_nombres varchar(64) [not null, note: 'Nombres del estudiante.']
+  aeestudiantes_telefono text [note: 'Teléfono.']
+  aeinstitucion_id double [not null, note: 'Institución (FK a aeinstituciones).']
+  aeusu_id double [default: '700', note: 'Usuario de login asociado (FK a engine.aeusu).']
+  Note: 'Estudiantes de la agenda escolar.'
+}
+
+Table data.aeestudiantes_old {
+  aeacudientes_id bigint [note: 'Acudiente asociado.']
+  aeano_id int [not null, note: 'Año lectivo.']
+  aeestudiantes_apellidos varchar(64) [not null, note: 'Apellidos.']
+  aeestudiantes_codigo varchar(32) [note: 'Código.']
+  aeestudiantes_direccion text [note: 'Dirección.']
+  aeestudiantes_estado int [default: '8', note: 'Estado.']
+  aeestudiantes_fechanacimiento date [note: 'Fecha de nacimiento.']
+  aeestudiantes_fecharegistro timestamp [not null, note: 'Fecha de registro.']
+  aeestudiantes_genero char(1) [note: 'Género.']
+  aeestudiantes_grupo varchar(32) [not null, note: 'Grupo/salón.']
+  aeestudiantes_id int [pk, not null, note: 'Identificador del estudiante.']
+  aeestudiantes_identificacion varchar(32) [note: 'Identificación.']
+  aeestudiantes_mail text [note: 'Correo electrónico.']
+  aeestudiantes_nombres varchar(64) [not null, note: 'Nombres.']
+  aeestudiantes_telefono text [note: 'Teléfono.']
+  aeinstitucion_id double [not null, note: 'Institución.']
+  aeusu_id double [default: '700', note: 'Usuario de login.']
+  Note: 'Copia/backup de estudiantes.'
+}
+
+Table data.aeetnias {
+  aeetnias_descripcion varchar(32) [not null, note: 'Descripción de la etnia.']
+  aeetnias_estado int [default: '1', note: 'Estado (1=activo).']
+  aeetnias_id int [pk, not null, note: 'Identificador único de la etnia.']
+  Note: 'Grupos étnicos (catálogo).'
+}
+
+Table data.aeexcusas {
+  aeanol_id bigint [not null, note: 'Año lectivo.']
+  aeestudiantes_id bigint [not null, note: 'Estudiante (FK a aeestudiantes).']
+  aeexcusas_archivoadjunto text [note: 'Archivo adjunto (soporte).']
+  aeexcusas_asignatura text [note: 'Asignaturas a las que aplica la excusa.']
+  aeexcusas_desde timestamp [not null, note: 'Fecha de inicio de la inasistencia.']
+  aeexcusas_estado int [default: '1', note: 'Estado de la excusa (1=activo).']
+  aeexcusas_fecha timestamp [not null, default: 'CURRENT_TIMESTAMP', note: 'Fecha de registro de la excusa.']
+  aeexcusas_hasta timestamp [not null, note: 'Fecha de fin de la inasistencia.']
+  aeexcusas_id int [pk, not null, default: 'nextval(\'data.aeexcusas_aeexcusas_id_seq\'::regclass)', note: 'Identificador único de la excusa.']
+  aeexcusas_mensaje text [not null, note: 'Mensaje/justificación de la excusa.']
+  aeinst_id bigint [not null, note: 'Institución.']
+  aetipoexcusa_id int [not null, note: 'Tipo de excusa (FK a aetipoexcusas).']
+  Note: 'Excusas presentadas por estudiantes/acudientes por inasistencias.'
+}
+
+Table data.aeexcusas_respuestas {
+  aeexcusas_id bigint [not null, note: 'Excusa (FK a aeexcusas).']
+  aeexcusasrespuestas_descripcion text [note: 'Texto de la respuesta.']
+  aeexcusasrespuestas_fecha timestamp [default: 'CURRENT_TIMESTAMP', note: 'Fecha de la respuesta.']
+  aeexcusasrespuestas_id int [pk, not null, default: 'nextval(\'data.aeexcusas_respuestas_aeexcusasrespuestas_id_seq\'::regclass)', note: 'Identificador único de la respuesta.']
+  aeexcusasrespuestas_tipo int [not null, note: 'Tipo de respuesta.']
+  aeusu_id bigint [not null, note: 'Usuario que responde.']
+  Note: 'Respuestas de los docentes a las excusas.'
+}
+
+Table data.aegrados {
+  aegrados_codigo smallint [not null, note: 'Código del grado (ej. -1=Jardín, 11=Once).']
+  aegrados_descripcion varchar(64) [note: 'Descripción del grado.']
+  aegrados_estado smallint [default: '1', note: 'Estado del grado (1=activo).']
+  aegrados_id smallint [pk, not null, note: 'Identificador único del grado.']
+  Note: 'Grados escolares (Jardín a Once).'
+}
+
+Table data.aegruposanguineo {
+  aegruposanguineo_descripcion varchar(2) [not null, note: 'Descripción del grupo (A, B, AB, O).']
+  aegruposanguineo_estado int [default: '1', note: 'Estado (1=activo).']
+  aegruposanguineo_id int [pk, not null, note: 'Identificador único del grupo sanguíneo.']
+  Note: 'Grupos sanguíneos (catálogo).'
+}
+
+Table data.aeinstituciones {
+  aeinst_direccion varchar(128) [not null, note: 'Dirección de la institución.']
+  aeinst_escudo text [note: 'Ruta/imagen del escudo institucional.']
+  aeinst_facebook text [note: 'URL de Facebook institucional.']
+  aeinst_fax varchar(128) [note: 'Fax de la institución.']
+  aeinst_himno text [note: 'Texto del himno institucional.']
+  aeinst_id double [pk, not null, default: 'nextval(\'data.secuence_aeinst_id\'::regclass)', note: 'Identificador único de la institución.']
+  aeinst_instagram text [note: 'URL de Instagram institucional.']
+  aeinst_lema text [note: 'Lema institucional.']
+  aeinst_mail varchar(128) [not null, note: 'Correo electrónico institucional.']
+  aeinst_manualconvivencia text [note: 'Manual de convivencia de la institución.']
+  aeinst_nit varchar(15) [not null, note: 'NIT de la institución.']
+  aeinst_nombre varchar(128) [not null, note: 'Nombre de la institución.']
+  aeinst_reconocimiento text [not null, note: 'Reconocimiento oficial (resolución) de la institución.']
+  aeinst_resolrector text [note: 'Resolución rectoral de la institución.']
+  aeinst_telefono varchar(128) [not null, note: 'Teléfono principal.']
+  aeinst_telefono2 varchar(128) [note: 'Teléfono secundario.']
+  aeinst_tiktok text [note: 'URL de TikTok institucional.']
+  aeinst_twitter text [note: 'URL de Twitter institucional.']
+  aeinst_youtube text [note: 'URL de YouTube institucional.']
+  aeusu_id double [not null, note: 'Usuario administrador de la institución (FK a engine.aeusu).']
+  calendario varchar(8) [note: 'Calendario de la institución (A/B).']
+  codigo varchar(4) [note: 'Código corto de la institución.']
+  codigo_cg1 smallint [note: 'Código interno CG1 de la institución.']
+  coordx real [note: 'Coordenada X (longitud) para el mapa.']
+  coordy real [note: 'Coordenada Y (latitud) para el mapa.']
+  zona varchar(16) [note: 'Zona geográfica (urbana/rural).']
+  Note: 'Instituciones educativas (clientes de la plataforma).'
+}
+
+Table data.aeinstituciones_ {
+  aeinst_direccion varchar(128) [not null, note: 'Dirección.']
+  aeinst_escudo text [not null, note: 'Escudo institucional.']
+  aeinst_fax varchar(128) [note: 'Fax.']
+  aeinst_himno text [note: 'Himno.']
+  aeinst_id double [pk, not null, default: 'nextval(\'data.secuence_aeinst_id\'::regclass)', note: 'Identificador único de la institución.']
+  aeinst_lema text [note: 'Lema.']
+  aeinst_mail varchar(128) [not null, note: 'Correo electrónico.']
+  aeinst_manualconvivencia text [not null, note: 'Manual de convivencia.']
+  aeinst_nit varchar(15) [not null, note: 'NIT de la institución.']
+  aeinst_nombre varchar(128) [not null, note: 'Nombre de la institución.']
+  aeinst_reconocimiento text [not null, note: 'Reconocimiento oficial.']
+  aeinst_resolrector text [note: 'Resolución rectoral.']
+  aeinst_telefono varchar(128) [not null, note: 'Teléfono principal.']
+  aeinst_telefono2 varchar(128) [note: 'Teléfono secundario.']
+  aeusu_id double [not null, note: 'Usuario administrador de la institución.']
+  Note: 'Copia/backup de instituciones educativas (tabla de respaldo).'
+}
+
+Table data.aeinstituciones_conf {
+  aeinst_id double [not null, note: 'Institución (FK a aeinstituciones).']
+  aeinstconf_anolectivo int [not null, note: 'Año lectivo al que aplica la configuración.']
+  aeinstconf_asistencias_umbralweek int [default: '2', note: 'Umbral semanal para alertas de asistencias.']
+  aeinstconf_bitacora_comunications_notifier bool [default: 'true', note: 'Permitir notificaciones de bitácora en móviles.']
+  aeinstconf_bitacora_comunications_notifier_text text [default: '\'la institución habilitará los registros de observaciones próximamente\'::text', note: 'Texto cuando no pueden consultar la bitácora.']
+  aeinstconf_comments_receivemail bool [default: 'true', note: 'Recibir correos cuando los móviles hacen comentarios.']
+  aeinstconf_excusas_limite int [default: '1', note: 'Límite de excusas permitidas.']
+  aeinstconf_id double [pk, not null, default: 'nextval(\'data.secuence_aeinstconf_id\'::regclass)', note: 'Identificador único de la configuración.']
+  aeinstconf_mobile_comunications_notifier bool [default: 'true', note: 'Habilitar notificador de comunicados hacia dispositivos móviles.']
+  aeinstconf_mobile_comunications_notifier_text text [default: '\'la institución habilitará los comunicados próximamente\'::text', note: 'Mensaje mostrado cuando no se pueden ver comunicados.']
+  aeinstconf_mobile_query bool [default: 'true', note: 'Permitir consultas desde dispositivos móviles.']
+  aeinstconf_mobile_query_text text [default: '\'la institución habilitará las consultas próximamente\'::text', note: 'Mensaje cuando no se pueden hacer consultas.']
+  aeinstconf_pin_char varchar(3) [default: '\'Q\'::"char"', note: 'Letra actual con la que la institución genera el PIN.']
+  aeinstconf_pin_number varchar(3) [default: '0', note: 'Número actual para generar los PINs.']
+  aeinstconf_pqr_notifier bool [default: 'true', note: 'Habilitar PQRS desde dispositivos móviles.']
+  aeinstconf_pqr_notifier_text text [default: '\'la institución habilitará los PQRS próximamente\'::text', note: 'Texto cuando no pueden realizar PQRS.']
+  Note: 'Configuraciones (parámetros de funcionamiento) por institución y año lectivo.'
+}
+
+Table data.aeinstitucionesss {
+  aeinst_direccion varchar(128) [not null, note: 'Dirección.']
+  aeinst_escudo text [not null, note: 'Escudo.']
+  aeinst_fax varchar(128) [note: 'Fax.']
+  aeinst_himno text [note: 'Himno.']
+  aeinst_id double [pk, not null, default: 'nextval(\'data.secuence_aeinst_id\'::regclass)', note: 'Identificador único de la institución.']
+  aeinst_lema text [note: 'Lema.']
+  aeinst_mail varchar(128) [not null, note: 'Correo electrónico.']
+  aeinst_manualconvivencia text [not null, note: 'Manual de convivencia.']
+  aeinst_nit varchar(15) [not null, note: 'NIT.']
+  aeinst_nombre varchar(128) [not null, note: 'Nombre de la institución.']
+  aeinst_reconocimiento text [not null, note: 'Reconocimiento oficial.']
+  aeinst_resolrector text [note: 'Resolución rectoral.']
+  aeinst_telefono varchar(128) [not null, note: 'Teléfono principal.']
+  aeinst_telefono2 varchar(128) [note: 'Teléfono secundario.']
+  aeusu_id double [not null, note: 'Usuario administrador.']
+  Note: 'Copia/backup adicional de instituciones educativas.'
+}
+
+Table data.aejornada {
+  aejornada_descripcion varchar(32) [not null, note: 'Descripción de la jornada.']
+  aejornada_estado int [default: '1', note: 'Estado de la jornada (1=activo).']
+  aejornada_id int [pk, not null, note: 'Identificador único de la jornada.']
+  Note: 'Jornadas escolares (diurna, nocturna, mañana, tarde, única).'
+}
+
+Table data.aelog_envios {
+  aeestudiantes_id bigint [not null, note: 'Estudiante relacionado.']
+  destino varchar(20) [not null, note: 'Número de destino.']
+  emisor varchar(14) [not null, note: 'Número emisor de WhatsApp.']
+  enviosdetalles text [note: 'Detalles del envío.']
+  fecharegistro timestamp [not null, default: 'CURRENT_TIMESTAMP', note: 'Fecha del envío.']
+  idempresa bigint [not null, note: 'Institución (FK a aeinstituciones).']
+  idlogenvios int [pk, not null, default: 'nextval(\'data.aelog_envios_idlogenvios_seq\'::regclass)', note: 'Identificador único del envío.']
+  idreferencia bigint [not null, note: 'Referencia del registro que motivó el envío.']
+  sent bool [not null, default: 'false', note: 'Si fue enviado.']
+  tipo int [not null, note: 'Tipo de mensaje (FK a aetipo_envio).']
+  Note: 'Log de envíos de mensajes (WhatsApp) realizados.'
+}
+
+Table data.aelogdispositivos {
+  aelogdispositivos_fecha timestamp [not null, note: 'Fecha del acceso.']
+  aelogdispositivos_id int [pk, not null, default: 'nextval(\'data.aelogdispositivos_aelogdispositivos_id_seq\'::regclass)', note: 'Identificador único del registro.']
+  aelogdispositivos_ip text [note: 'IP del dispositivo.']
+  aelogdispositivos_model text [note: 'Modelo del dispositivo.']
+  aelogdispositivos_platform text [note: 'Plataforma (Android/iOS/web).']
+  aelogdispositivos_serial text [note: 'Serial del dispositivo.']
+  aelogdispositivos_state text [not null, note: 'Estado de la acción.']
+  aelogdispositivos_target text [note: 'Destino/acción realizada.']
+  aelogdispositivos_uuid text [note: 'UUID del dispositivo.']
+  aelogdispositivos_version text [note: 'Versión de la app.']
+  aeusu_id double [not null, note: 'Usuario.']
+  Note: 'Log de accesos/dispositivos de los usuarios.'
+}
+
+Table data.aematriculas_academia {
+  aeestudiantes_id int [note: 'Estudiante (FK a aematriculas_estudiantes).']
+  aeestudiantesacademia_colegio_caracter smallint [note: 'Carácter del colegio anterior (FK a aecaracter).']
+  aeestudiantesacademia_colegio_ciudad smallint [note: 'Ciudad del colegio anterior.']
+  aeestudiantesacademia_colegio_pais smallint [note: 'País del colegio anterior.']
+  aeestudiantesacademia_colegio_provincia smallint [note: 'Provincia del colegio anterior.']
+  aeestudiantesacademia_conocernos smallint [note: 'Cómo conoció la institución (FK a aeconocer).']
+  aeestudiantesacademia_conocernos_otro varchar(255) [note: 'Otra forma de conocer la institución.']
+  aeestudiantesacademia_gradomatricula smallint [not null, note: 'Grado al que se matricula.']
+  aeestudiantesacademia_id int [not null, default: 'nextval(\'data.aematriculas_academia_aeestudiantesacademia_id_seq\'::regclass)', note: 'Identificador único del registro.']
+  aeestudiantesacademia_nuevo bool [note: 'Si es estudiante nuevo.']
+  aeestudiantesacademia_repitente bool [not null, note: 'Si es repitente.']
+  Note: 'Matrícula: información académica previa del estudiante.'
+}
+
+Table data.aematriculas_acudientes {
+  aeacudientes_apellidos varchar(128) [not null, note: 'Apellidos del acudiente.']
+  aeacudientes_celpersonal varchar(255) [note: 'Celular personal.']
+  aeacudientes_empresa varchar(64) [note: 'Empresa donde trabaja.']
+  aeacudientes_empresacargo varchar(64) [note: 'Cargo en la empresa.']
+  aeacudientes_empresadireccion varchar(255) [note: 'Dirección de la empresa.']
+  aeacudientes_empresario bool [note: 'Si es empresario independiente.']
+  aeacudientes_empresariotipo smallint [default: '0', note: 'Tipo de empresa (FK a aetipoempresa).']
+  aeacudientes_empresatelefono varchar(255) [note: 'Teléfono de la empresa.']
+  aeacudientes_id int [not null, default: 'nextval(\'data.aematriculas_acudientes_aeacudientes_id_seq\'::regclass)', note: 'Identificador único del acudiente.']
+  aeacudientes_identificacion varchar(16) [not null, note: 'Identificación.']
+  aeacudientes_mail varchar(128) [note: 'Correo electrónico.']
+  aeacudientes_nombres varchar(128) [not null, note: 'Nombres del acudiente.']
+  aeacudientes_parentezcootro varchar(32) [note: 'Otro parentesco.']
+  aeacudientes_telresidencia varchar(255) [note: 'Teléfono de residencia.']
+  aeacudientes_tipoidentificacion smallint [not null, note: 'Tipo de identificación.']
+  aeusu_id int [not null, note: 'Usuario de login.']
+  Note: 'Matrícula: datos de los acudientes en el proceso de matrícula.'
+}
+
+Table data.aematriculas_adjuntos {
+  adjuntos_certificadomedico text [note: 'Certificado médico.']
+  aeadjuntos_cartalaboral text [not null, note: 'Carta laboral.']
+  aeadjuntos_contrato text [note: 'Contrato.']
+  aeadjuntos_documentoacudiente text [not null, note: 'Documento del acudiente.']
+  aeadjuntos_documentoestudiante text [not null, note: 'Documento del estudiante.']
+  aeadjuntos_documentootroestudiante text [note: 'Otro documento del estudiante.']
+  aeadjuntos_documentoresponsable text [not null, note: 'Documento del responsable.']
+  aeadjuntos_epsafiliacion text [not null, note: 'Afiliación a EPS.']
+  aeadjuntos_facturaservicios text [not null, note: 'Factura de servicios públicos.']
+  aeadjuntos_fecharegistro timestamptz [not null, note: 'Fecha de registro.']
+  aeadjuntos_fotoacudiente text [not null, note: 'Foto del acudiente.']
+  aeadjuntos_fotoestudiante text [not null, note: 'Foto del estudiante.']
+  aeadjuntos_fotorespfinanciero text [not null, note: 'Foto del responsable financiero.']
+  aeadjuntos_id int [pk, not null, default: 'nextval(\'data.aematriculas_adjuntos_aeadjuntos_id_seq\'::regclass)', note: 'Identificador único del registro.']
+  aeadjuntos_pagadamatricula text [note: 'Pago de matrícula.']
+  aeadjuntos_pagadaotroscostos text [note: 'Pago de otros costos.']
+  aeadjuntos_pagare text [note: 'Pagaré.']
+  aeadjuntos_vacunas text [note: 'Carné de vacunas.']
+  aeestudiantes_id bigint [not null, note: 'Estudiante (FK a aematriculas_estudiantes).']
+  Note: 'Matrícula: documentos adjuntos del proceso de matrícula.'
+}
+
+Table data.aematriculas_demografia {
+  aeestudiantes_id int [not null, note: 'Estudiante (FK a aematriculas_estudiantes).']
+  aeestudiantesdemografia_barrio text [note: 'Barrio.']
+  aeestudiantesdemografia_cantidadhermanas int [note: 'Número de hermanas.']
+  aeestudiantesdemografia_cantidadhermanos int [note: 'Número de hermanos.']
+  aeestudiantesdemografia_cirugias bool [note: 'Si ha tenido cirugías.']
+  aeestudiantesdemografia_cirugias_cual varchar(255) [note: 'Detalle de cirugías.']
+  aeestudiantesdemografia_comuna int [note: 'Comuna.']
+  aeestudiantesdemografia_deptonacimiento int [note: 'Departamento de nacimiento.']
+  aeestudiantesdemografia_desplazado bool [note: 'Si es desplazado.']
+  aeestudiantesdemografia_direccion text [note: 'Dirección.']
+  aeestudiantesdemografia_discapacidad int [note: 'Discapacidad (FK a aediscapacidades).']
+  aeestudiantesdemografia_discapacidad_otra varchar(32) [note: 'Otra discapacidad.']
+  aeestudiantesdemografia_eps int [not null, note: 'EPS (FK a aeeps).']
+  aeestudiantesdemografia_estrato int [note: 'Estrato socioeconómico.']
+  aeestudiantesdemografia_etnia smallint [default: '0', note: 'Etnia (FK a aeetnias).']
+  aeestudiantesdemografia_fecharegistro timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  aeestudiantesdemografia_gruposanguineo int [note: 'Grupo sanguíneo (FK a aegruposanguineo).']
+  aeestudiantesdemografia_id int [pk, not null, default: 'nextval(\'data.aematriculas_demografia_aeestudiantesdemografia_id_seq\'::regclass)', note: 'Identificador único del registro.']
+  aeestudiantesdemografia_mupionacimiento int [note: 'Municipio de nacimiento.']
+  aeestudiantesdemografia_paisnacimiento int [note: 'País de nacimiento.']
+  aeestudiantesdemografia_peso numeric [note: 'Peso.']
+  aeestudiantesdemografia_rh char(1) [note: 'Factor RH.']
+  aeestudiantesdemografia_sisben bool [default: 'true', note: 'Si tiene SISBEN.']
+  aeestudiantesdemografia_sisbennivel numeric [not null, note: 'Nivel SISBEN.']
+  aeestudiantesdemografia_talla text [note: 'Talla.']
+  aeestudiantesdemografia_tratamientoterapia bool [note: 'Si está en tratamiento/terapia.']
+  aeestudiantesdemografia_tratamientoterapia_cual varchar(255) [note: 'Detalle del tratamiento.']
+  Note: 'Matrícula: datos demográficos y de salud del estudiante.'
+}
+
+Table data.aematriculas_estudiantes {
+  aeacudientes_id bigint [note: 'Acudiente asociado.']
+  aeano_id int [not null, note: 'Año lectivo.']
+  aeestudiantes_apellidos varchar(64) [not null, note: 'Apellidos del estudiante.']
+  aeestudiantes_codigo varchar(32) [note: 'Código.']
+  aeestudiantes_direccion text [note: 'Dirección.']
+  aeestudiantes_estado smallint [note: 'Estado de la matrícula.']
+  aeestudiantes_fechanacimiento date [note: 'Fecha de nacimiento.']
+  aeestudiantes_fecharegistro timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  aeestudiantes_genero char(1) [note: 'Género.']
+  aeestudiantes_grado smallint [note: 'Grado (FK a aegrados).']
+  aeestudiantes_grupo varchar(32) [note: 'Grupo/salón.']
+  aeestudiantes_id int [pk, not null, default: 'nextval(\'data.aematriculas_estudiantes_aeestudiantes_id_seq\'::regclass)', note: 'Identificador único del estudiante (FK a aeestudiantes).']
+  aeestudiantes_identificacion varchar(32) [note: 'Identificación.']
+  aeestudiantes_jornada smallint [note: 'Jornada (FK a aejornada).']
+  aeestudiantes_mail text [note: 'Correo.']
+  aeestudiantes_nombres varchar(64) [not null, note: 'Nombres del estudiante.']
+  aeestudiantes_telefono text [note: 'Teléfono.']
+  aeestudiantes_tipodocumento smallint [default: '2', note: 'Tipo de documento (FK a aetipodocumento).']
+  aeinstitucion_id int [not null, note: 'Institución.']
+  aeusu_id int [note: 'Usuario que registra.']
+  Note: 'Matrícula: datos del estudiante en el proceso de matrícula.'
+}
+
+Table data.aemediciones {
+  aelogdispositivos_model text [note: 'Modelo del dispositivo.']
+  aelogdispositivos_platform text [note: 'Plataforma.']
+  aelogdispositivos_serial text [note: 'Serial.']
+  aelogdispositivos_source text [note: 'Origen del registro.']
+  aelogdispositivos_uuid text [note: 'UUID.']
+  aelogdispositivos_version text [note: 'Versión.']
+  aemediciones_concepto text [not null, note: 'Concepto evaluado.']
+  aemediciones_estudiante double [not null, note: 'Estudiante evaluado.']
+  aemediciones_fecha timestamp [not null, note: 'Fecha de la medición.']
+  aemediciones_grupo varchar(32) [note: 'Grupo/salón.']
+  aemediciones_id double [pk, not null, note: 'Identificador único de la medición.']
+  aemediciones_valor double [not null, note: 'Valor de la medición.']
+  aeusu_id text [not null, note: 'Usuarios destinatarios.']
+  Note: 'Mediciones/valoraciones (conceptos evaluados) de los estudiantes.'
+}
+
+Table data.aemotivo {
+  aeestados_id int [not null, note: 'Estado asociado (FK a aeestados).']
+  aemotivo_id int [pk, not null, note: 'Identificador único del motivo.']
+  aemotivo_nombre varchar [not null, note: 'Nombre del motivo (Agresión, Evasión, etc.).']
+  Note: 'Motivos de citación (catálogo).'
+}
+
+Table data.aenotificaciones {
+  aenotificaciones_body text [note: 'Cuerpo de la notificación.']
+  aenotificaciones_data text [not null, note: 'Datos adicionales.']
+  aenotificaciones_de double [not null, note: 'Usuario remitente.']
+  aenotificaciones_estado int [default: '11', note: 'Estado de la notificación (FK a aeestados).']
+  aenotificaciones_fecha timestamp [not null, note: 'Fecha de la notificación.']
+  aenotificaciones_id double [pk, not null, note: 'Identificador único de la notificación.']
+  aenotificaciones_para text [not null, note: 'Usuarios destinatarios.']
+  aenotificaciones_referencia double [not null, note: 'Referencia al registro origen.']
+  aenotificaciones_ruta text [note: 'Ruta/URL de destino al abrir.']
+  aenotificaciones_title text [note: 'Título de la notificación.']
+  Note: 'Notificaciones internas generadas para los usuarios (inbox).'
+}
+
+Table data.aeopcres {
+  aeopcres_descripcion text [not null, note: 'Texto de la opción.']
+  aeopcres_estado bool [default: 'true', note: 'Estado (true=activo).']
+  aeopcres_id int [pk, not null, default: 'nextval(\'data.aeopcres_aeopcres_id_seq\'::regclass)', note: 'Identificador único de la opción.']
+  aeopcres_orden int [note: 'Orden de la opción.']
+  aeopcres_valor double [note: 'Valor/puntaje de la opción.']
+  aepre_id bigint [not null, note: 'Pregunta a la que pertenece (FK a aepre).']
+  Note: 'Opciones de respuesta para las preguntas de un cuestionario.'
+}
+
+Table data.aepqr {
+  aeano_id int [note: 'Año lectivo.']
+  aeestados_id int [note: 'Estado del PQRS (FK a aeestados).']
+  aeinst_id int [not null, note: 'Institución (FK a aeinstituciones).']
+  aepqr_adjunto varchar(500) [note: 'Archivo adjunto.']
+  aepqr_contenido text [not null, note: 'Contenido del PQRS.']
+  aepqr_email varchar(64) [not null, note: 'Correo del solicitante.']
+  aepqr_fecha timestamp(6) without time zone [not null, note: 'Fecha del PQRS.']
+  aepqr_id int [pk, not null, note: 'Identificador único del PQRS.']
+  aepqr_nombre text [not null, note: 'Nombre del solicitante.']
+  aepqr_telefono varchar(13) [note: 'Teléfono del solicitante.']
+  aepqr_tiposolicitud_id int [not null, note: 'Tipo de solicitud (FK a aepqr_tiposolicitud).']
+  aepqr_usuario int [not null, note: 'Usuario que registra (FK a engine.aeusu).']
+  Note: 'PQRS (peticiones, quejas, reclamos y sugerencias/felicitaciones) de los usuarios.'
+}
+
+Table data.aepqr_respuesta {
+  aepqr_id int [note: 'PQRS respondido (FK a aepqr, único).']
+  aepqr_respuesta_adjunto varchar(128) [note: 'Archivo adjunto.']
+  aepqr_respuesta_fecha timestamp(6) without time zone [note: 'Fecha de la respuesta.']
+  aepqr_respuesta_id int [not null, note: 'Identificador único de la respuesta.']
+  aepqr_respuesta_mensaje text [note: 'Texto de la respuesta.']
+  Note: 'Respuestas a los PQRS.'
+}
+
+Table data.aepqr_tiposolicitud {
+  aepqr_tiposolicitud_descripcion varchar(16) [note: 'Descripción del tipo de solicitud.']
+  aepqr_tiposolicitud_id int [pk, not null, default: 'nextval(\'data.aepqr_tiposolicitud_aepqr_tiposolicitud_id_seq\'::regclass)', note: 'Identificador único del tipo de solicitud.']
+  aepqr_tiposolicitud_vencimiento int [note: 'Días para el vencimiento de la respuesta.']
+  Note: 'Tipos de solicitud PQRS (Petición, Quejas, Reclamos, Felicitaciones).'
+}
+
+Table data.aepre {
+  aecue_id bigint [not null, note: 'Evaluación a la que pertenece (FK a aecue).']
+  aepre_descripcion text [not null, note: 'Enunciado de la pregunta.']
+  aepre_estado bool [default: 'true', note: 'Estado (true=activo).']
+  aepre_fechacreacion timestamp [note: 'Fecha de creación.']
+  aepre_id bigint [pk, not null, default: 'nextval(\'data.aepre_aecue_id_seq\'::regclass)', note: 'Identificador único de la pregunta.']
+  aepre_orden int [default: '1', note: 'Orden de la pregunta.']
+  aetippre_id int [not null, note: 'Tipo de pregunta (FK a aetippre).']
+  Note: 'Preguntas de un cuestionario/evaluación.'
+}
+
+Table data.aepublicaciones {
+  aeanol_id bigint [not null, note: 'Año lectivo.']
+  aeinst_id text [not null, note: 'Instituciones a las que aplica.']
+  aepublicaciones_aceptarespuestas bool [default: 'true', note: 'Si acepta respuestas.']
+  aepublicaciones_adjunto text [note: 'Archivo adjunto.']
+  aepublicaciones_alcance int [default: '1', note: 'Alcance de la publicación.']
+  aepublicaciones_descripcion text [not null, note: 'Descripción.']
+  aepublicaciones_estado int [default: '1', note: 'Estado (1=activo).']
+  aepublicaciones_estudiantesid text [note: 'Estudiantes específicos.']
+  aepublicaciones_fecha timestamp [not null, note: 'Fecha de creación.']
+  aepublicaciones_fechafinalizacion timestamp [not null, note: 'Fecha de finalización.']
+  aepublicaciones_fechapublicacion timestamp [not null, note: 'Fecha de publicación.']
+  aepublicaciones_grupo varchar[] [note: 'Grupos a los que aplica.']
+  aepublicaciones_id bigint [pk, not null, note: 'Identificador único de la publicación.']
+  aepublicaciones_titulo text [not null, note: 'Título.']
+  aepublicacionestipo_id int [default: '0', note: 'Tipo de publicación (FK a aepublicaciones_tipo).']
+  aeusu_id bigint [not null, note: 'Usuario autor.']
+  Note: 'Publicaciones generales (noticias, anuncios) de la institución.'
+}
+
+Table data.aepublicaciones_alerta {
+  aepublicaciones_id bigint [not null, note: 'Publicación (FK a aepublicaciones).']
+  aepublicacionesalerta_fecha timestamp [not null, default: 'CURRENT_TIMESTAMP', note: 'Fecha de la alerta.']
+  aepublicacionesalerta_id int [not null, default: 'nextval(\'data.aepublicaciones_alerta_aepublicacionesalerta_id_seq\'::regclass)', note: 'Identificador único de la alerta.']
+  Note: 'Alertas/recordatorios de publicaciones.'
+}
+
+Table data.aepublicaciones_comentarios {
+  aepublicaciones_id bigint [not null, note: 'Publicación (FK a aepublicaciones).']
+  aepublicacionescomentarios_descripcion text [not null, note: 'Texto del comentario.']
+  aepublicacionescomentarios_estado int [default: '1', note: 'Estado (1=activo).']
+  aepublicacionescomentarios_fecha timestamp [not null, note: 'Fecha del comentario.']
+  aepublicacionescomentarios_id bigint [pk, not null, note: 'Identificador único del comentario.']
+  aeusu_id bigint [not null, note: 'Usuario que comenta.']
+  Note: 'Comentarios a las publicaciones.'
+}
+
+Table data.aepublicaciones_tipo {
+  aepublicacionestipo_color varchar(8) [default: '\'#FBB919\'::character varying', note: 'Color asociado al tipo.']
+  aepublicacionestipo_descripcion text [not null, note: 'Descripción del tipo.']
+  aepublicacionestipo_estado int [not null, default: '1', note: 'Estado (1=activo).']
+  aepublicacionestipo_id int [not null, default: 'nextval(\'data.aepublicaciones_tipo_aepublicacionestipo_id_seq\'::regclass)', note: 'Identificador único del tipo.']
+  Note: 'Tipos de publicación (catálogo con color).'
+}
+
+Table data.aeres {
+  aeopcres_id int [note: 'Opción elegida (FK a aeopcres).']
+  aepre_id bigint [not null, note: 'Pregunta respondida (FK a aepre).']
+  aeres_id bigint [not null, note: 'Identificador único de la respuesta.']
+  aeresp_abierta text [note: 'Respuesta abierta (texto libre).']
+  inst_cue_res_id bigint [not null, note: 'Intento (FK a inst_cue_res).']
+  Note: 'Respuestas dadas a las preguntas de un cuestionario en un intento.'
+}
+
+Table data.aesolicitud {
+  aeanol_id int [not null, note: 'Año lectivo.']
+  aeinst_id int [not null, note: 'Institución (FK a aeinstituciones).']
+  aesolicitud_destino varchar(128) [default: '\'Reclamar en secretaría del colegio\'::character varying', note: 'Destino/forma de entrega del certificado.']
+  aesolicitud_estado int [default: '1', note: 'Estado de la solicitud.']
+  aesolicitud_fecha date [default: '(\'now\'::text)::date', note: 'Fecha de la solicitud.']
+  aesolicitud_hora time [default: '(\'now\'::text)::time without time zone', note: 'Hora de la solicitud.']
+  aesolicitud_id double [pk, not null, note: 'Identificador único de la solicitud.']
+  aesolicitud_mensaje text [not null, note: 'Mensaje de la solicitud.']
+  aetipo_certicado int [not null, note: 'Tipo de certificado (FK a aetipo_certificado).']
+  aeusu_id int [not null, note: 'Usuario que solicita.']
+  Note: 'Solicitudes de certificados (paz y salvo, notas, matrícula, etc.).'
+}
+
+Table data.aetar {
+  aetar_adjunto1 varchar(256) [note: 'Adjunto 1.']
+  aetar_adjunto2 varchar(256) [note: 'Adjunto 2.']
+  aetar_adjunto3 varchar(256) [note: 'Adjunto 3.']
+  aetar_descripcion text [not null, note: 'Descripción de la tarea.']
+  aetar_estado int [default: '1', note: 'Estado (1=activo).']
+  aetar_fechacreacion timestamp [not null, note: 'Fecha de creación.']
+  aetar_id bigint [not null, note: 'Identificador único de la tarea.']
+  aetar_nombre varchar(128) [not null, note: 'Nombre de la tarea.']
+  Note: 'Tareas (plantillas de homework).'
+}
+
+Table data.aetar_pro {
+  aeanol_id bigint [not null, note: 'Año lectivo.']
+  aeasignaciones_asignatura varchar(64) [not null, note: 'Asignatura.']
+  aedocentes_id bigint [not null, note: 'Docente que asigna.']
+  aeestudiantes_grupo varchar(32) [not null, note: 'Grupo/salón.']
+  aeinst_id bigint [not null, note: 'Institución.']
+  aetar_id bigint [not null, note: 'Tarea (FK a aetar).']
+  aetar_pro_estado int [default: '1', note: 'Estado (1=activo).']
+  aetar_pro_fechalimite timestamp [not null, note: 'Fecha límite de entrega.']
+  aetar_pro_id bigint [not null, note: 'Identificador único de la programación.']
+  Note: 'Programación de tareas (asignación de una tarea a un grupo/institución/año).'
+}
+
+Table data.aetar_res {
+  aeestudiantes_id bigint [not null, note: 'Estudiante que entrega.']
+  aetar_pro_id bigint [not null, note: 'Programación (FK a aetar_pro).']
+  aetar_res_adjunto1 varchar(256) [note: 'Adjunto 1.']
+  aetar_res_adjunto2 varchar(256) [note: 'Adjunto 2.']
+  aetar_res_adjunto3 varchar(256) [note: 'Adjunto 3.']
+  aetar_res_aprobacion bool [default: 'false', note: 'Si fue aprobada.']
+  aetar_res_descripcion text [not null, note: 'Descripción de la entrega.']
+  aetar_res_estado int [default: '1', note: 'Estado (1=activo).']
+  aetar_res_fechaentrega timestamp [not null, note: 'Fecha de entrega.']
+  aetar_res_id bigint [not null, note: 'Identificador único de la entrega.']
+  aetar_res_resultado double [note: 'Resultado/calificación.']
+  Note: 'Entrega de tareas (respuesta del estudiante a una tarea programada).'
+}
+
+Table data.aetipint {
+  aetipint_descripcion varchar(64) [note: 'Descripción del tipo de intento.']
+  aetipint_estado bool [default: 'true', note: 'Estado (true=activo).']
+  aetipint_id int [pk, not null, note: 'Identificador único del tipo de intento.']
+  Note: 'Tipos de intento para calificar un cuestionario (promedio, primer intento, último intento).'
+}
+
+Table data.aetipo_certificado {
+  aeestado_id int [note: 'Estado (FK a aeestados).']
+  aetipocertificado_descripcion varchar [note: 'Descripción del certificado.']
+  aetipocertificado_id bigint [pk, not null, note: 'Identificador único del tipo de certificado.']
+  aetipocertificado_nombre varchar [note: 'Nombre del certificado.']
+  Note: 'Tipos de certificado (paz y salvo, estudio, matrícula, notas, conducta, etc.).'
+}
+
+Table data.aetipo_envio {
+  aeestado_id int [default: '1', note: 'Estado (FK a aeestados).']
+  aetipoenvio_descripcion varchar(64) [note: 'Descripción del tipo de envío.']
+  aetipoenvio_id bigint [pk, not null, note: 'Identificador único del tipo de envío.']
+  Note: 'Tipos de envío de notificaciones (comunicado, asistencia, horario, excusa, tarea, etc.).'
+}
+
+Table data.aetipodocumento {
+  aetipodocumento_descripcion varchar(64) [note: 'Descripción del tipo de documento.']
+  aetipodocumento_estado smallint [default: '1', note: 'Estado (1=activo).']
+  aetipodocumento_id smallint [not null, note: 'Identificador único del tipo de documento.']
+  aetipodocumento_sigla varchar(8) [not null, note: 'Sigla del tipo de documento (C.C., T.I., etc.).']
+  Note: 'Tipos de documento de identidad (catálogo).'
+}
+
+Table data.aetipoempresa {
+  aetipoempresa_descripcion varchar(32) [note: 'Descripción del tipo de empresa.']
+  aetipoempresa_estado smallint [default: '1', note: 'Estado (1=activo).']
+  aetipoempresa_id smallint [pk, not null, note: 'Identificador único del tipo de empresa.']
+  Note: 'Tipos de empresa del acudiente (catálogo de encuesta).'
+}
+
+Table data.aetipoexcusas {
+  aetipoexcusa_descripcion text [not null, note: 'Descripción del tipo de excusa.']
+  aetipoexcusa_id int [pk, not null, note: 'Identificador único del tipo de excusa.']
+  aetipoexcusa_nombre text [not null, note: 'Nombre del tipo de excusa.']
+  aetipoexcusas_estado int [not null, note: 'Estado del tipo de excusa.']
+  Note: 'Tipos de excusa (catálogo: salud, calamidad, etc.).'
+}
+
+Table data.aetippre {
+  aetippre_descripcion varchar(64) [note: 'Descripción del tipo de pregunta.']
+  aetippre_estado bool [default: 'true', note: 'Estado (true=activo).']
+  aetippre_id int [pk, not null, default: 'nextval(\'data.aetippre_aetippre_id_seq\'::regclass)', note: 'Identificador único del tipo de pregunta.']
+  Note: 'Tipos de pregunta de los cuestionarios (única, múltiple, abierta, verdadero/falso, etc.).'
+}
+
+Table data.inst_cue {
+  aeano_id int [not null, note: 'Año lectivo.']
+  aecue_id bigint [not null, note: 'Cuestionario (FK a aecue).']
+  aeestudiantes_grupo varchar(32) [not null, note: 'Grupo/salón habilitado.']
+  aeinst_cue_duracion interval [default: '\'00:30:00\'::time without time zone', note: 'Duración permitida del cuestionario.']
+  aeinst_cue_estado int [default: '1', note: 'Estado (1=activo).']
+  aeinst_cue_fechacreacion timestamp [not null, note: 'Fecha de creación.']
+  aeinst_cue_fechafin timestamp [not null, note: 'Fecha de fin de la habilitación.']
+  aeinst_cue_fechaini timestamp [not null, note: 'Fecha de inicio de la habilitación.']
+  aeinst_cue_id bigint [pk, not null, note: 'Identificador único de la habilitación.']
+  aeinst_cue_intentos int [default: '1', note: 'Número de intentos permitidos.']
+  aeinst_cue_ordenado bool [default: 'true', note: 'Si las preguntas van en orden.']
+  aeinst_cue_resultadominimo double [note: 'Resultado mínimo para aprobar.']
+  aeinst_cue_tipointento int [note: 'Tipo de intento a calificar (FK a aetipint).']
+  aeinst_id double [not null, note: 'Institución (FK a aeinstituciones).']
+  aeusu_id bigint [not null, note: 'Docente que habilita (FK a engine.aeusu).']
+  Note: 'Cuestionarios habilitados para un salón/grupo de una institución.'
+}
+
+Table data.inst_cue_res {
+  aeinst_cue_id bigint [not null, note: 'Cuestionario habilitado (FK a inst_cue).']
+  aeusu_id double [not null, note: 'Usuario/estudiante que responde.']
+  inst_cue_res_aprobacion bool [default: 'false', note: 'Si aprobó.']
+  inst_cue_res_duracion interval [note: 'Duración del intento.']
+  inst_cue_res_estado int [default: '1', note: 'Estado (1=activo).']
+  inst_cue_res_fechafin timestamptz [not null, note: 'Fecha de fin del intento.']
+  inst_cue_res_fechaini timestamptz [not null, note: 'Fecha de inicio del intento.']
+  inst_cue_res_fechaintento timestamptz [not null, note: 'Fecha del intento.']
+  inst_cue_res_id bigint [pk, not null, note: 'Identificador único del intento.']
+  inst_cue_res_resultado double [not null, note: 'Resultado obtenido.']
+  Note: 'Intentos de respuesta de un estudiante a un cuestionario habilitado.'
+}
+
+Table data.inst_doce {
+  aeanol_id int [note: 'Año lectivo de la relación.']
+  aedocentes_id double [not null, note: 'Docente (FK a aedocentes).']
+  aeinst_id double [not null, note: 'Institución (FK a aeinstituciones).']
+  inst_doce_estado int [default: '1', note: 'Estado de la relación (1=activo).']
+  inst_doce_id double [pk, not null, default: 'nextval(\'data.secuence_inst_doce_id\'::regclass)', note: 'Identificador único de la relación.']
+  Note: 'Relación entre instituciones y docentes (docente contratado en una institución y año).'
+}
+
+Table data.tipo_citacion {
+  motivo_estado smallint [not null, note: 'Estado del motivo.']
+  motivo_id int [pk, not null, note: 'Identificador único del motivo.']
+  motivo_nombre varchar(200) [not null, note: 'Nombre del motivo.']
+  Note: 'Tipos/motivos de citación (catálogo adicional).'
+}
+
+Table engine.aemenu {
+  aemenu_descripcion text [not null, note: 'Descripción del menú.']
+  aemenu_estado int [not null, note: 'Estado del menú.']
+  aemenu_icono text [not null, note: 'Icono del menú.']
+  aemenu_id int [pk, not null, note: 'Identificador único del menú.']
+  aemenu_nombre text [not null, note: 'Nombre del menú.']
+  aemenu_orden int [note: 'Orden de visualización del menú.']
+  Note: 'Menús (agrupadores de opciones) de la agenda escolar.'
+}
+
+Table engine.aeopcmenu {
+  aemenu_id int [not null, note: 'Menú padre de la opción (FK a aemenu).']
+  aeopcmenu_descripcion text [not null, note: 'Descripción de la opción.']
+  aeopcmenu_enlace text [not null, note: 'Enlace/ruta de la opción.']
+  aeopcmenu_estado int [not null, note: 'Estado de la opción (1=activo).']
+  aeopcmenu_icono text [not null, note: 'Icono de la opción.']
+  aeopcmenu_id int [pk, not null, note: 'Identificador único de la opción.']
+  aeopcmenu_nombre text [not null, note: 'Nombre de la opción de menú.']
+  aeopcmenu_orden int [not null, note: 'Orden de visualización de la opción.']
+  Note: 'Opciones de menú (páginas/acciones) dentro de cada menú.'
+}
+
+Table engine.aeroll {
+  aeroll_descripcion text [not null, note: 'Descripción del rol.']
+  aeroll_esta int [not null, note: 'Estado del rol.']
+  aeroll_id int [pk, not null, note: 'Identificador único del rol.']
+  aeroll_index text [not null, note: 'Página de inicio a la que redirige el rol.']
+  aeroll_nombre varchar(20) [not null, note: 'Nombre del rol.']
+  Note: 'Roles de la agenda escolar (admin académico, docente, estudiante, acudiente, etc.).'
+}
+
+Table engine.aerollopc {
+  aeopcmenu_id int [not null, note: 'Opción de menú (FK a aeopcmenu).']
+  aeroll_id int [not null, note: 'Rol al que se asigna la opción (FK a aeroll).']
+  aerollopc_estado int [default: '1', note: 'Estado del privilegio (1=activo).']
+  aerollopc_id int [pk, not null, note: 'Identificador único del privilegio.']
+  indexes {
+    (aerollopc_estado, aeopcmenu_id, aeroll_id) [unique]
+  }
+  Note: 'Privilegios por rol: opciones de menú a las que puede acceder cada rol.'
+}
+
+Table engine.aeusu {
+  aeroll_id int [not null, note: 'Rol del usuario (FK a aeroll).']
+  aeusu_estado int [not null, note: 'Estado del usuario.']
+  aeusu_id double [pk, not null, default: 'nextval(\'engine.secuence_aeusu_id\'::regclass)', note: 'Identificador único del usuario.']
+  aeusu_llave text [not null, note: 'Clave/password del usuario.']
+  aeusu_nick text [not null, note: 'Nick/usuario de login (único).']
+  aeusu_nombre text [not null, note: 'Nombre del usuario.']
+  aeusu_token text [note: 'Token de sesión/dispositivo del usuario.']
+  Note: 'Usuarios de la agenda escolar (login).'
+}
+
+Table engine.aeusuopc {
+  aeopcmenu_id int [not null, note: 'Opción de menú (FK a aeopcmenu).']
+  aeusu_id int [not null, note: 'Usuario (FK a aeusu).']
+  aeusuopc_estado int [default: '1', note: 'Estado del privilegio (1=activo).']
+  aeusuopc_id int [pk, not null, note: 'Identificador único del privilegio.']
+  indexes {
+    (aeopcmenu_id, aeusu_id, aeusuopc_estado) [unique]
+  }
+  Note: 'Privilegios por usuario: opciones de menú adicionales asignadas a un usuario específico.'
+}
+
+Table engine.aeusuresetpass {
+  aeusu_id double [not null, note: 'Usuario que solicita el cambio (FK a aeusu).']
+  aeusures_dirip varchar(32) [note: 'IP desde donde se generó la solicitud.']
+  aeusures_estado int [default: '8', note: 'Estado de la solicitud.']
+  aeusures_fechageneracion timestamp [not null, note: 'Fecha de generación de la solicitud.']
+  aeusures_fechalink timestamp [note: 'Fecha en que se usó el enlace.']
+  aeusures_fechavence timestamp [not null, note: 'Fecha de vencimiento del enlace.']
+  aeusures_id int [pk, not null, note: 'Identificador único de la solicitud.']
+  aeusures_llavenew text [note: 'Nueva clave propuesta.']
+  aeusures_llavepre text [not null, note: 'Clave anterior (verificación).']
+  Note: 'Solicitudes de restablecimiento de contraseña de los usuarios.'
+}
+
+Table engine.aeusuroll {
+  aeacad_referencia bigint [note: 'Referencia académica asociada (docente, estudiante o acudiente).']
+  aeanol_id int [note: 'Año lectivo en el que aplica el rol.']
+  aeinst_id int [note: 'Institución en la que aplica el rol.']
+  aeroll_id int [not null, note: 'Rol asignado (FK a aeroll).']
+  aeusu_id bigint [not null, note: 'Usuario (FK a aeusu).']
+  aeusuroll_estado int [default: '1', note: 'Estado de la relación (1=activo).']
+  aeusuroll_fecharegistro timestamptz [default: 'CURRENT_TIMESTAMP', note: 'Fecha de registro de la relación.']
+  aeusuroll_id int [pk, not null, default: 'nextval(\'engine.secuence_aeusuroll_id\'::regclass)', note: 'Identificador único del registro.']
+  Note: 'Relación usuario-rol con alcance por institución y año lectivo (un usuario puede tener varios roles/contextos).'
+}
+
+Table estadistica.tabhistvis {
+  chisesta int [not null, default: '8', note: 'Estado del registro (8=activo).']
+  chistfech timestamp(6) without time zone [not null, note: 'Fecha y hora de la visita.']
+  chistid int [pk, not null, note: 'Identificador único de la visita.']
+  chistpage varchar(200) [not null, note: 'Página visitada (URL/ruta).']
+  cusuaid int [not null, note: 'Identificador del usuario que visitó la página.']
+  cusuatip varchar(20) [note: 'Tipo de usuario que realizó la visita.']
+  Note: 'Historial de visitas: páginas consultadas por cada usuario en la aplicación.'
+}
+
+Table integration.tabenla {
+  cenladesc text [not null, note: 'Descripción/tabla de destino del enlace.']
+  cenladesccamp text [not null, note: 'Campo(s) de la tabla de destino usados en el enlace.']
+  cenladescextr text [not null, note: 'Campos adicionales (extra) para la visualización en el enlace.']
+  cenlaesta int [not null, note: 'Estado del enlace.']
+  cenlaid int [pk, not null, note: 'Identificador único del enlace.']
+  Note: 'Mapeo de enlace entre los esquemas SAE (public/logic) y la agenda (Escuelapp): describe los campos con los que se hace el enlace.'
+}
+
+Table integration.tabregiacti {
+  cregiactifech date [not null, note: 'Fecha de la actividad.']
+  cregiactihora time [not null, note: 'Hora de la actividad.']
+  cregiactiid real [pk, not null, note: 'Identificador único del registro de actividad.']
+  cregiactiip varchar(15) [note: 'Dirección IP del usuario.']
+  cregiactinave varchar(16) [note: 'Navegador usado por el usuario.']
+  cregiactiregi text [not null, note: 'Descripción del registro/acción realizada.']
+  cregiactisecu varchar(14) [not null, note: 'Secuencia/código de la actividad.']
+  cusuaid int [not null, note: 'Usuario que realizó la actividad.']
+  Note: 'Registro de actividades de los usuarios en la aplicación (auditoría).'
+}
+
+Table logic.tabmenu {
+  cmenudesc text [not null, note: 'Descripción del menú.']
+  cmenudest text [not null, note: 'Página de destino/inicio del menú.']
+  cmenuesta int [not null, note: 'Estado del menú.']
+  cmenuid int [pk, not null, note: 'Identificador único del menú.']
+  cmenunomb text [not null, note: 'Nombre del menú.']
+  cmenuorde int [note: 'Orden de visualización del menú.']
+  Note: 'Menús (agrupadores de opciones) del sistema administrativo SAE.'
+}
+
+Table logic.tabopcimenu {
+  copcimenudesc text [not null, note: 'Descripción de la opción.']
+  copcimenuenla text [not null, note: 'Enlace/ruta de la opción.']
+  copcimenuesta int [not null, note: 'Estado de la opción.']
+  copcimenuicon text [not null, note: 'Icono de la opción.']
+  copcimenuid int [pk, not null, note: 'Identificador único de la opción.']
+  copcimenumenu int [not null, note: 'Menú padre (FK a tabmenu).']
+  copcimenunomb text [not null, note: 'Nombre de la opción.']
+  copcimenuorde int [not null, note: 'Orden de visualización.']
+  Note: 'Opciones de menú (páginas/acciones) dentro de cada menú del SAE.'
+}
+
+Table logic.tabroll {
+  cenlaid int [not null, note: 'Enlace de integración con la agenda (FK a integration.tabenla).']
+  crolldesc text [not null, note: 'Descripción del rol.']
+  crollesta int [not null, note: 'Estado del rol.']
+  crollid int [pk, not null, note: 'Identificador único del rol.']
+  crollnomb varchar(20) [not null, note: 'Nombre del rol.']
+  crollpagientr text [not null, note: 'Página de inicio del rol.']
+  Note: 'Roles del SAE (administrador, estudiante, docente, institución, acudiente, coordinador, secretaria).'
+}
+
+Table logic.tabrollopci {
+  copcimenuid int [not null, note: 'Opción de menú (FK a tabopcimenu).']
+  crollid int [not null, note: 'Rol (FK a tabroll).']
+  crollopciesta int [default: '1', note: 'Estado del privilegio (1=activo).']
+  crollopciid int [pk, not null, note: 'Identificador único del privilegio.']
+  Note: 'Privilegios por rol: opciones de menú accesibles para cada rol.'
+}
+
+Table logic.tabusua {
+  cusuaesta int [not null, note: 'Estado del usuario.']
+  cusuaid int [pk, not null, note: 'Identificador único del usuario.']
+  cusuallave text [not null, note: 'Clave/password del usuario.']
+  cusuanick text [not null, note: 'Nick/usuario de login.']
+  cusuanomb text [not null, note: 'Nombre del usuario.']
+  cusuaroll int [not null, note: 'Rol del usuario (FK a tabroll).']
+  indexes {
+    (cusuaesta, cusuanick) [unique]
+  }
+  Note: 'Usuarios del SAE (login).'
+}
+
+Table logic.tabusuaopci {
+  cusuaopciesta int [default: '1', note: 'Estado del privilegio (1=activo).']
+  cusuaopciid int [pk, not null, note: 'Identificador único del privilegio.']
+  cusuaopciopcimenu int [not null, note: 'Opción de menú (FK a tabopcimenu).']
+  cusuaopciusua int [not null, note: 'Usuario (FK a tabusua).']
+  Note: 'Privilegios por usuario: opciones de menú adicionales para un usuario específico.'
+}
+
+Table migracion.map_docente {
+  aedocentes_id double [pk, not null]
+  cdoceid int [not null]
+}
+
+Table migracion.map_estudiante {
+  aeestudiantes_id int [pk, not null]
+  cestuid int [not null]
+}
+
+Table migracion.map_institucion {
+  aeinst_id double [pk, not null]
+  cinstid int [not null]
+}
+
+Table migracion.map_rol {
+  aeroll_id int [not null]
+  crollid int [pk, not null]
+}
+
+Table migracion.map_usuario {
+  aeusu_id double [not null]
+  cusuaid int [pk, not null]
+}
+
+Table observador.tabobsplan {
+  cestaobsplan int [not null, default: '8', note: 'Estado de la plantilla (8=activo).']
+  cinstid int [not null, note: 'Institución a la que pertenece la plantilla (FK a public.tabinst).']
+  cobsplanid int [pk, not null, note: 'Identificador único de la plantilla.']
+  cparrobsplan1 text [note: 'Primer párrafo del contenido común.']
+  cparrobsplan2 text [note: 'Segundo párrafo del contenido común.']
+  ctituobsplan varchar(100) [note: 'Título de la plantilla del observador.']
+  Note: 'Plantilla institucional con el contenido común del documento de observación del estudiante.'
+}
+
+Table observador.tabresp {
+  cinstid int [not null, note: 'Institución (FK a public.tabinst).']
+  cpespdesc text [note: 'Descripción del grupo de responsabilidades.']
+  cpespnomb varchar(100) [note: 'Nombre del grupo de responsabilidades.']
+  crespesta int [not null, default: '8', note: 'Estado del grupo (8=activo).']
+  crespid int [pk, not null, note: 'Identificador único del grupo de responsabilidades.']
+  Note: 'Grupos de responsabilidades (aspectos) de los estudiantes a observar, por institución.'
+}
+
+Table observador.tabrespeval {
+  cevalsubid int [not null, note: 'Criterio de evaluación usado (FK a public.tabevalsub).']
+  cmatrid int [not null, note: 'Matrícula del estudiante (FK a public.tabmatr).']
+  cperiid int [not null, note: 'Periodo académico evaluado.']
+  crespevalesta int [not null, default: '8', note: 'Estado de la evaluación (8=activo).']
+  crespevalfech timestamp(6) without time zone [not null, note: 'Fecha de la evaluación.']
+  crespevalhist text [note: 'Historial/notas de la evaluación.']
+  crespevalid int [pk, not null, note: 'Identificador único de la evaluación.']
+  crespsubid int [not null, note: 'Responsabilidad evaluada (FK a tabrespsub).']
+  indexes {
+    (cmatrid, crespsubid, cperiid) [unique]
+  }
+  Note: 'Resultado de la evaluación de cada aspecto/responsabilidad por estudiante y periodo.'
+}
+
+Table observador.tabrespobs {
+  cmatrid int [not null, note: 'Matrícula del estudiante observado (FK a public.tabmatr).']
+  cperiid int [not null, note: 'Periodo académico de la observación.']
+  crespid int [not null, note: 'Grupo de responsabilidades (FK a tabresp).']
+  crespobsdesc text [note: 'Descripción de la observación.']
+  crespobsesta int [not null, default: '8', note: 'Estado de la observación (8=activo).']
+  crespobsfech timestamp(6) without time zone [not null, note: 'Fecha de la observación.']
+  crespobshist text [note: 'Historial/notas adicionales de la observación.']
+  crespobsid int [pk, not null, default: 'nextval(\'observador.tabrespobs_crespobsid_seq\'::regclass)', note: 'Identificador único de la observación.']
+  Note: 'Observaciones por estudiante para cada responsabilidad/aspecto (bitácora de clases y disciplina).'
+}
+
+Table observador.tabrespsub {
+  crespid int [not null, note: 'Grupo de responsabilidades padre (FK a tabresp).']
+  crespsubdesc text [note: 'Descripción de la responsabilidad.']
+  crespsubesta int [not null, default: '8', note: 'Estado de la responsabilidad (8=activo).']
+  crespsubid int [pk, not null, default: 'nextval(\'observador.tabrespsub_crespsubid_seq\'::regclass)', note: 'Identificador único de la responsabilidad.']
+  crespsubnomb varchar(200) [note: 'Nombre de la responsabilidad.']
+  Note: 'Responsabilidades (subaspectos) concretas de los estudiantes a observar, pertenecientes a un grupo.'
+}
+
+Table preescolar.tabpreambi {
+  cambicode text [note: 'Código del ámbito.']
+  cambicome text [note: 'Comentario/nota del ámbito.']
+  cambidesc text [note: 'Descripción del ámbito.']
+  cambiesta int [not null, note: 'Estado del ámbito.']
+  cambiid int [pk, not null, note: 'Identificador único del ámbito.']
+  Note: 'Ámbitos de desarrollo para preescolar.'
+}
+
+Table preescolar.tabpreasig {
+  cambiid int [not null, note: 'Ámbito (FK a tabpreambi).']
+  casigdura int [note: 'Duración de la asignación.']
+  ccursid int [not null, note: 'Curso (FK a public.tabcurs).']
+  cdimeid int [not null, note: 'Dimensión (FK a tabpredime).']
+  cdoceid int [not null, note: 'Docente a cargo (FK a public.tabdoce).']
+  cpreasigfechregi date [not null, note: 'Fecha de registro de la asignación.']
+  cpreasiggradfina time(6) without time zone [note: 'Grado final de la asignación.']
+  cpreasiggradinic time(6) without time zone [note: 'Grado inicial de la asignación.']
+  cpreasigid int [pk, not null, note: 'Identificador único de la asignación.']
+  cpreasigsesta int [not null, default: '8', note: 'Estado de la asignación (8=activo).']
+  indexes {
+    (cambiid, cdimeid, ccursid) [unique]
+  }
+  Note: 'Asignaciones de preescolar: relación ámbito + dimensión + curso + docente.'
+}
+
+Table preescolar.tabpredime {
+  cdimeabre varchar(4) [note: 'Abreviatura de la dimensión (única).']
+  cdimecode text [note: 'Código de la dimensión.']
+  cdimecome text [note: 'Comentario/nota de la dimensión.']
+  cdimedesc text [note: 'Descripción de la dimensión.']
+  cdimeesta int [not null, note: 'Estado de la dimensión.']
+  cdimeid int [pk, not null, note: 'Identificador único de la dimensión.']
+  Note: 'Dimensiones de desarrollo dentro de los ámbitos de preescolar.'
+}
+
+Table preescolar.tabprenota {
+  ccompid int [not null, note: 'Competencia evaluada (FK a public.tabcomp).']
+  cmatrid int [not null, note: 'Matrícula del estudiante (FK a public.tabmatr).']
+  cperiid int [not null, note: 'Periodo académico.']
+  cpreasigid int [not null, note: 'Asignación de preescolar (FK a tabpreasig).']
+  cprenotaesta int [not null, default: '8', note: 'Estado de la nota (8=activo).']
+  cprenotafech date [not null, note: 'Fecha de la nota.']
+  cprenotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro de la nota.']
+  cprenotaid int [pk, not null, default: 'nextval(\'preescolar.tabprenota_cprenotaid_seq\'::regclass)', note: 'Identificador único de la nota.']
+  cprenotaobse text [note: 'Observación de la nota.']
+  cprenotavalo double [not null, note: 'Valor de la nota.']
+  indexes {
+    (cprenotaesta, cpreasigid, ccompid, cperiid, cmatrid) [unique]
+  }
+  Note: 'Notas/evaluaciones de preescolar por asignación, competencia, periodo y matrícula.'
+}
+
+Table preescolar.tabprenove {
+  cmatrid int [not null, note: 'Matrícula del estudiante (FK a public.tabmatr).']
+  cperiid int [not null, note: 'Periodo académico (FK a public.anolperi).']
+  cpreasigid int [not null, note: 'Asignación de preescolar (FK a tabpreasig).']
+  cprenoveesta int [not null, default: '1', note: 'Estado de la novedad.']
+  cprenovefech date [not null, note: 'Fecha de la novedad.']
+  cprenovefechregi timestamp(6) without time zone [not null, note: 'Fecha de registro de la novedad.']
+  cprenoveid int [pk, not null, default: 'nextval(\'tabla_id_seq\'::regclass)', note: 'Identificador único de la novedad.']
+  cprenoveobse text [note: 'Observación de la novedad.']
+  cpretiponoveid int [not null, note: 'Tipo de novedad (FK a public.tabtiponove).']
+  Note: 'Novedades (observaciones, asistencias, etc.) de preescolar por asignación, periodo y matrícula.'
+}
+
+Table public.aeconsultas {
+  aeconsultas_contenido text [not null, note: 'Contenido de la consulta.']
+  aeconsultas_destino int [not null, note: 'Destinatario de la consulta.']
+  aeconsultas_estado int [not null, note: 'Estado de la consulta.']
+  aeconsultas_fpublicacion date [not null, note: 'Fecha de publicación.']
+  aeconsultas_id int [not null, note: 'Identificador único de la consulta.']
+  aeconsultas_usuario int [not null, note: 'Usuario que consulta.']
+  Note: 'Consultas (mensajes) de usuarios en el SAE.'
+}
+
+Table public.aeconsultas_Inst {
+  aeconsultas_contenido text [not null, note: 'Contenido de la consulta.']
+  aeconsultas_destino int [not null, note: 'Destinatario.']
+  aeconsultas_estado int [not null, note: 'Estado.']
+  aeconsultas_fpublicacion date [not null, note: 'Fecha de publicación.']
+  aeconsultas_id int [not null, note: 'Identificador único de la consulta.']
+  aeconsultas_usuario int [not null, note: 'Usuario que consulta.']
+  Note: 'Copia por institución de las consultas (aeconsultas).'
+}
+
+Table public.anolperi {
+  anolperidesc text [not null, note: 'Descripción del periodo.']
+  anolperiesta int [not null, note: 'Estado del registro.']
+  anolperifechfina date [not null, note: 'Fecha de fin del periodo.']
+  anolperifechinic date [not null, note: 'Fecha de inicio del periodo.']
+  anolperifechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  anolperiid int [pk, not null, note: 'Identificador único del registro.']
+  anolperivalo double [note: 'Valor (porcentaje) del periodo.']
+  canolid int [not null, note: 'Año lectivo (FK a tabanol).']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  cperiid int [not null, note: 'Periodo académico (FK a tabperi).']
+  Note: 'Relación institución-año lectivo-periodos: define los periodos académicos de cada institución por año.'
+}
+
+Table public.asigcurs {
+  asigcursid int [pk, not null, note: 'Identificador único del registro.']
+  casigcursesta int [not null, default: '1', note: 'Estado del registro (1=activo).']
+  casigcursfechregi date [not null, note: 'Fecha de registro.']
+  casigdura double [note: 'Duración de la clase.']
+  casiggradfina time(6) without time zone [note: 'Hora de fin de la clase.']
+  casiggradinic time(6) without time zone [note: 'Hora de inicio de la clase.']
+  casigid int [note: 'Asignatura (FK a tabasig).']
+  ccursid int [note: 'Curso (FK a tabcurs).']
+  cdoceid int [note: 'Docente que dicta (FK a tabdoce).']
+  indexes {
+    (ccursid, casigid, cdoceid) [unique]
+  }
+  Note: 'Asignaturas de un curso: relación asignatura + curso + docente (con horario).'
+}
+
+Table public.asigcurscomp {
+  asigcurscompesta int [not null, default: '1', note: 'Estado del registro (1=activo).']
+  asigcurscompid int [not null, note: 'Identificador único del registro.']
+  asigcursid int [not null, note: 'Asignatura-curso (FK a asigcurs).']
+  ccompid int [not null, note: 'Competencia (FK a tabcomp).']
+  indexes {
+    (asigcursid, ccompid) [unique]
+  }
+  Note: 'Competencias (logros) asociadas a una asignatura que pertenece a un curso.'
+}
+
+Table public.asigcurscontprog {
+  asigcurscontprogesta int [not null, default: '1', note: 'Estado (1=activo).']
+  asigcurscontprogid int [pk, not null, note: 'Identificador único del registro.']
+  asigcursid int [not null, note: 'Asignatura-curso (FK a asigcurs).']
+  casigcurscontprogfech date [not null, note: 'Fecha del registro.']
+  casigcurscontprogfechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  ccontprogid int [not null, note: 'Contenido programático (FK a tabcontprog).']
+  indexes {
+    (asigcursid, ccontprogid) [unique]
+  }
+  Note: 'Contenido programático de una asignatura que pertenece a un curso.'
+}
+
+Table public.avisrolldest {
+  cavisrolldestesta int [not null, note: 'Estado del registro.']
+  cavisrolldestid int [pk, not null, note: 'Identificador único del registro.']
+  cavisrollid int [not null, note: 'Aviso (FK a tabavisroll).']
+  cavisusuadest int [not null, note: 'Usuario destino (creador).']
+  cavisusuafechfina date [not null, note: 'Fecha de fin de vigencia del aviso.']
+  cavisusuafechinic date [not null, note: 'Fecha de inicio de vigencia del aviso.']
+  cavisusuafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  crollid int [not null, note: 'Rol destinatario (FK a logic.tabroll).']
+  Note: 'Tabla intermedia de avisos y roles: destinatarios (por rol) de cada aviso publicado.'
+}
+
+Table public.contact.aetempmess {
+  aetempmess_estado int [default: '1']
+  aetempmess_guia text [not null]
+  aetempmess_id int [pk, not null, default: 'nextval(\'"contact.aetempmess_aetempmess_id_seq"\'::regclass)']
+  aetempmess_text text [not null]
+  aetempmess_type int [not null]
+}
+
+Table public.contact.aetempmesssede {
+  aeinst_id bigint [not null]
+  aetempmess_estado int [default: '1']
+  aetempmess_guia text [not null]
+  aetempmess_id int [pk, not null, default: 'nextval(\'"contact.aetempmesssede_aetempmess_id_seq"\'::regclass)']
+  aetempmess_text text [not null]
+  aetempmess_type int [not null]
+}
+
+Table public.contact.aetempmesstype {
+  aetempmesstype_estado int [default: '1']
+  aetempmesstype_id int [pk, not null, default: 'nextval(\'"contact.aetempmesstype_aetempmesstype_id_seq"\'::regclass)']
+  aetempmesstype_text text [not null]
+}
+
+Table public.contact.aetempmessvars {
+  aetempmessvars_comentario text [not null]
+  aetempmessvars_estado int [default: '1']
+  aetempmessvars_id int [pk, not null, default: 'nextval(\'"contact.aetempmessvars_aetempmessvars_id_seq"\'::regclass)']
+  aetempmessvars_nombre varchar(19) [not null]
+}
+
+Table public.events {
+  color varchar(7) [default: 'NULL::character varying', note: 'Color del evento.']
+  fin timestamp [note: 'Fecha/hora de fin.']
+  id int [not null, note: 'Identificador único del evento.']
+  inicio timestamp [not null, note: 'Fecha/hora de inicio.']
+  title varchar(255) [not null, note: 'Título del evento.']
+  Note: 'Eventos de calendario.'
+}
+
+Table public.instarea {
+  careaid int [not null, note: 'Área (FK a tabarea).']
+  cinstareaesta int [not null, default: '1', note: 'Estado (1=activo).']
+  cinstareafechregi date [not null, note: 'Fecha de registro.']
+  cinstareaid int [pk, not null, note: 'Identificador único del registro.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  Note: 'Áreas del saber con las que cuenta una institución.'
+}
+
+Table public.sorteo {
+  id int [note: 'Identificador único del sorteo.']
+  nombre text [note: 'Nombre del sorteo.']
+  Note: 'Sorteos (tabla de soporte).'
+}
+
+Table public.tabanol {
+  canoldesc varchar(20) [note: 'Descripción del año lectivo.']
+  canolesta int [note: 'Estado del año lectivo.']
+  canolfina date [note: 'Fecha de fin.']
+  canolid int [pk, not null, note: 'Identificador único del año lectivo.']
+  canolinic date [note: 'Fecha de inicio.']
+  Note: 'Año lectivo (catálogo).'
+}
+
+Table public.tabarea {
+  careacome text [note: 'Comentario del área.']
+  careadesc text [note: 'Descripción del área.']
+  careaesta int [not null, note: 'Estado del área.']
+  careaid int [pk, not null, note: 'Identificador único del área.']
+  Note: 'Áreas del saber que contienen asignaturas (catálogo).'
+}
+
+Table public.tabareaconf {
+  canolid int [not null, note: 'Año lectivo (FK a tabanol).']
+  careaconfesta int [not null, default: '8', note: 'Estado del registro (8=activo).']
+  careaconfid int [not null, note: 'Identificador único del registro.']
+  careaconfvalo double [not null, note: 'Valor/ponderación de la configuración.']
+  casigid int [not null, note: 'Asignatura (FK a tabasig).']
+  cgradid int [not null, note: 'Grado (FK a tabgrad).']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  indexes {
+    (cgradid, casigid, careaconfesta, cinstid, canolid) [unique]
+  }
+  Note: 'Configuración de áreas: relación año-institución-asignatura-grado con su valor/ponderación.'
+}
+
+Table public.tabasig {
+  careaid int [note: 'Área a la que pertenece (FK a tabarea).']
+  casigabre varchar(4) [note: 'Abreviatura de la asignatura.']
+  casigdesc text [note: 'Descripción de la asignatura.']
+  casigesta int [not null, default: '1', note: 'Estado (1=activo).']
+  casigeval bool [note: 'Si es evaluable.']
+  casigid int [pk, not null, note: 'Identificador único de la asignatura.']
+  Note: 'Asignaturas (materias) de los cursos (catálogo).'
+}
+
+Table public.tabavisroll {
+  cavisorollusua int [not null, note: 'Usuario creador (FK a logic.tabusua).']
+  cavisrollcont text [not null, note: 'Contenido del aviso.']
+  cavisrollesta int [not null, note: 'Estado del aviso.']
+  cavisrollfechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cavisrollid int [pk, not null, note: 'Identificador único del aviso.']
+  cavisrollimag text [not null, note: 'Imagen del aviso.']
+  cavisrolltitu text [not null, note: 'Título del aviso.']
+  Note: 'Avisos para mostrar en la bandeja de entrada (inbox) de cada rol.'
+}
+
+Table public.tabavisusua {
+  cavisorollusua int [not null, note: 'Usuario creador (FK a logic.tabusua).']
+  cavisusuacont text [not null, note: 'Contenido del aviso.']
+  cavisusuadest int [not null, note: 'Usuario destinatario.']
+  cavisusuaesta int [not null, note: 'Estado del aviso.']
+  cavisusuafechfina date [not null, note: 'Fecha de fin de vigencia.']
+  cavisusuafechinic date [not null, note: 'Fecha de inicio de vigencia.']
+  cavisusuafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cavisusuaid int [pk, not null, note: 'Identificador único del aviso.']
+  cavisusuaimag text [not null, note: 'Imagen del aviso.']
+  cavisusuatitu text [not null, note: 'Título del aviso.']
+  Note: 'Avisos para mostrar en la bandeja de entrada de cada usuario.'
+}
+
+Table public.tabcapa {
+  ccapadesc varchar(64) [note: 'Descripción de la capacidad.']
+  ccapaesta int [note: 'Estado.']
+  ccapaid int [pk, not null, note: 'Identificador único.']
+  Note: 'Capacidades extraordinarias reconocidas oficialmente (catálogo).'
+}
+
+Table public.tabcara {
+  ccaradesc varchar(128) [note: 'Descripción del carácter.']
+  ccaraesta int [note: 'Estado.']
+  ccaraid int [pk, not null, note: 'Identificador único.']
+  Note: 'Carácter del colegio (catálogo anexo 6).'
+}
+
+Table public.tabcarg {
+  ccargdesc text [note: 'Descripción del cargo.']
+  ccargesta int [note: 'Estado del cargo.']
+  ccargid int [pk, not null, note: 'Identificador único del cargo.']
+  Note: 'Cargos de los docentes y demás empleados (catálogo).'
+}
+
+Table public.tabcerti {
+  ccertiid int [pk, not null, note: 'Identificador único del registro.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  cparra1cert text [not null, note: 'Párrafo 1 del certificado.']
+  cparra2cert text [not null, note: 'Párrafo 2 del certificado.']
+  ctitucert text [not null, note: 'Título del certificado.']
+  Note: 'Relación institución-resolución: certificados/resoluciones de la institución.'
+}
+
+Table public.tabciud {
+  cciuddesc text [note: 'Descripción del municipio.']
+  cciudgesta int [note: 'Estado.']
+  cciudid int [pk, not null, note: 'Identificador único del municipio.']
+  cdepageogid int [note: 'Departamento (FK a tabdepageog).']
+  Note: 'Ciudades y municipios de Colombia (catálogo geográfico).'
+}
+
+Table public.tabcomp {
+  careaid int [not null, note: 'Área (FK a tabarea).']
+  casigid int [default: '0', note: 'Asignatura (0=global).']
+  ccompcodi text [not null, note: 'Código de la competencia.']
+  ccompdesc text [not null, note: 'Descripción de la competencia.']
+  ccompesta int [default: '8', note: 'Estado de la competencia (8=activo).']
+  ccompid int [not null, note: 'Identificador único de la competencia.']
+  ccompobse text [note: 'Observación de la competencia.']
+  ccomptipid int [default: '1', note: 'Tipo de competencia.']
+  cgradid text [not null, note: 'Grado al que aplica.']
+  cinstid int [default: '0', note: 'Institución (0=global).']
+  Note: 'Competencias/indicadores de desempeño (logros) por área y grado.'
+}
+
+Table public.tabcompestu {
+  asigcurscompid int [not null, note: 'Competencia de la asignatura-curso (FK a asigcurscomp).']
+  ccompestuesta int [not null, default: '8', note: 'Estado del logro (8=activo).']
+  ccompestufechregi timestamp [not null, note: 'Fecha de registro.']
+  ccompestuid int [not null, default: 'nextval(\'tabcompestu_ccompestuid_seq\'::regclass)', note: 'Identificador único del logro.']
+  cmatrid int [not null, note: 'Matrícula del estudiante (FK a tabmatr).']
+  cperiid int [not null, note: 'Periodo académico.']
+  indexes {
+    (ccompestuesta, cmatrid, cperiid, asigcurscompid) [unique]
+  }
+  Note: 'Logros otorgados a un estudiante en una asignatura de un curso durante un periodo.'
+}
+
+Table public.tabconf {
+  cconfdesc text [note: 'Descripción del conflicto.']
+  cconfesta int [note: 'Estado.']
+  cconfid int [pk, not null, note: 'Identificador único del conflicto.']
+  Note: 'Tipos de conflicto de los que ha sido víctima el estudiante (catálogo).'
+}
+
+Table public.tabconfig {
+  cconfigemail text [not null, note: 'Correo configurado.']
+  cconfigesta int [not null, note: 'Estado.']
+  cconfigid int [pk, not null, note: 'Identificador único de la configuración.']
+  Note: 'Configuración general (correo electrónico de notificaciones).'
+}
+
+Table public.tabconfigvar {
+  cconfaccestu bool [note: 'Configuración de acceso de estudiantes.']
+  cconfbol bool [note: 'Configuración boletín.']
+  cconfpp int [note: 'Configuración de política de privacidad.']
+  cconfvarid int [pk, not null, note: 'Identificador único de la variable.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  Note: 'Variables de configuración por institución (parámetros booleanos).'
+}
+
+Table public.tabcons {
+  cconsid int [pk, not null, note: 'Identificador único de la constancia.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  cparra1cons text [not null, note: 'Párrafo 1.']
+  cparra2cons text [not null, note: 'Párrafo 2.']
+  ctitucons text [not null, note: 'Título de la constancia.']
+  Note: 'Constancias (documentos) por institución.'
+}
+
+Table public.tabcontprog {
+  casigid int [not null, note: 'Asignatura (FK a tabasig).']
+  ccontprogcodi varchar(8) [note: 'Código del contenido.']
+  ccontprogdesc text [not null, note: 'Descripción del contenido programático.']
+  ccontprogesta int [not null, default: '1', note: 'Estado (1=activo).']
+  ccontprogid int [pk, not null, note: 'Identificador único del contenido.']
+  Note: 'Catálogo de contenidos programáticos por asignatura.'
+}
+
+Table public.tabcurs {
+  canolid int [not null, note: 'Año lectivo (FK a tabanol).']
+  ccurscoor int [not null, default: '0', note: 'Coordinador del curso.']
+  ccursdire int [note: 'Director de curso.']
+  ccursesta int [not null, default: '8', note: 'Estado del curso (8=activo).']
+  ccursid int [pk, not null, note: 'Identificador único del curso.']
+  ccurslimiestu int [not null, note: 'Límite de estudiantes.']
+  ccursnomb text [note: 'Nombre del curso.']
+  cgradid int [note: 'Grado (FK a tabgrad).']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  cjornid int [note: 'Jornada (FK a tabjorn).']
+  csedeid int [not null, default: '0', note: 'Sede (FK a tabinstsede).']
+  Note: 'Cursos abiertos cada año lectivo por las instituciones.'
+}
+
+Table public.tabcursem {
+  anolperiid int [note: 'Periodo académico (FK a anolperi).']
+  ccursemesta int [not null, default: '8', note: 'Estado (8=activo).']
+  ccursemid int [pk, not null, note: 'Identificador único del registro.']
+  ccursid int [note: 'Curso (FK a tabcurs).']
+  indexes {
+    (ccursid, anolperiid, ccursemesta) [unique]
+  }
+  Note: 'Relación de un curso que funciona por semestre con un periodo académico.'
+}
+
+Table public.tabdepageog {
+  cdepageogdesc text [note: 'Descripción del departamento.']
+  cdepageogesta int [note: 'Estado.']
+  cdepageogid int [pk, not null, note: 'Identificador único del departamento.']
+  Note: 'Departamentos administrativos de Colombia (catálogo geográfico).'
+}
+
+Table public.tabdisc {
+  cdiscdesc varchar(64) [note: 'Descripción de la discapacidad.']
+  cdiscesta int [note: 'Estado.']
+  cdiscid int [pk, not null, note: 'Identificador único de la discapacidad.']
+  Note: 'Discapacidades reconocidas oficialmente (catálogo).'
+}
+
+Table public.tabdisci {
+  cdiscabre varchar(4) [note: 'Abreviatura de la disciplina.']
+  cdiscesta int [not null, default: '8', note: 'Estado (8=activo).']
+  cdisciid int [pk, not null, note: 'Identificador único de la disciplina.']
+  cdiscnomb text [note: 'Nombre de la disciplina.']
+  Note: 'Disciplinas/materias del sistema (catálogo).'
+}
+
+Table public.tabdiscinst {
+  cdisciid int [not null, note: 'Disciplina (FK a tabdisci).']
+  cdiscinstid int [pk, not null, note: 'Identificador único del registro.']
+  cestainstdisc int [not null, default: '8', note: 'Estado (8=activo).']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  Note: 'Disciplinas habilitadas por institución.'
+}
+
+Table public.tabdiscnota {
+  cdiscinstid int [not null, note: 'Disciplina-institución (FK a tabdiscinst).']
+  cdiscnotafech timestamp(6) without time zone [not null, note: 'Fecha de la nota.']
+  cdiscnotafechregi date [not null, note: 'Fecha de registro.']
+  cdiscnotaid int [pk, not null, note: 'Identificador único de la nota.']
+  cdiscnotaobse text [note: 'Observación de la nota.']
+  cdiscnotavalo double [not null, note: 'Valor de la nota.']
+  cestadiscnota int [not null, default: '8', note: 'Estado de la nota (8=activo).']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  cperiid int [not null, note: 'Periodo académico.']
+  Note: 'Notas por disciplina para un estudiante matriculado en un periodo.'
+}
+
+Table public.tabdoce {
+  cdoceapel text [note: 'Primer apellido.']
+  cdoceapel2 text [note: 'Segundo apellido.']
+  cdocecelu varchar(30) [note: 'Celular.']
+  cdocedire varchar(100) [note: 'Dirección.']
+  cdoceemai varchar(45) [note: 'Correo electrónico.']
+  cdoceesta int [note: 'Estado del docente.']
+  cdocefechingr date [note: 'Fecha de ingreso.']
+  cdocefechregi date [note: 'Fecha de registro.']
+  cdocefirm text [note: 'Firma del docente.']
+  cdocefnac date [note: 'Fecha de nacimiento.']
+  cdocefoto varchar(100) [note: 'Foto del docente.']
+  cdoceid int [pk, not null, note: 'Identificador único del docente.']
+  cdoceiden varchar(15) [note: 'Número de identificación (único).']
+  cdocenomb text [note: 'Primer nombre.']
+  cdocenomb2 text [note: 'Segundo nombre.']
+  cdocenombrado int [note: 'Si es nombrado en propiedad.']
+  cdocesexo int [note: 'Sexo (FK a tabsexo).']
+  cdocetele varchar(30) [note: 'Teléfono.']
+  cdocetipoiden int [note: 'Tipo de identificación (FK a tabtipodocu).']
+  cdocetiposang int [note: 'Tipo de sangre (FK a tabtiposang).']
+  Note: 'Docentes en general (datos personales).'
+}
+
+Table public.tabempr {
+  cemprdesc text [note: 'Nombre de la empresa.']
+  cemprdire text [note: 'Dirección de la empresa.']
+  cempresta int [note: 'Estado de la empresa.']
+  cemprid int [pk, not null, note: 'Identificador único de la empresa.']
+  cemprpers text [note: 'Persona de contacto.']
+  cemprtele text [note: 'Teléfono de la empresa.']
+  Note: 'Empresas (EPS, ARS, seguros, riesgos) donde están vinculados los docentes.'
+}
+
+Table public.tabesca {
+  canolid int [not null, note: 'Año lectivo (FK a tabanol).']
+  cescacualid int [not null, note: 'Escala cualitativa (FK a tabescacual).']
+  cescadesd double [not null, note: 'Valor desde del rango.']
+  cescahast double [not null, note: 'Valor hasta del rango.']
+  cescaid int [pk, not null, note: 'Identificador único del registro.']
+  cescanaciid int [not null, note: 'Escala nacional (FK a tabescanaci).']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  Note: 'Relación institución-escala: rangos de calificación y las escalas correspondientes.'
+}
+
+Table public.tabescacual {
+  cescacualdesc text [note: 'Descripción de la escala.']
+  cescacualesta int [note: 'Estado.']
+  cescacualid int [pk, not null, note: 'Identificador único.']
+  Note: 'Escala cualitativa de calificación (catálogo).'
+}
+
+Table public.tabescanaci {
+  cescanacidesc text [note: 'Descripción de la escala.']
+  cescanaciesta int [note: 'Estado.']
+  cescanaciid int [pk, not null, note: 'Identificador único.']
+  Note: 'Escala nacional de calificación (catálogo).'
+}
+
+Table public.tabespeinst {
+  cespeinstdesc varchar(45) [note: 'Descripción de la especialidad.']
+  cespeinstesta int [note: 'Estado.']
+  cespeinstid int [pk, not null, note: 'Identificador único.']
+  Note: 'Especialidad de la institución (catálogo).'
+}
+
+Table public.tabestacurs {
+  cestacursdesc text [note: 'Descripción del estado.']
+  cestacursesta int [note: 'Estado.']
+  cestacursid int [pk, not null, note: 'Identificador único del estado.']
+  Note: 'Estado de un curso (catálogo: aprobó, reprobó, desertó, etc.).'
+}
+
+Table public.tabestagene {
+  cestagenedesc text [note: 'Descripción del estado.']
+  cestageneid int [pk, not null, note: 'Identificador único del estado.']
+  Note: 'Estados generales para todos los registros de las tablas (catálogo maestro).'
+}
+
+Table public.tabestagrad {
+  cestagraddesc text [note: 'Descripción del estado del grado.']
+  cestagradesta int [note: 'Estado.']
+  cestagradid int [pk, not null, note: 'Identificador único.']
+  Note: 'Estado del grado (catálogo).'
+}
+
+Table public.tabestr {
+  cestrdesc int [note: 'Descripción del estrato.']
+  cestresta int [note: 'Estado.']
+  cestrid int [pk, not null, note: 'Identificador único del estrato.']
+  Note: 'Estrato socioeconómico (catálogo).'
+}
+
+Table public.tabestu {
+  cestuapel text [note: 'Primer apellido.']
+  cestuapel2 text [note: 'Segundo apellido.']
+  cestudire text [note: 'Dirección.']
+  cestuemai varchar(45) [note: 'Correo electrónico.']
+  cestuesta int [not null, note: 'Estado del estudiante (FK a tabestagene).']
+  cestufechnaci date [note: 'Fecha de nacimiento.']
+  cestufoto text [note: 'Foto del estudiante.']
+  cestugene int [not null, note: 'Género (FK a tabsexo).']
+  cestuid int [pk, not null, note: 'Identificador único del estudiante.']
+  cestuiden varchar(20) [not null, note: 'Número de identificación (único).']
+  cestuidenexpedepa int [note: 'Departamento de expedición del documento.']
+  cestuidenexpemuni int [note: 'Municipio de expedición del documento.']
+  cestuluganacidepa int [note: 'Departamento de nacimiento.']
+  cestuluganacimuni int [note: 'Municipio de nacimiento.']
+  cestunomb text [note: 'Primer nombre.']
+  cestunomb2 text [note: 'Segundo nombre.']
+  cestutele text [note: 'Teléfono.']
+  cestutiposang int [note: 'Tipo de sangre (FK a tabtiposang).']
+  ctipodocuid int [not null, note: 'Tipo de documento (FK a tabtipodocu).']
+  Note: 'Datos personales del estudiante.'
+}
+
+Table public.tabestuacud {
+  cestuacuddire text [note: 'Dirección del acudiente.']
+  cestuacudemai text [note: 'Correo del acudiente.']
+  cestuacudesta int [not null, default: '8', note: 'Estado del acudiente (8=activo).']
+  cestuacudid int [pk, not null, note: 'Identificador único del acudiente.']
+  cestuacudiden text [note: 'Identificación del acudiente.']
+  cestuacudnomb text [note: 'Nombre del acudiente.']
+  cestuacudpare int [note: 'Parentesco (FK a tabpare).']
+  cestuacudtele text [note: 'Teléfono del acudiente.']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  Note: 'Acudientes (datos) asociados a la matrícula de un estudiante.'
+}
+
+Table public.tabestuotrodato {
+  cestuotrodatobenehero varchar(1) [not null, note: 'Beneficiario héroe (S/N).']
+  cestuotrodatobenevete varchar(1) [not null, note: 'Beneficiario veterano (S/N).']
+  cestuotrodatocapa int [not null, note: 'Capacidad extraordinaria (FK a tabcapa).']
+  cestuotrodatodisc int [not null, note: 'Discapacidad (FK a tabdisc).']
+  cestuotrodatoesta int [not null, note: 'Estado (FK a tabestagene).']
+  cestuotrodatoetni int [not null, note: 'Etnia (FK a tabetni).']
+  cestuotrodatofuerec int [note: 'Fuente de recursos (FK a tabfuenrecu).']
+  cestuotrodatohijomadrhoga varchar(1) [not null, note: 'Hijo de madre cabeza de hogar (S/N).']
+  cestuotrodatoid int [pk, not null, note: 'Identificador único del registro.']
+  cestuotrodatomadrhoga varchar(1) [not null, note: 'Madre cabeza de hogar (S/N).']
+  cestuotrodatonomicbf int [default: '1', note: 'Número ICBF (FK a tabicbf).']
+  cestuotrodatoprovpriv varchar(1) [not null, note: 'Proveniente de institución privada (S/N).']
+  cestuotrodatosubs varchar(1) [not null, note: 'Recibe subsidio (S/N).']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  Note: 'Otros datos del estudiante concernientes al anexo 6 del gobierno nacional.'
+}
+
+Table public.tabestusociecon {
+  cestusociecondeparesi int [not null, note: 'Departamento de residencia (FK a tabdepageog).']
+  cestusocieconesta int [not null, default: '8', note: 'Estado (8=activo).']
+  cestusocieconestr int [not null, note: 'Estrato (FK a tabestr).']
+  cestusocieconid int [pk, not null, note: 'Identificador único del registro.']
+  cestusocieconmuniprov int [note: 'Municipio de procedencia.']
+  cestusocieconmuniresi int [not null, note: 'Municipio de residencia (FK a tabciud).']
+  cestusocieconsisb int [not null, note: 'SISBEN (FK a tabsisb).']
+  cestusocieconultidepaexpu int [note: 'Último departamento donde fue expulsado.']
+  cestusocieconultimuniexpu int [note: 'Último municipio donde fue expulsado.']
+  cestusocieconvictconf int [not null, note: 'Víctima de conflicto (FK a tabconf).']
+  cestusocieconzonaresi int [not null, note: 'Zona de residencia (FK a tabzonaresi).']
+  cestusocieregu int [default: '1', note: 'Régimen.']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  Note: 'Datos socioeconómicos del estudiante (matrícula).'
+}
+
+Table public.tabetni {
+  cetnicodi int [not null, note: 'Código de la etnia.']
+  cetnidesc text [not null, note: 'Descripción de la etnia.']
+  cetniesta int [not null, note: 'Estado de la etnia.']
+  cetniid int [pk, not null, note: 'Identificador único de la etnia.']
+  Note: 'Grupos étnicos dados por el MEN (catálogo).'
+}
+
+Table public.tabeval {
+  cevaldesc text [note: 'Descripción del criterio.']
+  cevalesta int [default: '8', note: 'Estado (8=activo).']
+  cevalid int [pk, not null, note: 'Identificador único del criterio.']
+  cevaltipo varchar(50) [note: 'Tipo de criterio.']
+  Note: 'Tipos de criterios de evaluación (juicios de valoración, frecuencia, etc.).'
+}
+
+Table public.tabevalsub {
+  cevalfin double [default: '0', note: 'Valor final.']
+  cevalid int [not null, note: 'Criterio padre (FK a tabeval).']
+  cevalini double [default: '0', note: 'Valor inicial.']
+  cevalnomb varchar(100) [note: 'Nombre del subcriterio.']
+  cevalsigl varchar(4) [note: 'Sigla del subcriterio.']
+  cevalsubesta int [not null, default: '8', note: 'Estado (8=activo).']
+  cevalsubid int [pk, not null, default: 'nextval(\'tabevalsub_cevalsubid_seq\'::regclass)', note: 'Identificador único del subcriterio.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  Note: 'Subcriterios de evaluación por institución (valoraciones de un criterio).'
+}
+
+Table public.tabfirm {
+  cdoceid int [not null, note: 'Docente que firma (FK a tabdoce).']
+  cestafirm int [not null, default: '8', note: 'Estado de la firma (8=activo).']
+  cfirmcarg varchar(50) [note: 'Cargo de la firma.']
+  cfirmid int [pk, not null, note: 'Identificador único de la firma.']
+  cfirmorde int [not null, note: 'Orden de la firma.']
+  cfirmtipo int [not null, note: 'Tipo de documento en el que firma.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  Note: 'Firmas correspondientes según la institución y el tipo de documento.'
+}
+
+Table public.tabfuenrecu {
+  cfuenrecudesc text [note: 'Descripción de la fuente de recursos.']
+  cfuenrecuesta int [note: 'Estado.']
+  cfuenrecuid int [pk, not null, note: 'Identificador único.']
+  Note: 'Fuente de recursos del estudiante (catálogo).'
+}
+
+Table public.tabgrad {
+  cgradcodi int [note: 'Código del grado.']
+  cgraddesc text [note: 'Descripción del grado.']
+  cgradesta int [note: 'Estado del grado.']
+  cgradid int [pk, not null, note: 'Identificador único del grado.']
+  cgradnive text [note: 'Nivel del grado (preescolar, básica, media).']
+  Note: 'Grados oficiales (catálogo).'
+}
+
+Table public.tabicbf {
+  cestaicbf int [note: 'Estado.']
+  cicbfid int [not null, note: 'Identificador único del ICBF.']
+  cnombicbf text [note: 'Nombre del ICBF.']
+  Note: 'Instituciones ICBF (catálogo).'
+}
+
+Table public.tabinst {
+  cinstcalendario varchar(8) []
+  cinstcara int [note: 'Carácter (FK a tabcara).']
+  cinstciud int [note: 'Ciudad (FK a tabciud).']
+  cinstcodidane varchar(20) [note: 'Código DANE de la institución.']
+  cinstcoordx real []
+  cinstcoordy real []
+  cinstdepa int [note: 'Departamento (FK a tabdepageog).']
+  cinstdire text [not null, note: 'Dirección de la institución.']
+  cinstemai text [note: 'Correo electrónico.']
+  cinstescu text [not null, default: '\'archivos/instituciones/imagenes/escudo.jpg\'::text', note: 'Escudo de la institución.']
+  cinstesta int [not null, default: '8', note: 'Estado (FK a tabestagene, 8=activo).']
+  cinstfacebook text []
+  cinstfirm varchar(100) [default: '\'archivos/instituciones/auto/blanco.jpg\'::character varying', note: 'Firma de la institución.']
+  cinsthimno text []
+  cinstid int [pk, not null, note: 'Identificador único de la institución.']
+  cinstinstagram text []
+  cinstlema text [note: 'Lema institucional.']
+  cinstmanualconvivencia text []
+  cinstnit text [note: 'NIT de la institución.']
+  cinstnomb text [note: 'Nombre de la institución.']
+  cinstpadre int [note: 'Institución padre (sedes).']
+  cinstreconocimiento text []
+  cinstresolrector text []
+  cinsttele text [note: 'Teléfono.']
+  cinsttiktok text []
+  cinsttwitter text []
+  cinstyoutube text []
+  tabespeinst_cespeinstid int [not null, note: 'Especialidad (FK a tabespeinst).']
+  tabmetoinst_cmetoinst int [not null, note: 'Método institucional (FK a tabmetoinst).']
+  tabzonaresi_czonaresiid int [not null, note: 'Zona de residencia (FK a tabzonaresi).']
+  Note: 'Instituciones educativas oficiales y extraoficiales.'
+}
+
+Table public.tabinstdoce {
+  canolid int [not null, note: 'Año lectivo (FK a tabanol).']
+  ccargid int [not null, note: 'Cargo (FK a tabcarg).']
+  cdoceid int [not null, note: 'Docente (FK a tabdoce).']
+  cinstdocearp int [note: 'ARP/riesgos (FK a tabempr).']
+  cinstdocears int [note: 'ARS (FK a tabempr).']
+  cinstdocecaja int [note: 'Caja de compensación (FK a tabempr).']
+  cinstdoceeps int [note: 'EPS (FK a tabempr).']
+  cinstdoceesta int [note: 'Estado (FK a tabestagene).']
+  cinstdocefechfina date [note: 'Fecha de fin del contrato.']
+  cinstdocefechinic date [note: 'Fecha de inicio del contrato.']
+  cinstdocefechregi date [note: 'Fecha de registro.']
+  cinstdoceid int [pk, not null, note: 'Identificador único del registro.']
+  cinstdocesala int [note: 'Salario.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  cjefearea int [default: '0', note: 'Si es jefe de área.']
+  ctipovincid int [not null, note: 'Tipo de vinculación (FK a tabtipovinc).']
+  Note: 'Docentes contratados en una institución en un año lectivo determinado (nómina).'
+}
+
+Table public.tabinstreso {
+  cinstcolcar text [default: '\'58ACFA\'::text', note: 'Color/característica del recurso.']
+  cinstdec int [default: '2', note: 'Cantidad de recursos.']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  cinstresodesc text [not null, note: 'Descripción del recurso.']
+  cinstresoid int [pk, not null, note: 'Identificador único del recurso.']
+  cinsttipar int [default: '1', note: 'Tipo de recurso.']
+  Note: 'Recursos institucionales (inventario).'
+}
+
+Table public.tabinstsede {
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  csedeid int [pk, not null, note: 'Identificador único de la sede.']
+  csedenomb text [not null, note: 'Nombre de la sede.']
+  Note: 'Sedes de las instituciones.'
+}
+
+Table public.tabjorn {
+  cjorndesc varchar(20) [note: 'Descripción de la jornada.']
+  cjornesta int [note: 'Estado.']
+  cjornid int [pk, not null, note: 'Identificador único de la jornada.']
+  Note: 'Jornadas oficiales (catálogo).'
+}
+
+Table public.tablogcomp {
+  casigid int [not null, note: 'Asignatura (FK a tabasig).']
+  ccompid int [not null, note: 'Competencia (FK a tabcomp).']
+  ccontprogid int [note: 'Contenido programático (FK a tabcontprog).']
+  cgradid int [not null, note: 'Grado (FK a tabgrad).']
+  clogcompid int [pk, not null, default: 'nextval(\'tablogcomp_clogcompid_seq\'::regclass)', note: 'Identificador único del registro.']
+  cnotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  Note: 'Registro histórico de temas y competencias vistos.'
+}
+
+Table public.tabmatr {
+  ccursid int [note: 'Curso (FK a tabcurs).']
+  cestuid int [note: 'Estudiante (FK a tabestu).']
+  cmatrdesc double [not null, default: '0', note: 'Valor de descuento.']
+  cmatresta int [not null, default: '13', note: 'Estado de la matrícula (13=matriculado).']
+  cmatrfech date [note: 'Fecha de la matrícula.']
+  cmatrianopasacond int [note: 'Año en que aprobó condicionalmente.']
+  cmatrianopasasitu int [note: 'Año en que aprobó su situación (FK a tabestacurs).']
+  cmatrid int [pk, not null, note: 'Identificador único de la matrícula.']
+  cmatrinst int [note: 'Institución de la matrícula.']
+  cmatrirepi bool [default: 'false', note: 'Si es repitente.']
+  cmatrnuevestu bool [default: 'false', note: 'Si es estudiante nuevo.']
+  cmatrvaloinsc double [not null, default: '0', note: 'Valor de inscripción.']
+  cmatrvalopens double [not null, default: '0', note: 'Valor de pensión.']
+  indexes {
+    (ccursid, cmatrinst, cestuid) [unique]
+  }
+  Note: 'Matrícula de todas las instituciones.'
+}
+
+Table public.tabmatrpago {
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  cmatrpagoesta int [not null, note: 'Estado del pago.']
+  cmatrpagofech date [not null, note: 'Fecha del pago.']
+  cmatrpagoid int [pk, not null, note: 'Identificador único del pago.']
+  cmatrpagoperi int [not null, note: 'Periodo del pago.']
+  Note: 'Cumplimiento de pagos de los estudiantes matriculados.'
+}
+
+Table public.tabmetoinst {
+  cmetoinstdesc text [note: 'Descripción del método.']
+  cmetoinstesta int [note: 'Estado.']
+  cmetoinstid int [pk, not null, note: 'Identificador único del método.']
+  Note: 'Métodos institucionales oficiales (catálogo: escuela tradicional, escuela nueva, etc.).'
+}
+
+Table public.tabnota {
+  asigcursid int [not null, note: 'Asignatura-curso (FK a asigcurs).']
+  ccompid int [not null, note: 'Competencia evaluada (FK a tabcomp).']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  cnotaesta int [not null, default: '8', note: 'Estado de la nota (8=activo).']
+  cnotafech date [not null, note: 'Fecha de la nota.']
+  cnotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cnotaid int [pk, not null, default: 'nextval(\'tabnota_cnotaid_seq\'::regclass)', note: 'Identificador único de la nota.']
+  cnotaobse text [note: 'Observación de la nota.']
+  cnotavalo double [not null, note: 'Valor de la nota.']
+  cperiid int [not null, note: 'Periodo académico.']
+  indexes {
+    (cperiid, asigcursid, ccompid, cmatrid, cnotaesta) [unique]
+  }
+  Note: 'Notas de un estudiante en una asignatura (por competencia y periodo).'
+}
+
+Table public.tabnota2013 {
+  asigcursid int [not null, note: 'Asignatura-curso.']
+  ccompid int [not null, note: 'Competencia.']
+  cmatrid int [not null, note: 'Matrícula.']
+  cnotaesta int [note: 'Estado.']
+  cnotafech date [not null, note: 'Fecha.']
+  cnotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cnotaid int [pk, not null, default: 'nextval(\'tabnota2013_cnotaid_seq\'::regclass)', note: 'Identificador único de la nota.']
+  cnotaobse text [note: 'Observación.']
+  cnotavalo double [not null, note: 'Valor de la nota.']
+  cperiid int [not null, note: 'Periodo.']
+  indexes {
+    (asigcursid, ccompid, cperiid, cmatrid, cnotaesta) [unique]
+  }
+  Note: 'Archivo histórico de notas del año 2013 (estructura igual a tabnota).'
+}
+
+Table public.tabnota2014 {
+  asigcursid int [not null, note: 'Asignatura-curso.']
+  ccompid int [not null, note: 'Competencia.']
+  cmatrid int [not null, note: 'Matrícula.']
+  cnotaesta int [note: 'Estado.']
+  cnotafech date [not null, note: 'Fecha.']
+  cnotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cnotaid int [pk, not null, default: 'nextval(\'tabnota2014_cnotaid_seq\'::regclass)', note: 'Identificador único de la nota.']
+  cnotaobse text [note: 'Observación.']
+  cnotavalo double [not null, note: 'Valor de la nota.']
+  cperiid int [not null, note: 'Periodo.']
+  indexes {
+    (asigcursid, ccompid, cperiid, cmatrid, cnotaesta) [unique]
+  }
+  Note: 'Archivo histórico de notas del año 2014 (estructura igual a tabnota).'
+}
+
+Table public.tabnota2015 {
+  asigcursid int [not null, note: 'Asignatura-curso.']
+  ccompid int [not null, note: 'Competencia.']
+  cmatrid int [not null, note: 'Matrícula.']
+  cnotaesta int [note: 'Estado.']
+  cnotafech date [not null, note: 'Fecha.']
+  cnotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cnotaid int [pk, not null, default: 'nextval(\'tabnota2015_cnotaid_seq\'::regclass)', note: 'Identificador único de la nota.']
+  cnotaobse text [note: 'Observación.']
+  cnotavalo double [not null, note: 'Valor de la nota.']
+  cperiid int [not null, note: 'Periodo.']
+  indexes {
+    (asigcursid, ccompid, cperiid, cmatrid, cnotaesta) [unique]
+  }
+  Note: 'Archivo histórico de notas del año 2015 (estructura igual a tabnota).'
+}
+
+Table public.tabnota2016 {
+  asigcursid int [not null, note: 'Asignatura-curso.']
+  ccompid int [not null, note: 'Competencia.']
+  cmatrid int [not null, note: 'Matrícula.']
+  cnotaesta int [note: 'Estado.']
+  cnotafech date [not null, note: 'Fecha.']
+  cnotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cnotaid int [pk, not null, default: 'nextval(\'tabnota2016_cnotaid_seq\'::regclass)', note: 'Identificador único de la nota.']
+  cnotaobse text [note: 'Observación.']
+  cnotavalo double [not null, note: 'Valor de la nota.']
+  cperiid int [not null, note: 'Periodo.']
+  indexes {
+    (asigcursid, ccompid, cperiid, cmatrid, cnotaesta) [unique]
+  }
+  Note: 'Archivo histórico de notas del año 2016 (estructura igual a tabnota).'
+}
+
+Table public.tabnotadef {
+  asigcursid int [not null, note: 'Asignatura-curso (FK a asigcurs).']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  cnotadefesta int [not null, default: '8', note: 'Estado (8=activo).']
+  cnotadeffech timestamp(6) without time zone [not null, note: 'Fecha del promedio.']
+  cnotadeffechregi date [not null, note: 'Fecha de registro.']
+  cnotadefid int [pk, not null, default: 'nextval(\'tabnota_cnotaid_seq\'::regclass)', note: 'Identificador único del promedio.']
+  cnotadefobse text [note: 'Observación.']
+  cnotadefvalo double [not null, note: 'Valor definitivo.']
+  cperiid int [not null, note: 'Periodo académico.']
+  ctipodeseid int [not null, note: 'Tipo de desempeño (FK a tabtipodese).']
+  indexes {
+    (cnotadefesta, cmatrid, asigcursid, cperiid, ctipodeseid) [unique]
+  }
+  Note: 'Promedios definitivos por asignatura/dimensión por periodo.'
+}
+
+Table public.tabnotahist {
+  asigcursid int [not null, note: 'Asignatura-curso (FK a asigcurs).']
+  ccompid int [not null, note: 'Competencia (FK a tabcomp).']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  cnotaesta int [not null, default: '9', note: 'Estado (9=inactivo).']
+  cnotafech date [not null, note: 'Fecha de la nota.']
+  cnotafechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cnotaid int [pk, not null, default: 'nextval(\'tabnotahist_cnotaid_seq\'::regclass)', note: 'Identificador único de la nota histórica.']
+  cnotaobse text [note: 'Observación.']
+  cnotavalo double [not null, note: 'Valor de la nota.']
+  cperiid int [not null, note: 'Periodo académico.']
+  indexes {
+    (asigcursid, cnotaesta, cmatrid, cperiid, ccompid) [unique]
+  }
+  Note: 'Notas históricas de un estudiante en una asignatura.'
+}
+
+Table public.tabnove {
+  asigcursid int [not null, note: 'Asignatura-curso (FK a asigcurs).']
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  cnoveesta int [not null, default: '1', note: 'Estado (1=activo).']
+  cnovefech date [not null, note: 'Fecha de la novedad.']
+  cnovefechregi timestamp(6) without time zone [not null, note: 'Fecha de registro.']
+  cnoveid int [pk, not null, default: 'nextval(\'tabla_id_seq\'::regclass)', note: 'Identificador único de la novedad.']
+  cnoveobse text [note: 'Observación de la novedad.']
+  cperiid int [not null, note: 'Periodo (FK a anolperi).']
+  ctiponoveid int [not null, note: 'Tipo de novedad (FK a tabtiponove).']
+  Note: 'Novedades: inasistencias, observaciones, etc. de un estudiante.'
+}
+
+Table public.tabpare {
+  cparedesc text [not null, note: 'Descripción del parentesco.']
+  cpareesta int [not null, default: '1', note: 'Estado (1=activo).']
+  cpareid int [pk, not null, note: 'Identificador único del parentesco.']
+  Note: 'Parentescos útiles en los datos personales (catálogo).'
+}
+
+Table public.tabpazsalv {
+  cestapazsal int [not null, default: '8', note: 'Estado (8=activo).']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  cparrpazsalv1 text [note: 'Párrafo 1.']
+  cparrpazsalv2 text [note: 'Párrafo 2.']
+  cpazsalvid int [pk, not null, note: 'Identificador único de la plantilla.']
+  ctitupazsalv1 varchar(100) [note: 'Título 1 del documento.']
+  ctitupazsalv2 varchar(100) [note: 'Título 2 del documento.']
+  Note: 'Plantilla institucional del documento constancia de paz y salvo.'
+}
+
+Table public.tabperi {
+  cperidesc int [note: 'Descripción del periodo.']
+  cperiesta int [note: 'Estado.']
+  cperiid int [pk, not null, note: 'Identificador único del periodo.']
+  cperinomb text [note: 'Nombre del periodo.']
+  Note: 'Periodos de un año lectivo para todas las instituciones (catálogo).'
+}
+
+Table public.tabperival {
+  canolperiid int [not null, note: 'Periodo institucional (FK a anolperi).']
+  cperivaldesc text [not null, note: 'Descripción del valor.']
+  cperivalesta int [not null, note: 'Estado.']
+  cperivalid int [pk, not null, note: 'Identificador único del valor.']
+  Note: 'Valores (etiquetas) para cada periodo académico.'
+}
+
+Table public.tabpromasig {
+  asigcursid int [not null, note: 'Asignatura-curso (FK a asigcurs).']
+  canolid int [not null, note: 'Año lectivo (FK a tabanol).']
+  careaid int [not null, note: 'Área (FK a tabarea).']
+  cpromasigesta int [not null, default: '1', note: 'Estado (1=activo).']
+  cpromasigid int [not null, default: 'nextval(\'tabpromasig_cpromasigid_seq\'::regclass)', note: 'Identificador único del promedio.']
+  cpromasigpond double [not null, note: 'Ponderación de la asignatura.']
+  cpromasigprom double [not null, note: 'Promedio de la asignatura.']
+  cpromoid int [not null, note: 'Promedio general (FK a tabpromo).']
+  Note: 'Promedio por asignatura: calculado para el promedio general del estudiante.'
+}
+
+Table public.tabpromdef {
+  cmatrid int [not null, note: 'Matrícula (FK a tabmatr).']
+  cperiid int [not null, note: 'Periodo (FK a anolperi).']
+  cpromdefesta int [not null, default: '8', note: 'Estado (8=activo).']
+  cpromdefid int [pk, not null, note: 'Identificador único del promedio.']
+  cpromdefvalo double [not null, note: 'Valor del promedio.']
+  ctipopromid int [not null, note: 'Tipo de promedio.']
+  indexes {
+    (cpromdefesta, cperiid, cmatrid) [unique]
+  }
+  Note: 'Promedios definitivos por matrícula y por periodo.'
+}
+
+Table public.tabpromo {
+  cgradodesde int [not null, note: 'Grado desde.']
+  cgradopara int [not null, note: 'Grado para.']
+  cpromdef bool [not null, note: 'Si el promedio es definitivo.']
+  cpromfin double [not null, note: 'Promedio final.']
+  cpromoesta int [note: 'Estado.']
+  cpromoid int [pk, not null, note: 'Identificador único del promedio.']
+  Note: 'Promedios generales de cada estudiante (con reglas de promoción).'
+}
+
+Table public.tabresg {
+  cresgcodi text [not null, note: 'Código del resguardo.']
+  cresgdesc text [not null, note: 'Descripción del resguardo.']
+  cresgesta int [not null, note: 'Estado.']
+  cresgid int [pk, not null, note: 'Identificador único del resguardo.']
+  Note: 'Resguardos indígenas (catálogo).'
+}
+
+Table public.tabsexo {
+  csexodesc text [note: 'Descripción del género.']
+  csexoesta int [note: 'Estado.']
+  csexoid int [pk, not null, note: 'Identificador único del género.']
+  Note: 'Género (catálogo).'
+}
+
+Table public.tabsie {
+  canolid int [not null, note: 'Año lectivo (FK a tabanol).']
+  cinstid int [not null, note: 'Institución (FK a tabinst).']
+  clibsie bit(1) [note: 'Indicador de libre/autonomía.']
+  csieesta int [not null, default: '8', note: 'Estado (8=activo).']
+  csieid int [pk, not null, note: 'Identificador único del registro.']
+  ctipodeseid int [not null, note: 'Tipo de desempeño (FK a tabtipodese).']
+  cvalprosie double [not null, note: 'Valor de promoción.']
+  Note: 'SIE (Sistema Institucional de Evaluación): valor de promoción por institución y año.'
+}
+
+Table public.tabsisb {
+  csisbdesc text [note: 'Descripción del nivel SISBEN.']
+  csisbesta int [note: 'Estado.']
+  csisbid int [pk, not null, note: 'Identificador único del nivel.']
+  Note: 'Niveles SISBEN (catálogo).'
+}
+
+Table public.tabsucu {
+  csucuclas char(1) [note: 'Clase de sucursal.']
+  csucucodi int [note: 'Código de la sucursal (único).']
+  csucudesc text [not null, note: 'Descripción de la ubicación.']
+  csucudire text [note: 'Dirección.']
+  csucuidpunt int [pk, not null, note: 'Identificador único del punto.']
+  csuculati double [not null, note: 'Latitud.']
+  csuculong double [not null, note: 'Longitud.']
+  Note: 'Ubicación de las escuelas en el mapa web (sucursales).'
+}
+
+Table public.tabtipodese {
+  cdesctipodese text [not null, note: 'Descripción del tipo de desempeño.']
+  cestatipdese int [not null, default: '8', note: 'Estado (8=activo).']
+  ctipodeseid int [pk, not null, note: 'Identificador único del tipo de desempeño.']
+  Note: 'Tipos de desempeño (cognitivo, personal, social, etc.) (catálogo).'
+}
+
+Table public.tabtipodocu {
+  ctipodocudesc text [note: 'Descripción del tipo de documento.']
+  ctipodocuesta int [note: 'Estado.']
+  ctipodocuid int [pk, not null, note: 'Identificador único del tipo de documento.']
+  Note: 'Tipos de documento oficiales en Colombia (catálogo).'
+}
+
+Table public.tabtiponota {
+  ctiponotadesc text [note: 'Descripción del tipo de nota.']
+  ctiponotaesta int [note: 'Estado.']
+  ctiponotaid int [pk, not null, note: 'Identificador único del tipo de nota.']
+  Note: 'Tipos de nota para la calificación de indicadores de logros (catálogo).'
+}
+
+Table public.tabtiponove {
+  ctiponoveabre varchar(2) [note: 'Abreviatura del tipo de novedad.']
+  ctiponovedesc text [note: 'Descripción del tipo de novedad.']
+  ctiponoveesta int [note: 'Estado.']
+  ctiponoveid int [pk, not null, note: 'Identificador único del tipo de novedad.']
+  Note: 'Tipos de novedad: inasistencia, observación, etc. (catálogo).'
+}
+
+Table public.tabtiposang {
+  ctiposangdesc varchar(20) [note: 'Descripción del tipo de sangre.']
+  ctiposangesta int [note: 'Estado.']
+  ctiposangid int [pk, not null, note: 'Identificador único del tipo de sangre.']
+  Note: 'Tipos de sangre conocidos (catálogo).'
+}
+
+Table public.tabtiposubs {
+  ctiposubsdesc text [note: 'Descripción del subsidio.']
+  ctiposubsesta int [note: 'Estado.']
+  ctiposubsid int [pk, not null, note: 'Identificador único del subsidio.']
+  Note: 'Tipos de subsidio (catálogo).'
+}
+
+Table public.tabtipovinc {
+  ctipovincdesc text [note: 'Descripción del tipo de vinculación.']
+  ctipovincesta int [note: 'Estado.']
+  ctipovincid int [pk, not null, note: 'Identificador único del tipo de vinculación.']
+  Note: 'Tipos de vinculación en los contratos de los empleados (catálogo).'
+}
+
+Table public.tabunio {
+  cacadid int [not null, note: 'Usuario académico (estudiante/docente) asociado.']
+  cunioesta int [not null, note: 'Estado del enlace.']
+  cunioid int [pk, not null, note: 'Identificador único del enlace.']
+  cusuaid int [not null, note: 'Usuario de login (FK a logic.tabusua).']
+  indexes {
+    (cusuaid, cacadid, cunioesta) [unique]
+  }
+  Note: 'Unión de los usuarios de login con los usuarios académicos (enlace entre esquemas).'
+}
+
+Table public.tabutil {
+  ccursid int [not null, note: 'Curso (FK a tabcurs).']
+  cutilcant int [note: 'Cantidad del útil.']
+  cutildesc text [note: 'Descripción del útil.']
+  cutilid int [pk, not null, note: 'Identificador único del útil.']
+  Note: 'Útiles escolares requeridos para los cursos.'
+}
+
+Table public.tabzonaresi {
+  czonaresidesc text [not null, note: 'Descripción de la zona.']
+  czonaresiesta int [note: 'Estado.']
+  czonaresiid int [pk, not null, note: 'Identificador único de la zona.']
+  Note: 'Zona de residencia oficial (catálogo).'
+}
+
+Table public.tipo_citacion {
+  motivo_estado smallint [not null, note: 'Estado del motivo.']
+  motivo_id int [pk, not null, note: 'Identificador único del motivo.']
+  motivo_nombre varchar(200) [not null, note: 'Nombre del motivo.']
+  Note: 'Tipos/motivos de citación (catálogo del SAE).'
+}
+
+Table temporal.matricula_2750 {
+  cmatrid int [note: 'Matrícula del estudiante.']
+  nombre text [note: 'Nombre del estudiante.']
+  pr1 double [note: 'Promedio periodo 1.']
+  pr2 double [note: 'Promedio periodo 2.']
+  pr3 double [note: 'Promedio periodo 3.']
+  pr4 double [note: 'Promedio periodo 4.']
+  pu1 int [note: 'Puesto periodo 1.']
+  pu2 int [note: 'Puesto periodo 2.']
+  pu3 int [note: 'Puesto periodo 3.']
+  pu4 int [note: 'Puesto periodo 4.']
+  Note: 'Snapshot temporal de matrícula y promedios por periodo (pr1-pr4) de la institución 2750.'
+}
+
+Table temporal.matricula_2752 {
+  cmatrid int [note: 'Matrícula del estudiante.']
+  nombre text [note: 'Nombre del estudiante.']
+  pr1 double [note: 'Promedio periodo 1.']
+  pr2 double [note: 'Promedio periodo 2.']
+  pr3 double [note: 'Promedio periodo 3.']
+  pr4 double [note: 'Promedio periodo 4.']
+  pu1 int [note: 'Puesto periodo 1.']
+  pu2 int [note: 'Puesto periodo 2.']
+  pu3 int [note: 'Puesto periodo 3.']
+  pu4 int [note: 'Puesto periodo 4.']
+  Note: 'Snapshot temporal de matrícula y promedios por periodo (pr1-pr4) de la institución 2752.'
+}
+
+Table temporal.matricula_2757 {
+  cmatrid int [note: 'Matrícula del estudiante.']
+  nombre text [note: 'Nombre del estudiante.']
+  pr1 double [note: 'Promedio periodo 1.']
+  pr2 double [note: 'Promedio periodo 2.']
+  pr3 double [note: 'Promedio periodo 3.']
+  pr4 double [note: 'Promedio periodo 4.']
+  pu1 int [note: 'Puesto periodo 1.']
+  pu2 int [note: 'Puesto periodo 2.']
+  pu3 int [note: 'Puesto periodo 3.']
+  pu4 int [note: 'Puesto periodo 4.']
+  Note: 'Snapshot temporal de matrícula y promedios por periodo (pr1-pr4) de la institución 2757.'
+}
+
+Table temporal.tabpromasig1129 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1139 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1263 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1642 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1654 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1658 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1665 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1749 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1750 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1961 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1971 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig1973 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2049 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2065 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2209 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2213 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2215 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2226 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2307 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2319 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2320 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2326 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2328 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2347 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2355 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2358 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig253 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2559 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2561 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2575 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2589 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2600 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2612 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2619 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2680 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2682 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2684 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2690 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2692 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2734 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2735 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2823 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2825 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2828 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2829 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig2834 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig351 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig519 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table temporal.tabpromasig782 {
+  asigcursid int [note: 'Asignatura-curso (FK a public.asigcurs).']
+  canolid int [note: 'Año lectivo (FK a public.tabanol).']
+  careaid int [note: 'Área del saber (FK a public.tabarea).']
+  cpromasigesta int [note: 'Estado del registro.']
+  cpromasigid int [note: 'Identificador único del promedio por asignatura.']
+  cpromasigpond double [note: 'Ponderación de la asignatura en el promedio.']
+  cpromasigprom double [note: 'Promedio de la asignatura.']
+  cpromoid int [note: 'Referencia al promedio general (FK a public.tabpromo).']
+  Note: 'Snapshot temporal (copia de public.tabpromasig) con los promedios por asignatura de la institución asociada.'
+}
+
+Table varios.estuasesoria {
+  estaases int [note: 'Estado del registro.']
+  idases int [pk, not null, note: 'Identificador único del registro.']
+  nomases varchar(50) [note: 'Nombre del estudiante en asesoría.']
+  Note: 'Estudiantes en asesoría (tarea específica de una institución).'
+}
+
+Table varios.sorteo {
+  estasorteo int [note: 'Estado del sorteo.']
+  fechsorteo date [note: 'Fecha del sorteo.']
+  idsorteo int [pk, not null, note: 'Identificador único del sorteo.']
+  nomsorteo varchar(50) [note: 'Nombre del sorteo.']
+  Note: 'Sorteos (tarea específica).'
+}
+
+Ref: contact.aetempmess.aetempmess_type > contact.aetempmesstype.aetempmesstype_id // aetempmess_fk1
+Ref: contact.aetempmesssede.aeinst_id > data.aeinstituciones.aeinst_id // messsedeinstitucion
+Ref: contact.aetempmesssede.aetempmesstype_id > contact.aetempmesstype.aetempmesstype_id // messsedetipo
+Ref: contact.emisor.estado > data.aeestados.aeestados_id // emisor_estado_fkey
+Ref: contact.emisor.idempresa > data.aeinstituciones.aeinst_id // emisor_idempresa_fkey
+Ref: data.aeavisos_comentarios.aeavisos_id > data.aeavisos.aeavisos_id // avisoscomentarios_fkey
+Ref: data.aeavisosinternal_comentarios.aeavisosinternal_id > data.aeavisosinternal.aeavisosinternal_id // aviinternalcomentarios_fkey
+Ref: data.aebitacora_comentarios.aebitacora_id > data.aebitacora.aebitacora_id // aeconsultascomentarios_fkey
+Ref: data.aecitaciones.aeanol_id > data.aeano.aeano_id // citacionano
+Ref: data.aecitaciones.aeinst_id > data.aeinstituciones.aeinst_id // citacionsede
+Ref: data.aecitaciones.aemotivo_id > data.aemotivo.aemotivo_id // citacionmotivo
+Ref: data.aeconsultasdocentes_comentarios.aeconsultasdocentes_id > data.aeconsultasdocentes.aeconsultasdocentes_id // aeconsultascomentarios_fkey
+Ref: data.aeexcusas.aetipoexcusa_id > data.aetipoexcusas.aetipoexcusa_id // latipoexcusa_fkey_
+Ref: data.aeexcusas_respuestas.aeexcusas_id > data.aeexcusas.aeexcusas_id // aeexcusas_fkey_
+Ref: data.aematriculas_academia.aeestudiantes_id > data.aematriculas_estudiantes.aeestudiantes_id // estudiantesacad_fk
+Ref: data.aematriculas_academia.aeestudiantesacademia_colegio_caracter > data.aecaracter.aecaracter_id // privpub
+Ref: data.aematriculas_academia.aeestudiantesacademia_conocernos > data.aeconocer.aeconocer_id // comosupo
+Ref: data.aematriculas_acudientes.aeacudientes_empresariotipo > data.aetipoempresa.aetipoempresa_id // tiponegocio
+Ref: data.aematriculas_adjuntos.aeestudiantes_id > data.aematriculas_estudiantes.aeestudiantes_id // elestudiante
+Ref: data.aematriculas_demografia.aeestudiantes_id > data.aematriculas_estudiantes.aeestudiantes_id // aematriculas_demografia_fk
+Ref: data.aematriculas_demografia.aeestudiantesdemografia_discapacidad > data.aediscapacidades.aediscapacidades_id // discapacidad_fk
+Ref: data.aematriculas_demografia.aeestudiantesdemografia_eps > data.aeeps.aeeps_id // laeps
+Ref: data.aematriculas_demografia.aeestudiantesdemografia_etnia > data.aeetnias.aeetnias_id // laetnia
+Ref: data.aematriculas_demografia.aeestudiantesdemografia_gruposanguineo > data.aegruposanguineo.aegruposanguineo_id // tiposangre
+Ref: data.aematriculas_estudiantes.aeestudiantes_grado > data.aegrados.aegrados_id // elgrado
+Ref: data.aematriculas_estudiantes.aeestudiantes_id > data.aeestudiantes.aeestudiantes_id // elacademico
+Ref: data.aematriculas_estudiantes.aeestudiantes_jornada > data.aejornada.aejornada_id // lajornada
+Ref: data.aematriculas_estudiantes.aeestudiantes_tipodocumento > data.aetipodocumento.aetipodocumento_id // eltipodoc
+Ref: data.aeopcres.aepre_id > data.aepre.aepre_id // aeopcres_aepre_id_fkey
+Ref: data.aepqr.aepqr_tiposolicitud_id > data.aepqr_tiposolicitud.aepqr_tiposolicitud_id // aepqr_pqr_tiposolicitud_fkey
+Ref: data.aepqr_respuesta.aepqr_id > data.aepqr.aepqr_id // aepqr_respuesta_id_fkey
+Ref: data.aepre.aetippre_id > data.aetippre.aetippre_id // aepre_aetippre_id_fkey
+Ref: data.aepublicaciones.aeanol_id > data.aeano.aeano_id // elanopublicaciones
+Ref: data.aepublicaciones_alerta.aepublicaciones_id > data.aepublicaciones.aepublicaciones_id // alertapublicaciones
+Ref: data.aepublicaciones_comentarios.aepublicaciones_id > data.aepublicaciones.aepublicaciones_id // aepublicacionescomentarios_fkey
+Ref: data.aeres.inst_cue_res_id > data.inst_cue_res.inst_cue_res_id // aeres_fk
+Ref: data.aesolicitud.aeinst_id > data.aeinstituciones.aeinst_id // aesolicitud_aeinstituciones_fk
+Ref: data.aetar_pro.aetar_id > data.aetar.aetar_id // tarprofk
+Ref: data.aetar_res.aetar_pro_id > data.aetar_pro.aetar_pro_id // tarprofk
+Ref: data.inst_cue.aecue_id > data.aecue.aecue_id // cuest_inst
+Ref: data.inst_cue.aeinst_id > data.aeinstituciones.aeinst_id // inst_cue_aeinstituciones_fk
+Ref: data.inst_cue_res.aeinst_cue_id > data.inst_cue.aeinst_cue_id // unionintento_programacion
+Ref: engine.aeusuresetpass.aeusu_id > engine.aeusu.aeusu_id // aeresetpk__fkey
+Ref: engine.aeusuroll.aeroll_id > engine.aeroll.aeroll_id // rollusu__fkey
+Ref: engine.aeusuroll.aeusu_id > engine.aeusu.aeusu_id // usuroll__fkey
+Ref: observador.tabobsplan.cinstid > public.tabinst.cinstid // tabobsplan_cobsplanid_fkey
+Ref: observador.tabresp.cinstid > public.tabinst.cinstid // tabresp_cinstid_fkey
+Ref: observador.tabrespeval.cmatrid > public.tabmatr.cmatrid // tabrespeval_cmatrid_fkey
+Ref: observador.tabrespeval.crespsubid > observador.tabrespsub.crespsubid // tabrespeval_crespsubid_fkey
+Ref: observador.tabrespobs.crespid > observador.tabresp.crespid // tabrespobs_crespobsid_fkey
+Ref: observador.tabrespsub.crespid > observador.tabresp.crespid // tabrespsub_crespid_fkey
+Ref: preescolar.tabpreasig.cambiid > preescolar.tabpreambi.cambiid // tabpreasig_cambiid_fkey
+Ref: preescolar.tabpreasig.ccursid > public.tabcurs.ccursid // tabpreasig_ccursid_fkey
+Ref: preescolar.tabpreasig.cdimeid > preescolar.tabpredime.cdimeid // tabpreasig_cdimeid_fkey
+Ref: preescolar.tabprenota.cmatrid > public.tabmatr.cmatrid // tabprenota_cmatrid_fkey
+Ref: preescolar.tabprenota.cpreasigid > preescolar.tabpreasig.cpreasigid // ligapreinstitucion
+Ref: preescolar.tabprenove.cmatrid > public.tabmatr.cmatrid // tabprenove_cmatrid_fkey
+Ref: preescolar.tabprenove.cperiid > public.anolperi.anolperiid // tabprenove_cperiid_fkey
+Ref: preescolar.tabprenove.cpreasigid > preescolar.tabpreasig.cpreasigid // tabprenove_cpreasigid_fkey
+Ref: preescolar.tabprenove.cpretiponoveid > public.tabtiponove.ctiponoveid // tabprenove_cpretiponoveid_fkey
+Ref: public.anolperi.canolid > public.tabanol.canolid // anolperi_canolid_fkey
+Ref: public.anolperi.cinstid > public.tabinst.cinstid // anolperi_cinstid_fkey
+Ref: public.anolperi.cperiid > public.tabperi.cperiid // anolperi_cperiid_fkey
+Ref: public.asigcurs.casigid > public.tabasig.casigid // asigcurs_casigid_fkey
+Ref: public.asigcurs.ccursid > public.tabcurs.ccursid // asigcurs_ccursid_fkey
+Ref: public.asigcurscomp.asigcursid > public.asigcurs.asigcursid // referenciaxmateria
+Ref: public.asigcurscomp.ccompid > public.tabcomp.ccompid // logrodeasignatura
+Ref: public.asigcurscontprog.asigcursid > public.asigcurs.asigcursid // asigcurscontprog_asigcursid_fkey
+Ref: public.asigcurscontprog.ccontprogid > public.tabcontprog.ccontprogid // asigcurscontprog_ccontprogid_fkey
+Ref: public.avisrolldest.cavisrolldestesta > public.tabestagene.cestageneid // union_publicacion_estado_fkey
+Ref: public.avisrolldest.cavisrollid > public.tabavisroll.cavisrollid // union_publicacion_roll2_fkey
+Ref: public.avisrolldest.crollid > logic.tabroll.crollid // union_publicacion_roll_fkey
+Ref: public.contact.aetempmess.aetempmess_type > public.contact.aetempmesstype.aetempmesstype_id // contact.aetempmess_fk1
+Ref: public.contact.aetempmesssede.aetempmess_type > public.contact.aetempmesstype.aetempmesstype_id // contact.aetempmesssede_fk1
+Ref: public.instarea.careaid > public.tabarea.careaid // instarea_careaid_fkey
+Ref: public.tabareaconf.casigid > public.tabasig.casigid // confasignatura
+Ref: public.tabareaconf.cgradid > public.tabgrad.cgradid // confgrado
+Ref: public.tabareaconf.cinstid > public.tabinst.cinstid // confinstitucion
+Ref: public.tabasig.careaid > public.tabarea.careaid // tabasig_careaid_fkey
+Ref: public.tabavisroll.cavisorollusua > logic.tabusua.cusuaid // tabavisroll_cavisorollusua_fkey
+Ref: public.tabavisroll.cavisrollesta > public.tabestagene.cestageneid // tabavisroll_cavisrollesta_fkey
+Ref: public.tabavisusua.cavisorollusua > logic.tabusua.cusuaid // tabavisusua_cavisorollusua_fkey
+Ref: public.tabavisusua.cavisusuaesta > public.tabestagene.cestageneid // tabavisusua_cavisusuaesta_fkey
+Ref: public.tabcerti.cinstid > public.tabinst.cinstid // tabcerti_cinstid_fkey
+Ref: public.tabciud.cdepageogid > public.tabdepageog.cdepageogid // tabciud_cdepageogid_fkey
+Ref: public.tabcompestu.asigcurscompid > public.asigcurscomp.asigcurscompid // referenciaxlogro
+Ref: public.tabcons.cinstid > public.tabinst.cinstid // tabcons_cinstid_fkey
+Ref: public.tabcurs.canolid > public.tabanol.canolid // tabcurs_canolid_fkey
+Ref: public.tabcurs.cgradid > public.tabgrad.cgradid // tabcurs_cgradid_fkey
+Ref: public.tabcurs.cinstid > public.tabinst.cinstid // tabcurs_cinstid_fkey
+Ref: public.tabcurs.cjornid > public.tabjorn.cjornid // tabcurs_cjornid_fkey
+Ref: public.tabdiscinst.cdisciid > public.tabdisci.cdisciid // tabdiscinst_cdisciid_fkey
+Ref: public.tabdiscnota.cdiscinstid > public.tabdiscinst.cdiscinstid // tabdiscnota_cdiscinstid_fkey
+Ref: public.tabdiscnota.cmatrid > public.tabmatr.cmatrid // tabdiscnota_cmatrid_fkey
+Ref: public.tabesca.canolid > public.tabanol.canolid // tabesca_canolid_fkey
+Ref: public.tabesca.cescacualid > public.tabescacual.cescacualid // tabesca_cescacualid_fkey
+Ref: public.tabesca.cescanaciid > public.tabescanaci.cescanaciid // tabesca_cescanaciid_fkey
+Ref: public.tabesca.cinstid > public.tabinst.cinstid // tabesca_cinstid_fkey
+Ref: public.tabestu.cestuesta > public.tabestagene.cestageneid // tabestu_cestuesta_fkey
+Ref: public.tabestu.ctipodocuid > public.tabtipodocu.ctipodocuid // tabestu_ctipodocuid_fkey
+Ref: public.tabestuacud.cestuacudpare > public.tabpare.cpareid // tabestuacud_cestuacudpare_fkey
+Ref: public.tabestuacud.cmatrid > public.tabmatr.cmatrid // tabestuacud_cmatrid_fkey
+Ref: public.tabestuotrodato.cestuotrodatocapa > public.tabcapa.ccapaid // tabestuotrodato_cestuotrodatocapa_fkey
+Ref: public.tabestuotrodato.cestuotrodatodisc > public.tabdisc.cdiscid // tabestuotrodato_cestuotrodatodisc_fkey
+Ref: public.tabestuotrodato.cestuotrodatoesta > public.tabestagene.cestageneid // tabestuotrodato_cestuotrodatoesta_fkey
+Ref: public.tabestuotrodato.cestuotrodatoetni > public.tabetni.cetniid // tabestuotrodato_cestuotrodatoetni_fkey
+Ref: public.tabestusociecon.cestusociecondeparesi > public.tabdepageog.cdepageogid // tabestusociecon_cestusociecondeparesi_fkey
+Ref: public.tabestusociecon.cestusocieconestr > public.tabestr.cestrid // tabestusociecon_cestusocieconestr_fkey
+Ref: public.tabestusociecon.cestusocieconmuniresi > public.tabciud.cciudid // tabestusociecon_cestusocieconmuniresi_fkey
+Ref: public.tabestusociecon.cestusocieconsisb > public.tabsisb.csisbid // tabestusociecon_cestusocieconsisb_fkey
+Ref: public.tabestusociecon.cmatrid > public.tabmatr.cmatrid // tabestusociecon_cmatrid_fkey
+Ref: public.tabevalsub.cevalid > public.tabeval.cevalid // tabevalsub_cevalid_fkey
+Ref: public.tabfirm.cinstid > public.tabinst.cinstid // tabfirm_cinstid_fkey
+Ref: public.tabgrad.cgradesta > public.tabestagene.cestageneid // tabgrad_cgradesta_fkey
+Ref: public.tabinst.cinstcara > public.tabcara.ccaraid // tabinst_cinstcara
+Ref: public.tabinst.cinstciud > public.tabciud.cciudid // tabinst_cinstciud_fkey
+Ref: public.tabinst.cinstdepa > public.tabdepageog.cdepageogid // tabinst_cinstdepa_fkey
+Ref: public.tabinst.cinstesta > public.tabestagene.cestageneid // tabinst_cinstesta_fkey
+Ref: public.tabinst.cinstesta > public.tabestagene.cestageneid // tabinst_cinstesta_fkey1
+Ref: public.tabinst.tabespeinst_cespeinstid > public.tabespeinst.cespeinstid // tabinst_tabespeinst_cespeinstid_fkey
+Ref: public.tabinst.tabmetoinst_cmetoinst > public.tabmetoinst.cmetoinstid // tabinst_tabmetoinst_cmetoinst_fkey
+Ref: public.tabinst.tabzonaresi_czonaresiid > public.tabzonaresi.czonaresiid // tabinst_tabzonaresi_czonaresiid_fkey
+Ref: public.tabinstdoce.canolid > public.tabanol.canolid // tabinstdoce_canolid_fkey
+Ref: public.tabinstdoce.ccargid > public.tabcarg.ccargid // tabinstdoce_ccargid_fkey
+Ref: public.tabinstdoce.cdoceid > public.tabdoce.cdoceid // tabinstdoce_cdoceid_fkey
+Ref: public.tabinstdoce.cinstdoceesta > public.tabestagene.cestageneid // tabinstdoce_cinstdoceesta_fkey
+Ref: public.tabinstdoce.cinstid > public.tabinst.cinstid // tabinstdoce_cinstid_fkey
+Ref: public.tabinstdoce.ctipovincid > public.tabtipovinc.ctipovincid // tabinstdoce_ctipovincid_fkey
+Ref: public.tabinstreso.cinstid > public.tabinst.cinstid // tabinstreso_cinstid_fkey
+Ref: public.tabmatr.ccursid > public.tabcurs.ccursid // tabmatr_ccursid_fkey
+Ref: public.tabmatrpago.cmatrid > public.tabmatr.cmatrid // tabmatrpago_cmatrid_fkey
+Ref: public.tabnota.asigcursid > public.asigcurs.asigcursid // ligainstitucion
+Ref: public.tabnota.cmatrid > public.tabmatr.cmatrid // tabnota_cmatrid_fkey
+Ref: public.tabnotadef.cmatrid > public.tabmatr.cmatrid // tabnotadef_cmatrid_fkey
+Ref: public.tabnotahist.asigcursid > public.asigcurs.asigcursid // ligainstitucion
+Ref: public.tabnotahist.cmatrid > public.tabmatr.cmatrid // tabnotahist_cmatrid_fkey
+Ref: public.tabnove.asigcursid > public.asigcurs.asigcursid // tabnove_asigcursid_fkey
+Ref: public.tabnove.cmatrid > public.tabmatr.cmatrid // tabnove_cmatrid_fkey
+Ref: public.tabnove.cperiid > public.anolperi.anolperiid // tabnove_cperiid_fkey
+Ref: public.tabnove.ctiponoveid > public.tabtiponove.ctiponoveid // tabnove_ctiponoveid_fkey
+Ref: public.tabpazsalv.cinstid > public.tabinst.cinstid // tabpazsalv_cpazsalvid_fkey
+Ref: public.tabperival.canolperiid > public.anolperi.anolperiid // tabperival_canolperiid_fkey
+Ref: public.tabpromdef.cmatrid > public.tabmatr.cmatrid // tabpromdef_cmatrid_fkey
+Ref: public.tabpromdef.cperiid > public.anolperi.anolperiid // tabpromdef_cperiid_fkey
+Ref: public.tabsie.cinstid > public.tabinst.cinstid // tabsie_cinstid_fkey
+Ref: public.tabutil.ccursid > public.tabcurs.ccursid // tabutil_ccursid_fkey

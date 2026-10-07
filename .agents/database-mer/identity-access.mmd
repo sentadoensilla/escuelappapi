@@ -1,0 +1,118 @@
+erDiagram
+    %% Identity & Access (engine + logic)
+    engine_aemenu {
+        text aemenu_descripcion
+        int aemenu_estado
+        text aemenu_icono
+        int aemenu_id PK
+        text aemenu_nombre
+        int aemenu_orden
+    }
+    engine_aeopcmenu {
+        int aemenu_id
+        text aeopcmenu_descripcion
+        text aeopcmenu_enlace
+        int aeopcmenu_estado
+        text aeopcmenu_icono
+        int aeopcmenu_id PK
+        text aeopcmenu_nombre
+        int aeopcmenu_orden
+    }
+    engine_aeroll {
+        text aeroll_descripcion
+        int aeroll_esta
+        int aeroll_id PK
+        text aeroll_index
+        varchar(20) aeroll_nombre
+    }
+    engine_aerollopc {
+        int aeopcmenu_id
+        int aeroll_id
+        int aerollopc_estado
+        int aerollopc_id PK
+    }
+    engine_aeusu {
+        int aeroll_id
+        int aeusu_estado
+        double aeusu_id PK
+        text aeusu_llave
+        text aeusu_nick
+        text aeusu_nombre
+        text aeusu_token
+    }
+    engine_aeusuopc {
+        int aeopcmenu_id
+        int aeusu_id
+        int aeusuopc_estado
+        int aeusuopc_id PK
+    }
+    engine_aeusuresetpass {
+        double aeusu_id
+        varchar(32) aeusures_dirip
+        int aeusures_estado
+        timestamp aeusures_fechageneracion
+        timestamp aeusures_fechalink
+        timestamp aeusures_fechavence
+        int aeusures_id PK
+        text aeusures_llavenew
+        text aeusures_llavepre
+    }
+    engine_aeusuroll {
+        bigint aeacad_referencia
+        int aeanol_id
+        int aeinst_id
+        int aeroll_id
+        bigint aeusu_id
+        int aeusuroll_estado
+        timestamptz aeusuroll_fecharegistro
+        int aeusuroll_id PK
+    }
+    logic_tabmenu {
+        text cmenudesc
+        text cmenudest
+        int cmenuesta
+        int cmenuid PK
+        text cmenunomb
+        int cmenuorde
+    }
+    logic_tabopcimenu {
+        text copcimenudesc
+        text copcimenuenla
+        int copcimenuesta
+        text copcimenuicon
+        int copcimenuid PK
+        int copcimenumenu
+        text copcimenunomb
+        int copcimenuorde
+    }
+    logic_tabroll {
+        int cenlaid
+        text crolldesc
+        int crollesta
+        int crollid PK
+        varchar(20) crollnomb
+        text crollpagientr
+    }
+    logic_tabrollopci {
+        int copcimenuid
+        int crollid
+        int crollopciesta
+        int crollopciid PK
+    }
+    logic_tabusua {
+        int cusuaesta
+        int cusuaid PK
+        text cusuallave
+        text cusuanick
+        text cusuanomb
+        int cusuaroll
+    }
+    logic_tabusuaopci {
+        int cusuaopciesta
+        int cusuaopciid PK
+        int cusuaopciopcimenu
+        int cusuaopciusua
+    }
+    engine_aeusu ||--o{ engine_aeusuresetpass : "aeusu_id -> aeusu_id"
+    engine_aeroll ||--o{ engine_aeusuroll : "aeroll_id -> aeroll_id"
+    engine_aeusu ||--o{ engine_aeusuroll : "aeusu_id -> aeusu_id"

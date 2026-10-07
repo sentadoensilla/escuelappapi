@@ -1,0 +1,47 @@
+flowchart TD
+    subgraph SAE["SAE — fuente de verdad académica"]
+        PUBLIC["public<br/>instituciones · sedes · estudiantes · docentes<br/>matrículas · cursos · notas · promoción"]
+        OBS["observador<br/>disciplina · convivencia"]
+        PRE["preescolar<br/>ámbitos · dimensiones · notas"]
+        LOGIC["logic<br/>IAM legacy"]
+    end
+
+    subgraph ESC["Escuelapp — capa digital"]
+        DATA["data<br/>agenda · asistencias · avisos · tareas<br/>cuestionarios · excusas · PQRS · cronogramas"]
+        ENGINE["engine<br/>IAM canónico"]
+        CONTACT["contact<br/>emisores WhatsApp · plantillas"]
+    end
+
+    subgraph INT["Integración / migración"]
+        MIG["migracion<br/>map_rol · map_usuario · map_institucion<br/>map_docente · map_estudiante"]
+        TABENLA["integration<br/>tabenla (puente) · tabregiacti (auditoría)"]
+        TABUNIO["public.tabunio<br/>login SAE → usuario académico"]
+        AEUSUROLL["engine.aeusuroll<br/>usuario × rol × institución × año"]
+    end
+
+    subgraph WA["Dominio de enlaces seguros"]
+        PLANNED["PLANNED DOMAIN<br/>enlaces firmados (token HMAC)<br/>No existe tabla física dedicada.<br/>Registro en estadistica.tabhistvis (visitas)."]
+    end
+
+    PUBLIC --> TABUNIO
+    PUBLIC --> TABENLA
+    PUBLIC --> OBS
+    PUBLIC --> PRE
+    LOGIC --> MIG
+    MIG --> ENGINE
+    DATA --> MIG
+    CONTACT --> MIG
+
+    PUBLIC -->|"evento académico<br/>(novedad, aviso, asistencia)"| INT
+    INT -->|"adapters identidad + dispatch"| DATA
+    DATA -->|"notificación / comunicación"| CONTACT
+    CONTACT -->|"mensaje WhatsApp"| WA
+    WA -->|"enlace seguro /vista/:token"| PADRE["Padre / Acudiente"]
+    PADRE -->|"valida enlace → acceso"| WA
+    WA -->|"visita"| HIST["estadistica.tabhistvis"]
+
+    ENGINE --- AEUSUROLL
+    AEUSUROLL --> ENGINE
+    ENGINE --> DATA
+
+    style PLANNED stroke-dasharray: 5 5

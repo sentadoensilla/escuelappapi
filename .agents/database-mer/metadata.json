@@ -1,0 +1,63 @@
+{
+  "skill": "database-mer",
+  "mode": "ANALYZE + GENERATE",
+  "database": "bdsae2",
+  "host": "localhost:5432",
+  "generated_at": "2026-08-16T00:00:00-05:00",
+  "sources": {
+    "structural": "PostgreSQL pg_catalog (superuser postgres)",
+    "semantic": ".agents/database.md (v2026-08-16)",
+    "code": "api/** (Node/Express) para relaciones implícitas y flujos"
+  },
+  "counts": {
+    "schemas": 12,
+    "tables_relational": 265,
+    "views": 1,
+    "matviews": 1,
+    "sequences": 68,
+    "functions": 20,
+    "foreign_keys": 146,
+    "comments_table_column": 2142
+  },
+  "schemas": {
+    "contact": {"tables": 5, "system": "Escuelapp"},
+    "data": {"tables": 74, "system": "Escuelapp"},
+    "engine": {"tables": 8, "system": "Escuelapp"},
+    "estadistica": {"tables": 1, "system": "SAE"},
+    "integration": {"tables": 2, "system": "SAE"},
+    "logic": {"tables": 6, "system": "SAE"},
+    "migracion": {"tables": 5, "system": "Consolidacion"},
+    "observador": {"tables": 5, "system": "SAE"},
+    "preescolar": {"tables": 5, "system": "SAE"},
+    "public": {"tables": 100, "system": "SAE"},
+    "temporal": {"tables": 52, "system": "SAE legacy"},
+    "varios": {"tables": 2, "system": "SAE legacy"}
+  },
+  "files": [
+    "README.md",
+    "bdsae2-full.dbml",
+    "bdsae2-full.mmd",
+    "sae-academic.dbml",
+    "sae-academic.mmd",
+    "escuelapp-communication.dbml",
+    "escuelapp-communication.mmd",
+    "identity-access.dbml",
+    "identity-access.mmd",
+    "integration-migration.dbml",
+    "integration-migration.mmd",
+    "domain-map.mmd",
+    "mer-analysis.md",
+    "metadata.json"
+  ],
+  "confidence": {
+    "confirmed": "146 FK fisicas + 265 tablas",
+    "documented": "equivalencias database.md §6.2 + puentes §6.3",
+    "inferred": "columnas FK sin constraint en data/engine (ver mer-analysis.md §8)",
+    "suspected": ["data.aeano<->public.tabanol", "data.aegrupos (vista)", "public.events<->scheduler", "public.sorteo", "aeinstituciones_", "aeinstitucionesss"]
+  },
+  "tooling": {
+    "generator": "/tmp/opencode/gen_mer.py",
+    "catalog_tsv": "/tmp/opencode/mer_tables.tsv, mer_columns.tsv, mer_fks.tsv, mer_keys.tsv",
+    "formats": ["DBML", "Mermaid"]
+  }
+}
