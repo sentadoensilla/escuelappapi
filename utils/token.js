@@ -155,26 +155,48 @@ module.exports = {
 
     /**
      * encriptar RECEIVE A STRING TO MASK
+     * Emite base64url (RFC 4648 §5): reversible, UTF-8 y sin '+', '/' ni '='.
      * @param {*} text 
      * @returns 
      */
     encriptar: (text) => {
         let encoded = ""
         if (text != "undefined" && text != null && text != "") {
-            encoded = Buffer.from(text.toString(), 'utf-8').toString('base64').toString('base64')
+            encoded = Buffer.from(text.toString(), 'utf-8')
+                .toString('base64')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '')
         }
         return encoded
     },
 
     /**
-     * decriptar RECEIVE A MASK LARGE STRING TO UN-MASK-IT
+     * decriptar RECEIVE A MASK TO UN-MASK-IT
+     * Tolerante: acepta base64url (nuevo) y base64 estándar (legado).
      * @param {*} text 
      * @returns 
      */
     decriptar: (text) => {
         let plain = ""
         if (text != "undefined" && text != null && text != "") {
-            plain = Buffer.from(Buffer.from(text.toString(), 'base64'), 'base64').toString('utf-8')
+            const s = text.toString()
+            const decodeUtf8 = (b64) => {
+                const d = Buffer.from(b64, 'base64').toString('utf-8')
+                return (d === '' || d.indexOf('\uFFFD') !== -1) ? null : d
+            }
+            // 1) base64url (nuevo): round-trip canónico.
+            if (/^[A-Za-z0-9_-]+$/.test(s)) {
+                const d = decodeUtf8(s.replace(/-/g, '+').replace(/_/g, '/'))
+                if (d !== null && module.exports.encriptar(d) === s) { plain = d; return plain }
+            }
+            // 2) base64 estándar (legado).
+            if (s.length % 4 === 0 && /^[A-Za-z0-9+/]+={0,2}$/.test(s)) {
+                const d = decodeUtf8(s)
+                if (d !== null) { plain = d; return plain }
+            }
+            // 3) passthrough.
+            plain = s
         }
         return plain
     },
