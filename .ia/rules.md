@@ -90,6 +90,8 @@ Vamos a construir escuelapp: un sistema SaaS de registros académicos y agenda e
         - api/src/utils/exoorts: Contiene la lógica para exportar a excel
         - api/src/utils/notifications: Contiene la lógica para enviar emails y para enviar whatsapp
         - api/src/utils/queue: Contiene la lógica para enviar notificaciones usando colas
+- Contrato de respuestas: los controllers responden `{status, statusCode, message, rows}`. Cuando NO hay resultados se responde `{status:'error', statusCode:400, message:'0 Resultados encontrados', rows:{}}`. El frontend debe validar `statusCode === 200` y que `rows` tenga contenido real; nunca comparar `rows` contra el string `"{}"`.
+- Dashboards `/totals/statsinitial/*`: hay endpoints exclusivos de docente/director (guarda `isDirector_and_tecaher`, p.ej. `attendancesteacher`, `attendancesteacherbyday`, `listUnnattendance`, `listUnnattendanceGroup`). Cada tablero por rol debe invocar solo los que su guarda permite; el tablero de estudiante (`/dashstudent`) usa los endpoints de estudiante/acudiente/institucion.
 
 ## Estilo
 - La plantilla base está en /var/www/html/atlantis, debes usar los elementos visuales que están en ésta plantilla, junto con bootstrap 5
