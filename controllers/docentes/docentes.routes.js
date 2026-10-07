@@ -1,12 +1,7 @@
-/**
- * docentes.routes.js
- * Rutas del módulo de docentes (datos, contratación y asignación académica).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./docentesController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./docentesController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Docentes (public.tabdoce) =====
 // Listar docentes.
 router.post('/docentes/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.docenteListar);
@@ -36,5 +31,4 @@ router.post('/asignaciones/registrar', [Auth.isAuth, Auth.isDirector_and_tecaher
 router.post('/asignaciones/actualizar', [Auth.isAuth, Auth.isDirector_and_tecaher], Controller.asignacionActualizar);
 // Borrar (lógico) una asignación académica.
 router.post('/asignaciones/borrar', [Auth.isAuth, Auth.isDirector_and_tecaher], Controller.asignacionBorrar);
-
-module.exports = router;
+export default router;

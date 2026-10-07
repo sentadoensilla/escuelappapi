@@ -1,46 +1,48 @@
-
-require('dotenv').config()
-const nodemailer = require("nodemailer");
-const generateButton = require('../../buttons')
-const presetText = require('../../textos')
-
-// async..await is not allowed in global scope, must use a wrapper
-
-
-module.exports = {
-
-    async send(data) {
-        let botonDefault = generateButton.boton({type:'warn',shape:'square',link:process.env.APP_API_FRONT,text:' '+process.env.MAIL_DOMAIN+' '})
-
-        let transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
-            port: process.env.MAIL_PORT,
-            secure: false, // process.env.MAIL_SECURE, // true for 465, false for other ports
-            auth: {
-                user:  process.env.MAIL_USER, // testAccount.user, // generated ethereal user
-                pass:  process.env.MAIL_PASS // testAccount.pass, // generated ethereal password
-            },
-            tls: {
-                // do not fail on invalid certs
-                rejectUnauthorized: false
-            },
-                
-        });
-
-
-        let promise = new Promise( async(resolve,reject) => {
-            let info = await transporter.sendMail({
-                from: process.env.MAIL_SENDER_NAME+' <'+process.env.MAIL_SENDER_ACCOUNT+'>', // sender address
-                to: data.email, // list of receivers
-                subject: process.env.MAIL_SENDER_SUBJECT, // Subject line
-                text: process.env.MAIL_SENDER_TEXT, // plain text body
-                html: `
+import nodemailer from "nodemailer";
+import generateButton from "../../buttons.js";
+import presetText from "../../textos.js";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+require('dotenv').config();
+export async function send(data) {
+  let botonDefault = generateButton.boton({
+    type: 'warn',
+    shape: 'square',
+    link: process.env.APP_API_FRONT,
+    text: ' ' + process.env.MAIL_DOMAIN + ' '
+  });
+  let transporter = nodemailer.createTransport({
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    secure: false,
+    // process.env.MAIL_SECURE, // true for 465, false for other ports
+    auth: {
+      user: process.env.MAIL_USER,
+      // testAccount.user, // generated ethereal user
+      pass: process.env.MAIL_PASS // testAccount.pass, // generated ethereal password
+    },
+    tls: {
+      // do not fail on invalid certs
+      rejectUnauthorized: false
+    }
+  });
+  let promise = new Promise(async (resolve, reject) => {
+    let info = await transporter.sendMail({
+      from: process.env.MAIL_SENDER_NAME + ' <' + process.env.MAIL_SENDER_ACCOUNT + '>',
+      // sender address
+      to: data.email,
+      // list of receivers
+      subject: process.env.MAIL_SENDER_SUBJECT,
+      // Subject line
+      text: process.env.MAIL_SENDER_TEXT,
+      // plain text body
+      html: `
                 ${presetText.encabezadoPagina({
-                    logo: process.env.MAIL_SENDER_LOGO,
-                    email: data.email,
-                    titulo: process.env.MAIL_DOMAIN,
-                    subtitulo: process.env.MAIL_SENDER_TEXT_ALT
-                })}
+        logo: process.env.MAIL_SENDER_LOGO,
+        email: data.email,
+        titulo: process.env.MAIL_DOMAIN,
+        subtitulo: process.env.MAIL_SENDER_TEXT_ALT
+      })}
                 <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="margin: 0; padding: 0;font-family: Helvetica, Arial, sans-serif;color:#666666;">
                     <tr>
                     
@@ -119,32 +121,26 @@ module.exports = {
                     <tr>        
                         <td bgcolor="#F8F8FF" style="padding: 30px 30px 30px 30px;">
                             ${presetText.piePagina({
-                                numeroAtencion: numeroAtencion,
-                                logo: process.env.MAIL_SENDER_LOGO_MINI,
-                                email: data.email,
-                                domain: process.env.MAIL_DOMAIN,
-                                lema: process.env.MAIL_SENDER_SUBJECT
-                            })}                           
+        numeroAtencion: numeroAtencion,
+        logo: process.env.MAIL_SENDER_LOGO_MINI,
+        email: data.email,
+        domain: process.env.MAIL_DOMAIN,
+        lema: process.env.MAIL_SENDER_SUBJECT
+      })}                           
                         </td>        
                     </tr>
                 </table>
-                `, 
-            });
-
-        
-            if (info.messageId) {
-                resolve("Correo Enviado con Exito")
-            } else {
-                reject("Error Al enviar el Correo")
-            }
-
-            
-        })
-
-        
-        return promise
-        
-    },
-
+                `
+    });
+    if (info.messageId) {
+      resolve("Correo Enviado con Exito");
+    } else {
+      reject("Error Al enviar el Correo");
+    }
+  });
+  return promise;
 }
+export default {
+  send: send
+}; // async..await is not allowed in global scope, must use a wrapper
 //main().catch(console.error);

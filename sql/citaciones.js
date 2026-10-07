@@ -1,5 +1,4 @@
-module.exports={
-    citacionesListar:`
+export const citacionesListar = `
         -- LISTADO DE CITACIONES
         SELECT 
             c.aecitacion_id AS idregistro, c.aecitacion_fecharegistro AS fecharegistro,
@@ -27,8 +26,8 @@ module.exports={
             aecitacion_estado, TO_CHAR(c.aecitacion_fecha, 'YYYY-MM-DD'), c.aecitacion_lugar, c.aecitacion_descripcion,
             c.aecitacion_adjunto
         ORDER BY fechacitacion;
-        `,
-    citacionesListarOne:`
+        `;
+export const citacionesListarOne = `
         -- UNA CITACION ESPECIFICA
         SELECT 
             c.aecitacion_id AS idregistro, c.aecitacion_fecharegistro AS fecharegistro,
@@ -61,9 +60,8 @@ module.exports={
             i.aeinst_id, i.aeinst_nombre, i.calendario, 
             i.aeinst_direccion, i.aeinst_telefono, 
             i.aeinst_mail, i.aeinst_escudo, i.aeinst_facebook;
-        `,
-
-    citacionesUpdate:`
+        `;
+export const citacionesUpdate = `
         -- ACTUALIZAR UNA CITACION POR SU IDREGISTRO
         UPDATE 
             data.aecitaciones
@@ -75,8 +73,8 @@ module.exports={
         WHERE 
             aecitacion_id=$1
         RETURNING aecitacion_id AS idregistro;    
-        `,
-    citacionesDelete:`
+        `;
+export const citacionesDelete = `
         -- "ELIMINAR" UNA CITACION POR SU IDREGISTRO
         UPDATE 
             data.aecitaciones
@@ -89,8 +87,8 @@ module.exports={
         RETURNING aecitacion_id AS idregistro, aecitacion_fecharegistro AS fecharegistro,
         aeestudiantes_id AS estudiante, aedocentes_id AS docente, aemotivo_id AS motivocitacion, aecitacion_estado AS estado, 
         aecitacion_fecha AS fechacitacion, aecitacion_lugar AS lugar, aecitacion_descripcion AS descripcion, aecitacion_adjunto AS adjunto;   
-        `,
-    citacionesRegistrar:`
+        `;
+export const citacionesRegistrar = `
         -- REGISTRAR UNA CITACION           
         INSERT INTO data.aecitaciones
             (aecitacion_id, aecitacion_fecharegistro, 
@@ -100,5 +98,11 @@ module.exports={
             $1, $2, $3, $4, 
             $5, 1, $6, $7, $8, $9)
         RETURNING aecitacion_id AS idregistro;
-        `,
-}
+        `;
+export default {
+  citacionesListar: citacionesListar,
+  citacionesListarOne: citacionesListarOne,
+  citacionesUpdate: citacionesUpdate,
+  citacionesDelete: citacionesDelete,
+  citacionesRegistrar: citacionesRegistrar
+};

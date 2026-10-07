@@ -1,11 +1,7 @@
-/**
- * integration.routes.js — Rutas del Integration Layer (SAE → Escuelapp → Padre)
- */
-const express = require('express');
+import express from "express";
+import Controller from "./integrationController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./integrationController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Adaptadores de identidad (Escuelapp lee SAE) =====
 // Dado un acudiente (por identificación), devuelve sus estudiantes SAE.
 router.post('/familia/mis-estudiantes', [Auth.isAuth, Auth.isAcudiente_and_estudiante_and_institucion], Controller.misEstudiantes);
@@ -25,5 +21,4 @@ router.get('/enlace/:token', Controller.abrirEnlace);
 router.post('/config/instituciones', [Auth.isAuth, Auth.Admin], Controller.institucionesConfig);
 // Mapear institución SAE (cinstid) a la institución Escuelapp con cuenta WhatsApp.
 router.post('/config/emisor-institucion', [Auth.isAuth, Auth.Admin], Controller.guardarEmisorInstitucion);
-
-module.exports = router;
+export default router;

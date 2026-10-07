@@ -1,7 +1,7 @@
-var moment = require('moment-timezone');
+import moment from "moment-timezone";
 // const ahora = moment().format('s').toString().slice(-1); //LAST SECOND
 
-const ahora = moment().valueOf().toString().slice(-1);//LAST MILLISECOND
+const ahora = moment().valueOf().toString().slice(-1); //LAST MILLISECOND
 
 var datetime = new Date();
-console.log('datetime, ahora: '. datetime, ahora);
+console.log('datetime, ahora: '.datetime, ahora);

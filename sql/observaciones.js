@@ -1,7 +1,4 @@
-module.exports = {
-    //----------------------------------------------------------------
-    //REGISTRO DE OBSERVACIONES
-    observacionAdd:`
+export const observacionAdd = `
     -- REGISTRAR UNA OBSERVACION
     INSERT INTO data.aebitacora(
         aebitacora_id, aebitacora_fecha, aeusu_id, aeinst_id, 
@@ -9,25 +6,22 @@ module.exports = {
         aebitacora_descripcion)
         VALUES ((SELECT COALESCE((MAX(aebitacora_id)+1), 1)  FROM data.aebitacora), $1, $2, $3, 
         $4, $5, $6, $7, $8, $9) RETURNING aebitacora_id;
-    `,
-
-    notificationAdd:`
+    `;
+export const notificationAdd = `
     -- AGREGAR NOTIFICACION ENVIADA AL USUARIO
     INSERT INTO data.aenotificaciones(
         aenotificaciones_id, aenotificaciones_de, aenotificaciones_para, aenotificaciones_fecha, 
         aenotificaciones_title, aenotificaciones_body, aenotificaciones_ruta, aenotificaciones_referencia, aenotificaciones_data)
-    VALUES ((SELECT COALESCE(MAX(aenotificaciones_id)+1, 1) FROM data.aenotificaciones), $1, $2, $3, $4, $5, $6, $7, $8);`,
-
-    contactoStudentOne:`
+    VALUES ((SELECT COALESCE(MAX(aenotificaciones_id)+1, 1) FROM data.aenotificaciones), $1, $2, $3, $4, $5, $6, $7, $8);`;
+export const contactoStudentOne = `
     -- DATOS DE CONTACTO DE UN ESTUDIANTE
         SELECT * FROM engine.contacto_student_one($1, $2, $3);
-        `,
-    contactoStudent:`
+        `;
+export const contactoStudent = `
     -- DATOS DE CONTACTO DE UN ESTUDIANTE
         SELECT * FROM engine.contacto_student($1, $2, $3);
-    `,
-
-    observacionesListOne:`
+    `;
+export const observacionesListOne = `
     -- UNA OBSERVACION CON TODAS SUS PROPIEDADES
         SELECT 
             aebitacora_id as idregistro, TO_CHAR(b.aebitacora_fecha, 'YYYY-MM-DD') AS fechaobservacion,
@@ -56,9 +50,8 @@ module.exports = {
                 ON (b.aeanol_id = y.aeano_id)
         WHERE 
             aebitacora_id = $1
-    `,
-
-    observacionesListTeachers:`
+    `;
+export const observacionesListTeachers = `
     -- LISTA DE OBSERVACIONES PARA DOCENTES
         SELECT 
             aebitacora_id AS idregistro, TO_CHAR(b.aebitacora_fecha, 'YYYY-MM-DD') AS fechaobservacion, 
@@ -86,9 +79,8 @@ module.exports = {
                 BETWEEN TO_DATE($4, 'YYYY-MM-DD') 
                     AND TO_DATE($5, 'YYYY-MM-DD')
         ORDER BY fechaobservacion DESC;
-    `,
-
-    observacionesListStudents:`
+    `;
+export const observacionesListStudents = `
     -- LISTA DE OBSERVACIONES PARA DOCENTES
         SELECT 
             aebitacora_id AS idregistro, TO_CHAR(b.aebitacora_fecha, 'YYYY-MM-DD') AS fechaobservacion, 
@@ -116,9 +108,8 @@ module.exports = {
                 BETWEEN TO_DATE($4, 'YYYY-MM-DD') 
                     AND TO_DATE($5, 'YYYY-MM-DD')
         ORDER BY fechaobservacion DESC;
-    `,
-
-    observacionesListAdmins:`
+    `;
+export const observacionesListAdmins = `
     -- LISTA DE OBSERVACIONES PARA ADMINISTRATIVOS
         SELECT 
             aebitacora_id AS idregistro, TO_CHAR(b.aebitacora_fecha, 'YYYY-MM-DD') AS fechaobservacion, 
@@ -145,9 +136,8 @@ module.exports = {
                 BETWEEN TO_DATE($3, 'YYYY-MM-DD') 
                     AND TO_DATE($4, 'YYYY-MM-DD')
         ORDER BY fechaobservacion DESC;
-    `,
-
-    observacionesListComments:`
+    `;
+export const observacionesListComments = `
     -- COMENTARIOS DE UNA OBSERVACION HECHA POR UN DOCENTE
       SELECT TO_CHAR(x.aebitacoracomentarios_fecha, 'YYYY-MM-DD, HH:mi:ss') as comment_fecha, 
       u.aeusu_nombre as comment_nombre, x.aebitacoracomentarios_descripcion as comment_desc 
@@ -156,16 +146,14 @@ module.exports = {
       AND x.aebitacoracomentarios_estado=1
       AND c.aebitacora_id=x.aebitacora_id
       AND x.aeusu_id=u.aeusu_id
-      ORDER BY x.aebitacoracomentarios_fecha ASC`,
-    
-    observacionesInsertComments:`
+      ORDER BY x.aebitacoracomentarios_fecha ASC`;
+export const observacionesInsertComments = `
         INSERT INTO data.aebitacora_comentarios(
         aebitacoracomentarios_id, aebitacora_id, aeusu_id, aebitacoracomentarios_fecha, 
         aebitacoracomentarios_descripcion, aebitacoracomentarios_estado)
         VALUES ((SELECT COALESCE((MAX(aebitacoracomentarios_id)+1), 1)  FROM data.aebitacora_comentarios), 
-            $1, $2, $3, $4, 1);`,
-    
-    observacionesDelete:`
+            $1, $2, $3, $4, 1);`;
+export const observacionesDelete = `
     -- DELETE A OBSERVACION (aebitacora no posee columna estado; se elimina el registro y sus comentarios)
         WITH borrada AS (
             DELETE FROM data.aebitacora
@@ -177,5 +165,17 @@ module.exports = {
             RETURNING aebitacora_id
         )
         DELETE FROM data.aebitacora_comentarios WHERE aebitacora_id IN (SELECT aebitacora_id FROM borrada);
-    `,
-}
+    `;
+export default {
+  observacionAdd: observacionAdd,
+  notificationAdd: notificationAdd,
+  contactoStudentOne: contactoStudentOne,
+  contactoStudent: contactoStudent,
+  observacionesListOne: observacionesListOne,
+  observacionesListTeachers: observacionesListTeachers,
+  observacionesListStudents: observacionesListStudents,
+  observacionesListAdmins: observacionesListAdmins,
+  observacionesListComments: observacionesListComments,
+  observacionesInsertComments: observacionesInsertComments,
+  observacionesDelete: observacionesDelete
+};

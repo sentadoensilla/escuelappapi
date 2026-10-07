@@ -13,8 +13,8 @@
  * Para migrar otra BD (p.ej. localhost) sin tocar .env:
  *   PG_HOST=localhost node scripts/migrar_cusuallave_base64url.js --apply
  */
-require('dotenv').config();
-const pg = require('pg');
+import 'dotenv/config';
+import pg from 'pg';
 
 const { Client } = pg;
 
@@ -85,66 +85,64 @@ const client = new Client({
   ssl: false,
 });
 
-client
-  .connect()
-  .then(() =>
-    client.query('SELECT cusuaid, cusuanick, cusuallave FROM logic.tabusua ORDER BY cusuaid'),
-  )
-  .then(async (res) => {
-    const rows = res.rows;
-    let vacios = 0;
-    let sinCambio = 0;
-    let aCambiar = 0;
-    const cambios = [];
-    const muestras = [];
+await client.connect();
 
-    for (const r of rows) {
-      const v = r.cusuallave;
-      if (v === null || v === '') {
-        vacios++;
-        continue;
-      }
-      const plano = aPlano(v);
-      const nuevo = encriptar(plano);
-      if (nuevo === v) {
-        sinCambio++;
-        continue;
-      }
-      aCambiar++;
-      cambios.push({ id: r.cusuaid, nick: r.cusuanick, viejo: v, plano, nuevo });
-      if (muestras.length < 20) muestras.push({ nick: r.cusuanick, viejo: v, plano, nuevo });
-    }
+const res = await client.query(
+  'SELECT cusuaid, cusuanick, cusuallave FROM logic.tabusua ORDER BY cusuaid',
+);
+const rows = res.rows;
 
-    console.log(
-      `Resumen: total=${rows.length} vacios=${vacios} sinCambio=${sinCambio} aCambiar=${aCambiar}`,
-    );
-    console.log('Muestras (nick | viejo -> plano -> nuevo):');
-    for (const m of muestras) console.log(`  ${m.nick} | ${m.viejo} -> ${m.plano} -> ${m.nuevo}`);
+let vacios = 0;
+let sinCambio = 0;
+let aCambiar = 0;
+const cambios = [];
+const muestras = [];
 
-    if (!aplicar) {
-      console.log('\nDRY-RUN: nada escrito. Ejecuta con --apply para aplicar.');
-      return client.end();
-    }
+for (const r of rows) {
+  const v = r.cusuallave;
+  if (v === null || v === '') {
+    vacios++;
+    continue;
+  }
+  const plano = aPlano(v);
+  const nuevo = encriptar(plano);
+  if (nuevo === v) {
+    sinCambio++;
+    continue;
+  }
+  aCambiar++;
+  cambios.push({ id: r.cusuaid, nick: r.cusuanick, viejo: v, plano, nuevo });
+  if (muestras.length < 20) muestras.push({ nick: r.cusuanick, viejo: v, plano, nuevo });
+}
 
-    try {
-      await client.query('BEGIN');
-      for (const c of cambios) {
-        await client.query('UPDATE logic.tabusua SET cusuallave = $1 WHERE cusuaid = $2', [
-          c.nuevo,
-          c.id,
-        ]);
-      }
-      await client.query('COMMIT');
-      console.log(`\nAPLICADO: ${cambios.length} filas actualizadas.`);
-    } catch (e) {
-      await client.query('ROLLBACK');
-      console.error('ERROR aplicando, rollback ejecutado:', e);
-      process.exitCode = 1;
-    } finally {
-      await client.end();
-    }
-  })
-  .catch((e) => {
-    console.error('ERROR de conexión:', e);
-    process.exitCode = 1;
-  });
+console.log(
+  `Resumen: total=${rows.length} vacios=${vacios} sinCambio=${sinCambio} aCambiar=${aCambiar}`,
+);
+console.log('Muestras (nick | viejo -> plano -> nuevo):');
+for (const m of muestras) {
+  console.log(`  ${m.nick} | ${m.viejo} -> ${m.plano} -> ${m.nuevo}`);
+}
+
+if (!aplicar) {
+  console.log('\nDRY-RUN: nada escrito. Ejecuta con --apply para aplicar.');
+  await client.end();
+  process.exit(0);
+}
+
+try {
+  await client.query('BEGIN');
+  for (const c of cambios) {
+    await client.query('UPDATE logic.tabusua SET cusuallave = $1 WHERE cusuaid = $2', [
+      c.nuevo,
+      c.id,
+    ]);
+  }
+  await client.query('COMMIT');
+  console.log(`\nAPLICADO: ${cambios.length} filas actualizadas.`);
+} catch (e) {
+  await client.query('ROLLBACK');
+  console.error('ERROR aplicando, rollback ejecutado:', e);
+  process.exitCode = 1;
+} finally {
+  await client.end();
+}

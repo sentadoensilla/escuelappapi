@@ -1,10 +1,8 @@
-require('dotenv').config()
-
-module.exports = {
-
-	encabezadoPagina(props){ 
-        
-        return `
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+require('dotenv').config();
+export function encabezadoPagina(props) {
+  return `
         <div style="width:100%;text-align:center;">
             <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px; padding: 10px;font-family: Helvetica, Arial, sans-serif;color:#666666;">
                 <tr>
@@ -21,11 +19,9 @@ module.exports = {
             </table>
         </div>
         `;
-    },
-
-	piePagina(props){ 
-        
-        return `
+}
+export function piePagina(props) {
+  return `
         <table align="center" border="0" cellpadding="0" cellspacing="0">
             <tr> 
                 <td width="75%"> 
@@ -52,6 +48,9 @@ module.exports = {
                 </td>
             </tr>
         </table> 
-    `
-    },
+    `;
 }
+export default {
+  encabezadoPagina: encabezadoPagina,
+  piePagina: piePagina
+};

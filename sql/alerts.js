@@ -1,11 +1,11 @@
-module.exports={
-  rowsviewGroupsJSON:`
+export default {
+  rowsviewGroupsJSON: `
   -- GRUPOS DE UNA INSTITUCION EN UN ANO LECTIVO
   SELECT array_agg (g.aeestudiantes_grupo) AS grupos
   FROM data.aegrupos g
   WHERE g.aeinstitucion_id=$2
   AND g.aeano_id=$1;`,
-  rowsviewGroups:`
+  rowsviewGroups: `
   -- GRUPOS DE UNA INSTITUCION EN UN ANO LECTIVO
   SELECT g.aeestudiantes_grupo, COALESCE(NULLIF(regexp_replace(g.aeestudiantes_grupo, '[^0-9]*','','g'), '')::NUMERIC, 0) as orden
   FROM data.aegrupos g
@@ -24,8 +24,7 @@ module.exports={
       AND a.aeanol_id=$2
       AND a.aeavisos_estado=e.aeestados_id
   ) u`,
-
-  viewComments:`
+  viewComments: `
   --LISTADO DE COMENTARIOS EN UN AVISO
     SELECT 
     'a las ' || TO_CHAR(aeavisoscomentarios_fecha, 'HH24:MI')
@@ -54,8 +53,7 @@ module.exports={
     WHERE 
       aeavisos_id = $1
     ORDER BY aeavisoscomentarios_fecha DESC`,
-
-  viewCommentsStudent:`
+  viewCommentsStudent: `
   --LISTADO DE COMENTARIOS EN UN AVISO PARA UN ACUDIENTE
     SELECT 
     'a las ' || TO_CHAR(aeavisoscomentarios_fecha, 'HH24:MI')
@@ -84,7 +82,6 @@ module.exports={
     WHERE aeavisos_id = $1
     AND c.aeusu_id=$2
     ORDER BY aeavisoscomentarios_fecha DESC`,
-
   alertsFind: `
     -- VIEW ALERTS FOR reference
     SELECT 
@@ -108,7 +105,6 @@ module.exports={
       aeavisos_id=$1
       AND aeavisos_estado<>0
       AND CURRENT_TIMESTAMP <= aeavisos_fechafinalizacion;`,
-
   alertsDelete: `
   -- DELETE AN ALERT, SEND _estado TO 0
     UPDATE data.aeavisos
@@ -117,8 +113,7 @@ module.exports={
     AND aeanol_id=$2
     AND aeinst_id=$3
     AND (aeusu_id=$4 OR 1=$5)`,
-
-  alertsEdit:`
+  alertsEdit: `
   -- CHANGE AN ALERT, SOME COLUMNS OFF QUERY
   UPDATE data.aeavisos
   SET 
@@ -126,9 +121,8 @@ module.exports={
       aeavisos_titulo=$6, aeavisos_descripcion=$7, aeavisos_adjunto=$8, aeavisos_estado=$9,
       aeavisos_alcance=$10, aeavisos_aceptarespuestas=$11
   WHERE aeavisos_id=$1 RETURNING aeavisos_id`,
-
   //VER LAS NOTIFICACIONES REGISTRADAS PARA UN aeusu_id
-  notificationUser:`
+  notificationUser: `
   -- CONSULTAR NOTIFICACIONES DE MI USUARIO DESDE HACE ALGUN TIEMPO
   SELECT n.aenotificaciones_id, u.aeusu_nombre, n.aenotificaciones_para, TO_CHAR(n.aenotificaciones_fecha, 'YYYY-MM-DD, HH:mi') as aenotificaciones_fecha, 
   n.aenotificaciones_title, n.aenotificaciones_body, n.aenotificaciones_ruta, 
@@ -140,9 +134,8 @@ module.exports={
   AND n.aenotificaciones_de=u.aeusu_id
   AND n.aenotificaciones_estado = e.aeestados_id
   ORDER BY n.aenotificaciones_fecha DESC, n.aenotificaciones_title;`,
-
   //VER LAS NOTIFICACIONES REGISTRADAS PARA UN aeinst_id y un aeanol_id
-  notificationGlobal:`
+  notificationGlobal: `
   -- CONSULTAR NOTIFICACIONES DE LOS DOCENTES DE MI INSTITUCION DESDE HACE ALGUN TIEMPO
   SELECT n.aenotificaciones_id, u.aeusu_nombre, n.aenotificaciones_para, TO_CHAR(n.aenotificaciones_fecha, 'YYYY-MM-DD, HH:mi') as aenotificaciones_fecha, 
   n.aenotificaciones_title, n.aenotificaciones_body, n.aenotificaciones_ruta, 
@@ -160,29 +153,24 @@ module.exports={
   AND n.aenotificaciones_de=u.aeusu_id
   AND n.aenotificaciones_estado = e.aeestados_id
   ORDER BY n.aenotificaciones_fecha DESC, n.aenotificaciones_title;`,
-
-  notificationUser:`
+  notificationUser: `
   -- LISTAR UN COMUNICADO PARA VERLO SI NO ESTA ELIMINADO
 
   `,
-
-  answerComunicado:`
+  answerComunicado: `
   -- RESPUESTA A UN COMUNICADO POR PARTE DE UN USUARIO AUTENTICADO
   INSERT INTO data.aeavisos_comentarios(
     aeavisoscomentarios_id, aeavisos_id, aeusu_id, aeavisoscomentarios_fecha, aeavisoscomentarios_descripcion, aeavisoscomentarios_estado)
   VALUES ((SELECT COALESCE(MAX(aeavisoscomentarios_id)+1, 1) FROM data.aeavisos_comentarios), $1, $2, current_timestamp, $3, 1)
   RETURNING aeavisoscomentarios_id;`,
-
-  comunicadoRegisterNotification:`
+  comunicadoRegisterNotification: `
   -- REGISTRAR LA NOTIFICACION CUANDO SE ENVIA UN COMUNICADO
   INSERT INTO data.aenotificaciones(
       aenotificaciones_id, aenotificaciones_de, aenotificaciones_para, aenotificaciones_fecha, 
       aenotificaciones_title, aenotificaciones_body, aenotificaciones_ruta, aenotificaciones_referencia, aenotificaciones_data)
   VALUES ((SELECT COALESCE(MAX(aenotificaciones_id)+1, 1) FROM data.aenotificaciones), $1, $2, current_timestamp, $3, $4, $5, $6, $7) 
   RETURNING aenotificaciones_id`,
-
-
-  comunicadoDestinatarios:`
+  comunicadoDestinatarios: `
   -- CONSULTAR LOS ID DE TODOS LOS QUE RECIBEN UN COMUNICADO DEL COLEGIO O DE UN PROFESOR
   SELECT * FROM engine.contacto_user(
       (SELECT 
@@ -198,5 +186,5 @@ module.exports={
       FROM data.aeavisos a
       WHERE a.aeavisos_id= $1
       )
-  );`,
-}
+  );`
+};

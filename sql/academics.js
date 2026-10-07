@@ -1,5 +1,4 @@
-module.exports={
-  attendanceCountGlobal:`
+export const attendanceCountGlobal = `
   -- TOTAL AUSENTISMO POR INSTITUCION: AUSENTISMO GLOBAL
   SELECT aeinst_id, aeinst_nombre, aeinstconf_anolectivo, 
   array_agg(aeestudiantes_id) AS aeestudiantes_id, 
@@ -47,9 +46,8 @@ module.exports={
       HAVING COUNT(DISTINCT a.aeasistencias_fecha) > c.aeinstconf_asistencias_umbralweek
   ) au
   GROUP BY aeinst_id, aeinst_nombre, aeinstconf_anolectivo
-  ORDER BY aeinst_nombre;`,
-
-  attendanceCountGlobal_old:`
+  ORDER BY aeinst_nombre;`;
+export const attendanceCountGlobal_old = `
   -- TOTAL AUSENTISMO POR INSTITUCION
   SELECT aeinst_id, aeinst_nombre, aeinstconf_anolectivo, COUNT(aeestudiantes_grupo) AS CANTIDAD
   FROM (
@@ -75,9 +73,8 @@ module.exports={
       HAVING COUNT(DISTINCT a.aeasistencias_fecha) > $5
   ) au
   GROUP BY aeinst_id, aeinst_nombre, aeinstconf_anolectivo
-  ORDER BY aeinst_nombre;`,
-
-  attendanceCount:`
+  ORDER BY aeinst_nombre;`;
+export const attendanceCount = `
     -- TOTAL AUSENTISMO POR GRUPO
       SELECT row_to_json(u) as datos
       FROM (
@@ -104,9 +101,8 @@ module.exports={
         GROUP BY aeestudiantes_grupo
         ORDER BY COALESCE(NULLIF(regexp_replace(aeestudiantes_grupo, '[^0-9]*','','g'), '')::NUMERIC, 0)
       ) u;  
-      `,
-
-  attendanceMonth:`
+      `;
+export const attendanceMonth = `
   -- ASISTENCIA POR GRUPO EN UN MES DETERMINADO
   -- SELECT row_to_json(u) as datos
   -- FROM (
@@ -302,9 +298,8 @@ module.exports={
         t.aeestudiantes_grupo, t.aeestudiantes_codigo, t.aeestudiantes_nombres
       ORDER BY estudiante;
   -- ) u;
-  `,
-
-  attendanceMontAssigment:`
+  `;
+export const attendanceMontAssigment = `
   -- ASISTENCIA POR GRUPO EN UN MES DETERMINADO
   -- SELECT row_to_json(u) as datos
   -- FROM (
@@ -472,17 +467,15 @@ module.exports={
       t.aeestudiantes_codigo, t.aeestudiantes_grupo, t.aeasignaciones_asignatura, t.aeestudiantes_nombres
     ORDER BY t.aeestudiantes_nombres;
   -- ) u;
-  `,
-  
-  rowsviewGroups:`
+  `;
+export const rowsviewGroups = `
     -- GRUPOS DE UNA INSTITUCION EN UN ANO LECTIVO
     SELECT g.aeestudiantes_grupo, COALESCE(NULLIF(regexp_replace(g.aeestudiantes_grupo, '[^0-9]*','','g'), '')::NUMERIC, 0) as orden
     FROM data.aegrupos g
     WHERE g.aeinstitucion_id=$2
     AND g.aeano_id=$1
-    ORDER BY orden, aeestudiantes_grupo;`,
-    
-  listaSedes: `
+    ORDER BY orden, aeestudiantes_grupo;`;
+export const listaSedes = `
     -- LISTA DE INSTITUCIONES EDUCATIVAS 
     SELECT i.aeinst_id, u.aeusu_id, i.aeinst_nombre, i.aeinst_nit, i.aeinst_mail, 
     i.aeinst_direccion, i.aeinst_telefono, i.aeinst_escudo, i.coordx, i.coordy, i.aeinst_facebook,    
@@ -492,9 +485,8 @@ module.exports={
     AND u.aeusu_id=i.aeusu_id
     AND c.aeinst_id=i.aeinst_id
     AND c.aeinstconf_anolectivo=a.aeano_id
-    ORDER BY aeinst_nombre;`,
-
-  rowsviewAsigments:`
+    ORDER BY aeinst_nombre;`;
+export const rowsviewAsigments = `
     --LISTADO DE ASIGNATURAS DE UN GRUPO CON DOCENTE QUE LA DICTA
     SELECT  
       a.aeasignaciones_asignatura, --aeasignaciones_dia, aeasignaciones_hora, aeasignaciones_horafin,
@@ -507,9 +499,8 @@ module.exports={
     AND a.aedocentes_id = d.aedocentes_id
     GROUP BY a.aedocentes_id, a.aeasignaciones_asignatura, -- aeasignaciones_dia, aeasignaciones_hora, aeasignaciones_horafin, 
     d.aedocentes_nombres || ' ' || d.aedocentes_apellidos, a.aeasignaciones_enlace
-    ORDER BY a.aeasignaciones_asignatura,aedocente`,
-
-  viewAsigments:`
+    ORDER BY a.aeasignaciones_asignatura,aedocente`;
+export const viewAsigments = `
     --LISTADO DE ASIGNATURAS DE UN GRUPO PARA QUE EL PADRE DE FAMILIA CONSULTE A ESE DOCENTE
       SELECT row_to_json(u) as listaasignaturas
         FROM (
@@ -525,16 +516,15 @@ module.exports={
           GROUP BY a.aedocentes_id, a.aeasignaciones_asignatura, 
           d.aedocentes_nombres || ' ' || d.aedocentes_apellidos, a.aeasignaciones_enlace
           ORDER BY a.aeasignaciones_asignatura,aedocente
-      ) u`,
-  insertAskTeacher:`
+      ) u`;
+export const insertAskTeacher = `
     --INSERTAR CONSULTA HECHA POR UN ACUDIENTE A UN DOCENTE DE SU ELECCION
     INSERT INTO data.aeconsultasdocentes(
       aeconsultasdocentes_id, aeconsultasdocentes_fecha, aeestudiantes_id, aeasignaciones_asignatura, 
       aedocente_id, aeinst_id, aeanol_id, aeconsultasdocentes_descripcion, 
       aeconsultasdocentes_visibilidad, aeconsultasdocentes_estado)
-    VALUES ((SELECT COALESCE((MAX(aeconsultasdocentes_id)+1), 1)  FROM data.aeconsultasdocentes), $1, $2, $3, $4, $5, $6, $7, false, 1)RETURNING aeconsultasdocentes_id;`,
-    
-  listAsistenciasEstudiante:`
+    VALUES ((SELECT COALESCE((MAX(aeconsultasdocentes_id)+1), 1)  FROM data.aeconsultasdocentes), $1, $2, $3, $4, $5, $6, $7, false, 1)RETURNING aeconsultasdocentes_id;`;
+export const listAsistenciasEstudiante = `
       --LISTA DE INASISTENCIAS PARA UN ESTUDIANTE ESPECIFICO, LOS ULTIMOS MESES
       SELECT row_to_json(u) as datos
       FROM (
@@ -551,27 +541,22 @@ module.exports={
           AND e.aeestudiantes_id=a.aeestudiantes_id
           AND a.aeasistencias_docente=d.aedocentes_id
           ORDER BY a.aeasistencias_fecharegistro DESC
-      ) u;`,
-    
-
-    
-  excusasInsert:`
+      ) u;`;
+export const excusasInsert = `
     INSERT INTO data.aeexcusas(
       aeexcusas_id, aeinst_id, aeanol_id, aeestudiantes_id, aeexcusas_fecha, 
       aeexcusas_desde, aeexcusas_hasta, aetipoexcusa_id, aeexcusas_asignatura,
       aeexcusas_mensaje, aeexcusas_archivoadjunto, aeexcusas_estado)
     VALUES ((SELECT COALESCE((MAX(aeexcusas_id)+1), 1) FROM data.aeexcusas), 
-      $1, $2, $3, $4, $5, $6, $7, $10, $8, $9, 1)RETURNING aeexcusas_id;`,
-    
-  excusasInsertComments:`
+      $1, $2, $3, $4, $5, $6, $7, $10, $8, $9, 1)RETURNING aeexcusas_id;`;
+export const excusasInsertComments = `
     -- INSERTAR COMENTARIO EN LA EXCUSA
     -- aeexcusasrespuestas_tipo: 1: Visto, 2: comentario
     INSERT INTO data.aeexcusas_respuestas(
       aeexcusasrespuestas_id, aeexcusas_id, aeusu_id, aeexcusasrespuestas_tipo, aeexcusasrespuestas_descripcion)
     VALUES ((SELECT COALESCE((MAX(aeexcusasrespuestas_id)+1), 1)  FROM data.aeexcusas_respuestas), 
-        $1, $2, $3, $4) RETURNING aeexcusasrespuestas_id;`,
-  
-  excusasList:`
+        $1, $2, $3, $4) RETURNING aeexcusasrespuestas_id;`;
+export const excusasList = `
       SELECT 
         e.aeexcusas_id, e.aeinst_id, e.aeanol_id, e.aeestudiantes_id, (s.aeestudiantes_apellidos || ' ' || s.aeestudiantes_nombres) as aeestudiantes_nombre,
         e.aeexcusas_fecha, e.aeexcusas_desde, e.aeexcusas_hasta, t.aetipoexcusa_nombre, 
@@ -588,13 +573,28 @@ module.exports={
       AND t.aetipoexcusa_id<>0
       AND e.aetipoexcusa_id=t.aetipoexcusa_id
       AND e.aeestudiantes_id=s.aeestudiantes_id
-      ORDER BY e.aeexcusas_fecha;`,
-
-  excusasDelete:`
+      ORDER BY e.aeexcusas_fecha;`;
+export const excusasDelete = `
   -- DELETE EXCUSA ENVIADA POR UN ACUDIENTE
   UPDATE data.aeexcusas
   SET aeexcusas_estado=0
   WHERE aeexcusas_id=$1
   AND (aeestudiantes_id=$2 OR $3=1);
-  `,
-}
+  `;
+export default {
+  attendanceCountGlobal: attendanceCountGlobal,
+  attendanceCountGlobal_old: attendanceCountGlobal_old,
+  attendanceCount: attendanceCount,
+  attendanceMonth: attendanceMonth,
+  attendanceMontAssigment: attendanceMontAssigment,
+  rowsviewGroups: rowsviewGroups,
+  listaSedes: listaSedes,
+  rowsviewAsigments: rowsviewAsigments,
+  viewAsigments: viewAsigments,
+  insertAskTeacher: insertAskTeacher,
+  listAsistenciasEstudiante: listAsistenciasEstudiante,
+  excusasInsert: excusasInsert,
+  excusasInsertComments: excusasInsertComments,
+  excusasList: excusasList,
+  excusasDelete: excusasDelete
+};

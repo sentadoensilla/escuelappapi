@@ -1,13 +1,7 @@
-/**
- * estudiantes.routes.js
- * Rutas del módulo de estudiantes SAE (estudiantes, matrícula, acudientes,
- * otros datos, socioeconómicos y pagos).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./estudiantesController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./estudiantesController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Estudiantes (public.tabestu) =====
 // Listar estudiantes.
 router.post('/estudiantes/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.estudianteListar);
@@ -59,5 +53,4 @@ router.post('/pagos/borrar', [Auth.isAuth, Auth.Admin_academico], Controller.pag
 // ===== Promoción masiva =====
 // Promover estudiantes de un curso origen a un curso destino (matrícula masiva de promovidos).
 router.post('/promover', [Auth.isAuth, Auth.Admin_academico], Controller.promover);
-
-module.exports = router;
+export default router;

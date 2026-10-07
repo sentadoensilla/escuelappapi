@@ -1,4 +1,3 @@
-
-module.exports = async (job,done) =>{
-    done(null,"Job#processNumberOne has been done")
-}
+export default async (job, done) => {
+  done(null, "Job#processNumberOne has been done");
+};

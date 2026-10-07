@@ -1,7 +1,9 @@
-require('dotenv').config()
-const fs = require("fs")
-const Sequelize = require("sequelize");
-
+import fs from "fs";
+import Sequelize from "sequelize";
+import modelFn from "../scheduler/models/model.js";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+require('dotenv').config();
 /*
  * =====================================================================
  * CONEXIÓN A LA BASE DE DATOS (bdsae2) - Sequelize (scheduler)
@@ -41,22 +43,21 @@ const Sequelize = require("sequelize");
  */
 
 // CONEXIÓN ACTIVA: DESARROLLO LOCAL (sin SSL)
-const sequelize = new Sequelize(process.env.PG_DB_NAME, process.env.PG_USER, process.env.PG_PASSWORD,
-{
-    host: process.env.PG_HOST,
-    dialect: process.env.PG_DIALECT,
-    operatorsAliases: 0,
-    pool: {
-        max: process.env.PG_POOL_MAX,
-        min: process.env.PG_POOL_MIN,
-        acquire: process.env.PG_POOL_ACQUIRE,
-        idle: process.env.PG_POOL_IDLE
-    },
-    ssl: false,
+const sequelize = new Sequelize(process.env.PG_DB_NAME, process.env.PG_USER, process.env.PG_PASSWORD, {
+  host: process.env.PG_HOST,
+  dialect: process.env.PG_DIALECT,
+  operatorsAliases: 0,
+  pool: {
+    max: process.env.PG_POOL_MAX,
+    min: process.env.PG_POOL_MIN,
+    acquire: process.env.PG_POOL_ACQUIRE,
+    idle: process.env.PG_POOL_IDLE
+  },
+  ssl: false
 });
 var db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 // MODEL FOR SCHEDULE
-db.scheduler = require("../scheduler/models/model")(sequelize, Sequelize);
-module.exports = db;
+db.scheduler = modelFn(sequelize, Sequelize);
+export default db;

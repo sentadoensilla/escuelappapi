@@ -1,12 +1,7 @@
-/**
- * preescolar.routes.js
- * Rutas del módulo de preescolar (esquema preescolar).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./preescolarController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./preescolarController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Ámbitos (preescolar.tabpreambi) =====
 // Listar ámbitos de preescolar.
 router.post('/ambitos/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.ambitoListar);
@@ -52,5 +47,4 @@ router.post('/novedades/listar', [Auth.isAuth, Auth.isAcademico_and_estudiante_a
 router.post('/novedades/registrar', [Auth.isAuth, Auth.isDirector_and_tecaher], Controller.novedadRegistrar);
 // Borrar (lógico) una novedad de preescolar.
 router.post('/novedades/borrar', [Auth.isAuth, Auth.isDirector_and_tecaher], Controller.novedadBorrar);
-
-module.exports = router;
+export default router;

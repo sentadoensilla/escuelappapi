@@ -1,19 +1,16 @@
-module.exports = {
-    checkUser:`
+export const checkUser = `
     -- BUSCAR UN USUARIO CON  EL CORREO
     SELECT aeusu_id,aeusu_nombre FROM engine.aeusu WHERE aeusu_nick LIKE $1;
-    `, 
-    
-    updateStudentsUser:`
+    `;
+export const updateStudentsUser = `
     -- ACTUALIZAR LOS DATOS DE USUARIO DE UN ESTUDIANTE
     UPDATE engine.aeusu SET 
     aeusu_nombre = $1 || ' ' || $2, 
     aeusu_nick=$3
     WHERE aeusu_id=(SELECT aeusu_id FROM data.aeestudiantes
         WHERE aeestudiantes_id=$4)
-    RETURNING aeusu_id; `,
-
-    updateStudentsPersonal:`
+    RETURNING aeusu_id; `;
+export const updateStudentsPersonal = `
     -- ACTUALIZAR DATOS PERSONALES DE ESTUDIANTES
         UPDATE data.aeestudiantes SET
         aeestudiantes_codigo = $1,
@@ -28,9 +25,8 @@ module.exports = {
         aeestudiantes_mail = $10
         WHERE aeestudiantes_id = $11
         RETURNING aeestudiantes_id
-    `,
-
-    updateStudentsParents:`
+    `;
+export const updateStudentsParents = `
     -- ACTUALIZAR DATOS DE LOS ACUDIENTES SEGUN EL ESTUDIANTE
     UPDATE data.aeacudientes SET
     aeestudiantes_idenacudiente = $1,
@@ -42,9 +38,8 @@ module.exports = {
     aeestudiantes_mailacudiente = $7
     WHERE aeacudientes_id = (SELECT aeacudientes_id FROM data.aeestudiantes WHERE aeestudiantes_id=$8)
     RETURNING aeacudientes_id
-    `,
-
-    allStudents:`
+    `;
+export const allStudents = `
     -- LISTADO DE ESTUDIANTES DE ESTE ANO EN EL COLEGIO
     SELECT x.aeusuroll_id, e.aeestudiantes_id, e.aeinstitucion_id, e.aeano_id,
     e.aeestudiantes_fecharegistro, u.aeusu_id, e.aeestudiantes_grupo, 
@@ -65,5 +60,11 @@ module.exports = {
     AND e.aeestudiantes_id=x.aeacad_referencia
     AND u.aeusu_id=x.aeusu_id
     ORDER BY e.aeestudiantes_grupo,aeestudiantes_apellidos,aeestudiantes_nombresacudiente;
-    `
-}
+    `;
+export default {
+  checkUser: checkUser,
+  updateStudentsUser: updateStudentsUser,
+  updateStudentsPersonal: updateStudentsPersonal,
+  updateStudentsParents: updateStudentsParents,
+  allStudents: allStudents
+};

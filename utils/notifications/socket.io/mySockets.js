@@ -1,4 +1,4 @@
 var Global = {
-    io : { }
-};    
-module.exports = Global;
+  io: {}
+};
+export default Global;

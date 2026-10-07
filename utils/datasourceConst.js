@@ -1,6 +1,7 @@
-require('dotenv').config()
-const fs = require("fs")
-
+import fs from "fs";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+require('dotenv').config();
 /*
  * =====================================================================
  * CONEXIÓN A LA BASE DE DATOS (bdsae2)
@@ -41,15 +42,18 @@ const fs = require("fs")
 
 // CONEXIÓN ACTIVA: DESARROLLO LOCAL (sin SSL)
 const connParams = {
-    host: process.env.PG_HOST,
-    port: process.env.PG_PORT,
-    user: process.env.PG_USER,
-    database: process.env.PG_DB_NAME,
-    password: process.env.PG_PASSWORD,
-    max:50, // max number of clients in the pool
-    connectionTimeoutMillis: 15000,
-    idleTimeoutMillis: 30000,
-    ssl: false,
-}
-
-module.exports = {connParams};
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
+  user: process.env.PG_USER,
+  database: process.env.PG_DB_NAME,
+  password: process.env.PG_PASSWORD,
+  max: 50,
+  // max number of clients in the pool
+  connectionTimeoutMillis: 15000,
+  idleTimeoutMillis: 30000,
+  ssl: false
+};
+export { connParams };
+export default {
+  connParams: connParams
+};

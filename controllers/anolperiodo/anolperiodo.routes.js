@@ -1,12 +1,7 @@
-/**
- * anolperiodo.routes.js
- * Rutas del módulo de configuración académica (años lectivos, periodos y valores).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./anolperiodoController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./anolperiodoController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Año lectivo (public.tabanol) =====
 // Listar todos los años lectivos.
 router.post('/anos/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.anoListar);
@@ -46,5 +41,4 @@ router.post('/perival/registrar', [Auth.isAuth, Auth.Admin_academico], Controlle
 router.post('/perival/actualizar', [Auth.isAuth, Auth.Admin_academico], Controller.perivalActualizar);
 // Borrar (lógico) un valor por periodo.
 router.post('/perival/borrar', [Auth.isAuth, Auth.Admin_academico], Controller.perivalBorrar);
-
-module.exports = router;
+export default router;

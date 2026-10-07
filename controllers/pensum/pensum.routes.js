@@ -1,13 +1,7 @@
-/**
- * pensum.routes.js
- * Rutas del módulo de pensum (áreas, asignaturas, contenidos programáticos,
- * áreas por institución y configuración de áreas).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./pensumController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./pensumController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Áreas (public.tabarea) =====
 // Listar áreas del saber.
 router.post('/areas/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.areaListar);
@@ -63,5 +57,4 @@ router.post('/areaconf/registrar', [Auth.isAuth, Auth.Admin_academico], Controll
 router.post('/areaconf/actualizar', [Auth.isAuth, Auth.Admin_academico], Controller.areaconfActualizar);
 // Borrar (lógico) una configuración de área.
 router.post('/areaconf/borrar', [Auth.isAuth, Auth.Admin_academico], Controller.areaconfBorrar);
-
-module.exports = router;
+export default router;

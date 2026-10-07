@@ -1,5 +1,4 @@
-module.exports = {
-    institucionesList:`
+export const institucionesList = `
     --LISTADO DE INSTITUCIONES 
     SELECT 
         i.aeinst_id AS institucion_id, 
@@ -13,27 +12,24 @@ module.exports = {
         AND u.aeusu_id=i.aeusu_id
         AND c.aeinst_id=i.aeinst_id
     ORDER BY 
-        calendario, aeinst_nombre;`,
-
-    tipopublicacionesList:`
+        calendario, aeinst_nombre;`;
+export const tipopublicacionesList = `
     -- LISTADO DE TIPO DE PUBLICACIONES
     SELECT 
         aepublicacionestipo_id, aepublicacionestipo_estado, 
         aepublicacionestipo_descripcion, aepublicacionestipo_color
     FROM data.aepublicaciones_tipo
     ORDER BY 
-        aepublicacionestipo_descripcion;`,
-
-    listEstados:`
+        aepublicacionestipo_descripcion;`;
+export const listEstados = `
         -- LISTADO DE ESTADOS 
         SELECT 
             aeestados_id AS idestado, INITCAP(aeestados_descripcion) AS descripcion
         FROM 
             data.aeestados 
         ORDER BY 
-            aeestados_descripcion;`,
-
-    listGroups:`
+            aeestados_descripcion;`;
+export const listGroups = `
         -- LISTADO DE GRUPOS EN UN COLEGIO Y UN ANO LECTIVO
         SELECT g.aeestudiantes_grupo, NULLIF(regexp_replace(g.aeestudiantes_grupo, '[^0-9]*','','g'), '')::numeric as orden
         FROM DATA.aeestudiantes g
@@ -47,9 +43,8 @@ module.exports = {
         -- WHERE g.aeinstitucion_id=$1
         -- AND g.aeano_id=$2
         -- ORDER BY orden, aeestudiantes_grupo
-        `,
-
-    listMotivos: `
+        `;
+export const listMotivos = `
         -- LISTADO DE MOTIVOS PARA CITACION
         SELECT 
             aemotivo_id AS idregistro, aemotivo_nombre AS descripcion
@@ -58,5 +53,11 @@ module.exports = {
         WHERE 
             aeestados_id<>0
         ORDER BY 
-            aemotivo_nombre;`,
-}
+            aemotivo_nombre;`;
+export default {
+  institucionesList: institucionesList,
+  tipopublicacionesList: tipopublicacionesList,
+  listEstados: listEstados,
+  listGroups: listGroups,
+  listMotivos: listMotivos
+};

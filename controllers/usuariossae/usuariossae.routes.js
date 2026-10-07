@@ -1,12 +1,7 @@
-/**
- * usuariossae.routes.js
- * Rutas del módulo de usuarios y roles SAE (esquema logic) y enlace académico (tabunio).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./usuariossaeController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./usuariossaeController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Usuarios (logic.tabusua) =====
 // Listar usuarios.
 router.post('/usuarios/listar', [Auth.isAuth, Auth.Admin], Controller.usuarioListar);
@@ -72,5 +67,4 @@ router.post('/uniones/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_adm
 router.post('/uniones/registrar', [Auth.isAuth, Auth.Admin], Controller.unioRegistrar);
 // Borrar (lógico) un enlace usuario-académico.
 router.post('/uniones/borrar', [Auth.isAuth, Auth.Admin], Controller.unioBorrar);
-
-module.exports = router;
+export default router;

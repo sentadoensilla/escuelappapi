@@ -1,18 +1,10 @@
-const express = require('express');
+import express from "express";
+import Controller from "../controllers/AreasController.js";
+import Auth from "../middlware/jwtoken.js";
+import * as __mod0 from "../middlware/uploadImages.js";
 const router = express.Router();
-
-
-const Controller = require('../controllers/AreasController');
-
-const Auth = require('../middlware/jwtoken');
-const {upload} = require('../middlware/uploadImages');
-
-router.post(
-    '/listado',
-    upload.none(),
-    Controller.areaListado
-);
-
-
-
-module.exports = router 
+const {
+  upload
+} = __mod0;
+router.post('/listado', upload.none(), Controller.areaListado);
+export default router;

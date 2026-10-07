@@ -1,6 +1,4 @@
-
-module.exports={
-    horarios:`
+export const horarios = `
     -- MOSTRAMOS EL HORARIO DE UN SALON DE CLASES
     SELECT row_to_json(u)
     FROM (
@@ -29,8 +27,8 @@ module.exports={
         AND y.aeinst_id=$2 -- ID INSTITUCION
         GROUP BY y.aeasignaciones_hora, y.aeasignaciones_grupo
         ORDER BY aeasignaciones_hora
-    ) u`,
-    horariosSeguimiento:`
+    ) u`;
+export const horariosSeguimiento = `
     -- MUESTRA LAS ASISTENCIAS MARCADAS EN EL HORARIO DE CLASES
     SELECT row_to_json(u) AS data
     FROM (
@@ -88,8 +86,8 @@ module.exports={
                GROUP BY y.aeasignaciones_hora, y.aeasignaciones_grupo
                ORDER BY aeasignaciones_hora
       ) u
-    `,
-    horariosSendPapas_nueva:`
+    `;
+export const horariosSendPapas_nueva = `
         -- LA NUEVA    
         -- HORARIOS POR DIAS, PARA ENVIAR A LOS ACUDIENTES EN TAREA PROGRAMADA
         SELECT 
@@ -124,5 +122,9 @@ module.exports={
         AND (a.aeasignaciones_dia-1)=extract(dow from (CURRENT_DATE + INTERVAL '1 day')) 
         GROUP BY a.aeanol_id, a.aeinst_id, a.aeasignaciones_dia, a.aeasignaciones_grupo
         ORDER BY NULLIF(regexp_replace(a.aeasignaciones_grupo, '[^0-9]*','','g'), '')::numeric;
-        `,
-}
+        `;
+export default {
+  horarios: horarios,
+  horariosSeguimiento: horariosSeguimiento,
+  horariosSendPapas_nueva: horariosSendPapas_nueva
+};

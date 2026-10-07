@@ -1,5 +1,4 @@
-module.exports ={
-    totalTeacherAttendance:`
+export const totalTeacherAttendance = `
     --ASISTENCIAS: % PORCENTAJE DE DOCENTES HACIENDO ASISTENCIAS
     -- $1 IDINSTITUCION
     SELECT i.aeinst_id as id_institucion, i.aeinst_nombre as sede, i.calendario,
@@ -21,9 +20,8 @@ module.exports ={
     AND x.aeinst_id = i.aeinst_id
     GROUP BY i.aeinst_id, i.aeinst_nombre, i.calendario
     ORDER BY id_institucion;    
-    `,
-
-    totalTeacherAttendanceByDay:`
+    `;
+export const totalTeacherAttendanceByDay = `
     -- DOCENTES REGISTRANDO ASISTENCIAS ULTIMOS DIAS
     -- $1 IDINSTITUCION, $2 FECHAINICIAL, $3 FECHAFINAL,
     SELECT i.aeinst_id, i.aeinst_nombre, i.calendario,
@@ -45,9 +43,8 @@ module.exports ={
     TO_CHAR(a.aeasistencias_fecharegistro, 'YYYY-MM-DD'), 
     TO_CHAR(a.aeasistencias_fecharegistro, 'DD')
     ORDER BY fecha DESC, i.aeinst_id;
-    `,   
-
-    attendanceCount:`
+    `;
+export const attendanceCount = `
       -- TOTAL AUSENTISMO POR GRUPO EN EL COLEGIO
       SELECT aeestudiantes_grupo AS grupo, COUNT(aeestudiantes_grupo) AS CANTIDAD
       FROM (
@@ -90,9 +87,8 @@ module.exports ={
       ) au
       GROUP BY aeestudiantes_grupo
       ORDER BY CANTIDAD DESC; 
-    `,
-
-    attendanceCountXTeacher:`
+    `;
+export const attendanceCountXTeacher = `
     -- TOTAL AUSENTISMO POR GRUPO SEGUN LAS ASIGNACIONES DE UN MAESTRO
     -- ARGUMENTOS -> $1 ano_lectivo, $2 id_institucion, $3 inicio, $4 fin, $5 umbralinasistencias, $6 id_academico
     SELECT aeestudiantes_grupo AS grupo, COUNT(aeestudiantes_grupo) AS CANTIDAD
@@ -140,9 +136,8 @@ module.exports ={
     ) au
     GROUP BY aeestudiantes_grupo
     ORDER BY CANTIDAD DESC; 
-    `,
-
-    totalStudentsAttendance:`
+    `;
+export const totalStudentsAttendance = `
     -- ESTUDIANTES CON INASISTENCIAS HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 FECHAINICIAL, $4 FECHAFINAL, $5 '10' MES LITERAL
     SELECT 
@@ -191,9 +186,8 @@ module.exports ={
     	ON (e.aeestudiantes_id=a.aeestudiantes_id)
    WHERE e.aeano_id = $1 
    AND e.aeinstitucion_id = $2;   
-    `,
-
-    totalStudentsAttendanceXTeacher:`
+    `;
+export const totalStudentsAttendanceXTeacher = `
     -- ESTUDIANTES CON INASISTENCIAS HOY, SEMANA, MES SEGUN EL MAESTRO
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 FECHAINICIAL, $4 FECHAFINAL, $5 '10' MES LITERAL, $6 IDACADEMICO
         SELECT 
@@ -244,9 +238,8 @@ module.exports ={
             ON (e.aeestudiantes_id=a.aeestudiantes_id)
        WHERE e.aeano_id = $1 
        AND e.aeinstitucion_id = $2;
-    `,
-
-    totalStudentsAttendanceByDay:`
+    `;
+export const totalStudentsAttendanceByDay = `
     -- ESTUDIANTES INASISTENTES POR DIA EN MI COLEGIO
     -- $1 ANOLECTIVO, $2 INSTITUCION, $3 FECHAINICIO, $4 FECHAFIN
     SELECT 
@@ -296,9 +289,8 @@ module.exports ={
         r.aeinst_id, TO_CHAR(x.aeasistencias_fecha, 'YYYY-MM-DD'),
         TO_CHAR(x.aeasistencias_fecha, 'DD'), TO_CHAR(x.aeasistencias_fecha, 'D')
     ORDER BY FECHA DESC;        
-    `,
-
-    totalStudentsAttendanceByDayXTeacher:`
+    `;
+export const totalStudentsAttendanceByDayXTeacher = `
     -- ESTUDIANTES INASISTENTES POR DIA EN MI COLEGIO
     -- $1 ANOLECTIVO, $2 INSTITUCION, $3 FECHAINICIO, $4 FECHAFIN, $5: IDACADEMICO
     SELECT 
@@ -357,9 +349,8 @@ module.exports ={
         r.aeinst_id, TO_CHAR(x.aeasistencias_fecha, 'YYYY-MM-DD'),
         TO_CHAR(x.aeasistencias_fecha, 'DD'), TO_CHAR(x.aeasistencias_fecha, 'D')
     ORDER BY FECHA DESC;        
-    `,
-
-    totalHomeworks:`
+    `;
+export const totalHomeworks = `
     -- TAREAS HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL
     SELECT 
@@ -373,9 +364,8 @@ module.exports ={
     AND tp.aetar_pro_estado <> 0
     AND t.aetar_estado <> 0
     AND tp.aetar_id = t.aetar_id;    
-    `,
-
-    totalHomeworksXTeacher:`
+    `;
+export const totalHomeworksXTeacher = `
     -- TAREAS HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4 IDACADEMICO
     SELECT 
@@ -397,9 +387,8 @@ module.exports ={
     AND tp.aetar_pro_estado <> 0
     AND t.aetar_estado <> 0
     AND tp.aetar_id = t.aetar_id;    
-    `,
-
-    totalExams:`
+    `;
+export const totalExams = `
     -- EVALUACIONES HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL
     SELECT 
@@ -412,9 +401,8 @@ module.exports ={
     AND x.aeinst_cue_estado <> 0
     AND c.aecue_estado <> false
     AND x.aecue_id = c.aecue_id;    
-    `,
-
-    totalExamsXTeacher:`
+    `;
+export const totalExamsXTeacher = `
     -- EVALUACIONES HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4 IDACADEMICO
     SELECT 
@@ -437,9 +425,8 @@ module.exports ={
         AND x.aeinst_cue_estado <> 0
         AND c.aecue_estado <> false
         AND x.aecue_id = c.aecue_id;    
-    `,
-
-    totalQuestionsTeachers:`
+    `;
+export const totalQuestionsTeachers = `
     -- CONSULTAS A DOCENTES HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL
     SELECT 
@@ -464,9 +451,8 @@ module.exports ={
     AND x.aeinst_id = $2
     AND x.aeconsultasdocentes_estado <> 0
     AND x.aedocente_id = d.aedocentes_id;
-    `,
-
-    totalQuestionsTeachersSpecific:`
+    `;
+export const totalQuestionsTeachersSpecific = `
     -- CONSULTAS A DOCENTES HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4: IDACADEMICO
     SELECT 
@@ -493,9 +479,8 @@ module.exports ={
     AND x.aedocente_id = $4
     AND x.aeconsultasdocentes_estado <> 0
     AND x.aedocente_id = d.aedocentes_id;
-    `,
-
-    topTeachersRequested:`
+    `;
+export const topTeachersRequested = `
     -- TOP 3 DOCENTES MAS CONSULTADOS ESTE MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4 TOPE
     SELECT x.aedocente_id, INITCAP(LOWER(d.aedocentes_nombres || ' ' || d.aedocentes_apellidos))  AS docente,
@@ -519,9 +504,8 @@ module.exports ={
     GROUP BY x.aedocente_id, d.aedocentes_nombres || ' ' || d.aedocentes_apellidos
     ORDER BY CONSULTAS DESC
     LIMIT $4;
-    `,
-
-    last5RequestedTeachers:`
+    `;
+export const last5RequestedTeachers = `
     -- LAST 5 CONSULTAS PARA UN DOCENTE
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4 TOPE, $5: IDDOCENTE
     SELECT x.aeestudiantes_id, INITCAP(LOWER(e.aeestudiantes_apellidos || ' ' || e.aeestudiantes_nombres))  AS estudiante,
@@ -547,9 +531,8 @@ module.exports ={
     GROUP BY x.aeestudiantes_id, e.aeestudiantes_apellidos || ' ' || e.aeestudiantes_nombres
     ORDER BY CONSULTAS DESC
     LIMIT $4;
-    `,
-
-    totalAlerts:`
+    `;
+export const totalAlerts = `
         -- COMUNICADOS HOY, SEMANA, MES
         -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4 TOPE
         SELECT 
@@ -560,9 +543,8 @@ module.exports ={
         WHERE x.aeanol_id = $1
         AND x.aeinst_id = $2
         AND x.aeavisos_estado<>0;    
-    `,
-
-    totalAlertsDocente:`
+    `;
+export const totalAlertsDocente = `
         -- COMUNICADOS HOY, SEMANA, MES
         -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4 IDDOCENTE
         SELECT 
@@ -582,9 +564,8 @@ module.exports ={
             AND a.aeinst_id=$2 -- institucion
         )
         AND x.aeavisos_estado<>0;    
-    `,
-
-    totalExcusesToDayTeacher:`
+    `;
+export const totalExcusesToDayTeacher = `
     -- EXCUSAS LOS GRUPOS DE UN DOCENTE SEGUN EL DIA ORDERNADAS DE MAS RECIENTE A MAS ANTIGUA
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '2023-11-26' HOY LITERAL, $4 IDDOCENTE
         SELECT 
@@ -611,9 +592,8 @@ module.exports ={
         AND e.aetipoexcusa_id=t.aetipoexcusa_id
         AND e.aeestudiantes_id=s.aeestudiantes_id
         ORDER BY e.aeexcusas_fecha DESC;
-    `,
-
-    totalWarnings:`
+    `;
+export const totalWarnings = `
     -- OBSERVACIONES HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL
     SELECT 
@@ -623,9 +603,8 @@ module.exports ={
     FROM data.aebitacora x
     WHERE x.aeanol_id = $1
     AND x.aeinst_id = $2;    
-    `,
-
-    totalWarningsXTeacher:`
+    `;
+export const totalWarningsXTeacher = `
     -- OBSERVACIONES HOY, SEMANA, MES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL
     SELECT 
@@ -643,9 +622,8 @@ module.exports ={
 		AND a.aeanol_id=$1 -- anolectivo
 		AND a.aeinst_id=$2 -- institucion  
     );    
-    `,
-
-    topWarningsByGroups:`
+    `;
+export const topWarningsByGroups = `
     -- GRUPOS CON MAS OBSERVACIONES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 '11' MES LITERAL, $4 TOPE
     SELECT e.aeestudiantes_id, e.aeestudiantes_apellidos  || ' ' || e.aeestudiantes_nombres AS LOSMALOS,
@@ -660,9 +638,8 @@ module.exports ={
     GROUP BY e.aeestudiantes_id, e.aeestudiantes_apellidos  || ' ' || e.aeestudiantes_nombres
     ORDER BY CONSULTAS DESC
     LIMIT $4;    
-    `,
-
-    resumeStudentsByGroup:`
+    `;
+export const resumeStudentsByGroup = `
     -- GRUPOS Y SUS ESTUDIANTES
     -- $1 ANOLECTIVO, $2 IDINSTITUCION
     SELECT e.aeestudiantes_grupo as grupo, 
@@ -697,9 +674,8 @@ module.exports ={
     AND aeano_id = $1
     GROUP BY e.aeestudiantes_grupo
     ORDER BY COALESCE(NULLIF(regexp_replace(e.aeestudiantes_grupo, '[^0-9]*','','g'), '')::NUMERIC, 0);    
-    `,
-
-    resumeStudentsByGroupTeacher:`
+    `;
+export const resumeStudentsByGroupTeacher = `
         -- GRUPOS Y SUS ESTUDIANTES
         -- $1 ANOLECTIVO, $2 IDINSTITUCION, $3 IDACADEMICO
         SELECT e.aeestudiantes_grupo as grupo, 
@@ -743,9 +719,8 @@ module.exports ={
         )
         GROUP BY e.aeestudiantes_grupo
         ORDER BY COALESCE(NULLIF(regexp_replace(e.aeestudiantes_grupo, '[^0-9]*','','g'), '')::NUMERIC, 0);
-    `,
-
-    resumeWPMessageSent:`
+    `;
+export const resumeWPMessageSent = `
     -- WHATSAPP: ESTADO DE LA CONEXION Y MENSAJES ENVIADOS, HOY Y ESTE MES
     -- $1 IDINSTITUCION
     SELECT 
@@ -760,9 +735,8 @@ module.exports ={
             AND l.sent=true)
     GROUP BY t.aetipoenvio_id, t.aetipoenvio_descripcion
     ORDER BY tipo;    
-    `,
-
-    resumeWPMessageStatus:`
+    `;
+export const resumeWPMessageStatus = `
     -- WHATSAPP: ESTADO DEL EMISOR Y DATOS DE LA EMPRESA
     -- $1 IDINSTITUCION
     SELECT i.aeinst_id as empresaid, i.aeinst_nombre as empresanombre,
@@ -771,5 +745,32 @@ module.exports ={
         LEFT JOIN contact.emisor e ON 
         (i.aeinst_id=e.idempresa)
     WHERE i.aeinst_id=$1;   
-    `,
-}
+    `;
+export default {
+  totalTeacherAttendance: totalTeacherAttendance,
+  totalTeacherAttendanceByDay: totalTeacherAttendanceByDay,
+  attendanceCount: attendanceCount,
+  attendanceCountXTeacher: attendanceCountXTeacher,
+  totalStudentsAttendance: totalStudentsAttendance,
+  totalStudentsAttendanceXTeacher: totalStudentsAttendanceXTeacher,
+  totalStudentsAttendanceByDay: totalStudentsAttendanceByDay,
+  totalStudentsAttendanceByDayXTeacher: totalStudentsAttendanceByDayXTeacher,
+  totalHomeworks: totalHomeworks,
+  totalHomeworksXTeacher: totalHomeworksXTeacher,
+  totalExams: totalExams,
+  totalExamsXTeacher: totalExamsXTeacher,
+  totalQuestionsTeachers: totalQuestionsTeachers,
+  totalQuestionsTeachersSpecific: totalQuestionsTeachersSpecific,
+  topTeachersRequested: topTeachersRequested,
+  last5RequestedTeachers: last5RequestedTeachers,
+  totalAlerts: totalAlerts,
+  totalAlertsDocente: totalAlertsDocente,
+  totalExcusesToDayTeacher: totalExcusesToDayTeacher,
+  totalWarnings: totalWarnings,
+  totalWarningsXTeacher: totalWarningsXTeacher,
+  topWarningsByGroups: topWarningsByGroups,
+  resumeStudentsByGroup: resumeStudentsByGroup,
+  resumeStudentsByGroupTeacher: resumeStudentsByGroupTeacher,
+  resumeWPMessageSent: resumeWPMessageSent,
+  resumeWPMessageStatus: resumeWPMessageStatus
+};

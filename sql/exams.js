@@ -1,5 +1,4 @@
-module.exports={
-    consulexams:  `SELECT row_to_json(u)
+export const consulexams = `SELECT row_to_json(u)
     FROM (
       SELECT c.aecue_id as idcuestionario, 
       c.aecue_nombre as nombre, 
@@ -82,9 +81,8 @@ module.exports={
       x.aeinst_cue_intentos, x.aeinst_cue_tipointento,
       ti.aetipint_descripcion, x.aeinst_cue_ordenado,
       x.aeinst_cue_resultadominimo
-    ) u;`, 
-   
-    consulexams_reference:  `SELECT row_to_json(u)
+    ) u;`;
+export const consulexams_reference = `SELECT row_to_json(u)
     FROM (
       SELECT c.aecue_id as idcuestionario, 
       c.aecue_nombre as nombre, 
@@ -170,9 +168,8 @@ module.exports={
       x.aeinst_cue_intentos, x.aeinst_cue_tipointento,
       ti.aetipint_descripcion, x.aeinst_cue_ordenado,
       x.aeinst_cue_resultadominimo
-    ) u;`, 
-
-  consulallexam : `SELECT row_to_json(u)
+    ) u;`;
+export const consulallexam = `SELECT row_to_json(u)
   FROM (
     SELECT c.aecue_id as idcuestionario, 
     c.aecue_nombre as nombre, 
@@ -249,11 +246,8 @@ module.exports={
         ti.aetipint_descripcion, x.aeinst_cue_ordenado,
         x.aeinst_cue_resultadominimo
         ORDER BY c.aecue_id
-      ) u;`,
-                
-  
-  
-  consulExamsAdmin:`SELECT row_to_json(u)
+      ) u;`;
+export const consulExamsAdmin = `SELECT row_to_json(u)
 	FROM (
 		SELECT c.aecue_id as idcuestionario, 
 		c.aecue_nombre as nombre, 
@@ -330,18 +324,16 @@ module.exports={
 		ti.aetipint_descripcion, x.aeinst_cue_ordenado,
 		x.aeinst_cue_resultadominimo
 		ORDER BY c.aecue_id
-	) u;`,
-
-  programation:`SELECT x.aeinst_cue_fechacreacion, x.aeinst_cue_fechaini, x.aeinst_cue_fechafin, 
+	) u;`;
+export const programation = `SELECT x.aeinst_cue_fechacreacion, x.aeinst_cue_fechaini, x.aeinst_cue_fechafin, 
                 x.aeinst_cue_duracion, x.aeinst_cue_intentos, x.aeinst_cue_tipointento, x.aeinst_cue_resultadominimo,
                 c.aecue_nombre, c.aecue_descripcion, c.aecue_asignatura
                 FROM data.inst_cue x, data.aecue c 
                 WHERE x.aeinst_cue_id = $1  --TENIENDO EL ID (DE LA PROGRAMACION) SALE UN SOLO RESULTADO                
                 AND x.aecue_id=$2 --EL ID DEL CUESTIONARIO PUEDEN SALIR MAS DE UN RESULTADO
                 AND x.aecue_id=c.aecue_id
-                AND x.aeinst_cue_estado=1;`,
-
-  allintentos : `SELECT inst_cue_res_id, c.aeinst_cue_id, i.aeusu_id, inst_cue_res_resultado, 
+                AND x.aeinst_cue_estado=1;`;
+export const allintentos = `SELECT inst_cue_res_id, c.aeinst_cue_id, i.aeusu_id, inst_cue_res_resultado, 
                   inst_cue_res_fechaini, inst_cue_res_fechafin, inst_cue_res_duracion, 
                   inst_cue_res_fechaintento, inst_cue_res_estado,
                   c.aeinst_cue_fechacreacion as programacionfecha,
@@ -355,28 +347,21 @@ module.exports={
                   AND i.aeusu_id= $2-- AQUI EL ID DEL USUARIO (OSEA EL ESTUDIANTE)
                   AND c.aeinst_cue_estado=1
                   AND i.inst_cue_res_estado=1
-                  AND i.aeinst_cue_id=c.aeinst_cue_id;`,   
- 
-  consul: `SELECT aeopcres_id, aeopcres_descripcion, aeopcres_valor,aepre_id 
+                  AND i.aeinst_cue_id=c.aeinst_cue_id;`;
+export const consul = `SELECT aeopcres_id, aeopcres_descripcion, aeopcres_valor,aepre_id 
             FROM data.aeopcres 
             WHERE aepre_id=$1  -- AQUI VA EL ID DE LA PREGUNTA
             AND aeopcres_estado=true 
-            ORDER BY aeopcres_orden`, 
-  
-  
-  respuestas: `INSERT INTO data.aeres(
+            ORDER BY aeopcres_orden`;
+export const respuestas = `INSERT INTO data.aeres(
                 aeres_id, inst_cue_res_id, aepre_id, aeopcres_id, aeresp_abierta)
-                VALUES ((SELECT MAX(aeres_id)+1 FROM data.aeres),$1, $2, $3, $4)`,
-
-
-   intentos: `INSERT INTO data.inst_cue_res(
+                VALUES ((SELECT MAX(aeres_id)+1 FROM data.aeres),$1, $2, $3, $4)`;
+export const intentos = `INSERT INTO data.inst_cue_res(
                 inst_cue_res_id, aeinst_cue_id, aeusu_id, inst_cue_res_resultado, 
                 inst_cue_res_fechaini, inst_cue_res_fechafin, inst_cue_res_duracion, 
                 inst_cue_res_fechaintento,inst_cue_res_aprobacion,inst_cue_res_estado)
-                VALUES ((SELECT COALESCE(MAX(inst_cue_res_id)+1, 1) FROM data.inst_cue_res),$1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING inst_cue_res_id`,   
-
-
-   taskDocs: `SELECT row_to_json(u)
+                VALUES ((SELECT COALESCE(MAX(inst_cue_res_id)+1, 1) FROM data.inst_cue_res),$1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING inst_cue_res_id`;
+export const taskDocs = `SELECT row_to_json(u)
    FROM (
      SELECT 
      t.aetar_id as idtarea, t.aetar_estado as estadotarea,  
@@ -406,9 +391,8 @@ module.exports={
      d.aedocentes_nombres || ' ' || d.aedocentes_apellidos,
      t.aetar_adjunto1, t.aetar_adjunto2, t.aetar_adjunto3
      ORDER BY t.aetar_fechacreacion DESC 
-   ) u;`,
-   
-   TaskStudents: `SELECT row_to_json(u)
+   ) u;`;
+export const TaskStudents = `SELECT row_to_json(u)
    FROM (
      SELECT 
      t.aetar_id as idtarea, t.aetar_estado as estadotarea,  
@@ -440,9 +424,8 @@ module.exports={
      d.aedocentes_nombres || ' ' || d.aedocentes_apellidos,
      t.aetar_adjunto1, t.aetar_adjunto2, t.aetar_adjunto3
      ORDER BY t.aetar_fechacreacion DESC 
-   ) u;`,
-   
-   showTaskStudents: `SELECT row_to_json(u)
+   ) u;`;
+export const showTaskStudents = `SELECT row_to_json(u)
    FROM (
      SELECT 
      t.aetar_id as idtarea, t.aetar_estado as estadotarea,  
@@ -506,9 +489,8 @@ module.exports={
      d.aedocentes_nombres || ' ' || d.aedocentes_apellidos,
      array[t.aetar_adjunto1, t.aetar_adjunto2, t.aetar_adjunto3]
      ORDER BY t.aetar_fechacreacion DESC 
-   ) u;`,
-
-   showTaskTeachers: `SELECT row_to_json(u)
+   ) u;`;
+export const showTaskTeachers = `SELECT row_to_json(u)
    FROM (
      SELECT 
      t.aetar_id as idtarea, t.aetar_estado as estadotarea,  
@@ -569,17 +551,15 @@ module.exports={
      d.aedocentes_nombres || ' ' || d.aedocentes_apellidos,
      array[t.aetar_adjunto1, t.aetar_adjunto2, t.aetar_adjunto3]
      ORDER BY t.aetar_fechacreacion DESC 
-   ) u;`,
-
-   showTaskStudents_responses:`SELECT row_to_json(u)
+   ) u;`;
+export const showTaskStudents_responses = `SELECT row_to_json(u)
    FROM (
      SELECT *
      FROM data.aetar_res r
      WHERE r.aetar_pro_id IN (SELECT aetar_pro_id FROM data.aetar WHERE aetar_id=$1 ) 
      AND r.aeestudiantes_id= $2
-   ) u;`,
-
-   showTaskResults: `
+   ) u;`;
+export const showTaskResults = `
    SELECT row_to_json(u) as data
    FROM (
     SELECT e.aeestudiantes_id, e.aeestudiantes_grupo, e.aeestudiantes_apellidos || ' ' || e.aeestudiantes_nombres as estudiante,
@@ -595,9 +575,8 @@ module.exports={
     AND e.aeinstitucion_id=$2
     AND e.aeano_id=$1
     ORDER BY e.aeestudiantes_grupo, estudiante
-  ) u;`,
- 
-  showExamsResults: `
+  ) u;`;
+export const showExamsResults = `
   SELECT row_to_json(u) as data
   FROM (
     SELECT e.aeestudiantes_id, e.aeusu_id, e.aeestudiantes_grupo, e.aeestudiantes_apellidos || ' ' || e.aeestudiantes_nombres as estudiante,
@@ -623,9 +602,8 @@ module.exports={
     AND e.aeinstitucion_id=$2
     AND e.aeano_id=$1
     ORDER BY e.aeestudiantes_grupo, estudiante
-  ) u;`,
-
-  showExamsAnswers: ` 
+  ) u;`;
+export const showExamsAnswers = ` 
   SELECT 
 	x.aeinst_cue_id AS programacion, x.inst_cue_res_id AS intento, x.inst_cue_res_fechaintento AS fecha, x.inst_cue_res_duracion AS duracion,
 	x.inst_cue_res_fechaini AS fechainicio, x.inst_cue_res_fechafin AS fechafin, x.inst_cue_res_resultado AS resultado,
@@ -642,6 +620,23 @@ FROM data.inst_cue_res x, (
  AND x.inst_cue_res_id=r.intento
  GROUP BY 
 	x.aeinst_cue_id, x.inst_cue_res_id, x.inst_cue_res_fechaintento, x.inst_cue_res_duracion,
-	x.inst_cue_res_fechaini, x.inst_cue_res_fechafin, x.inst_cue_res_resultado;`
-
-}
+	x.inst_cue_res_fechaini, x.inst_cue_res_fechafin, x.inst_cue_res_resultado;`;
+export default {
+  consulexams: consulexams,
+  consulexams_reference: consulexams_reference,
+  consulallexam: consulallexam,
+  consulExamsAdmin: consulExamsAdmin,
+  programation: programation,
+  allintentos: allintentos,
+  consul: consul,
+  respuestas: respuestas,
+  intentos: intentos,
+  taskDocs: taskDocs,
+  TaskStudents: TaskStudents,
+  showTaskStudents: showTaskStudents,
+  showTaskTeachers: showTaskTeachers,
+  showTaskStudents_responses: showTaskStudents_responses,
+  showTaskResults: showTaskResults,
+  showExamsResults: showExamsResults,
+  showExamsAnswers: showExamsAnswers
+};

@@ -1,9 +1,6 @@
-const express = require('express');
+import express from "express";
+import Controller from "../controllers/linkables.js";
+import Auth from "../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('../controllers/linkables');
-const Auth = require('../middlware/jwtoken');
-
-
-router.get('/avisos',[Auth.isAuth,Auth.isAcademico_and_estudiante_and_teacher],Controller.showAviso);
-
-module.exports = router 
+router.get('/avisos', [Auth.isAuth, Auth.isAcademico_and_estudiante_and_teacher], Controller.showAviso);
+export default router;

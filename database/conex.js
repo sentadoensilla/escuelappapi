@@ -1,7 +1,11 @@
-require('dotenv').config()
-const { Client } = require('pg')
-const fs = require("fs")
-
+import * as __mod0 from "pg";
+import fs from "fs";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+require('dotenv').config();
+const {
+  Client
+} = __mod0;
 /*
  * =====================================================================
  * CONEXIÓN A LA BASE DE DATOS (bdsae2)
@@ -38,20 +42,15 @@ const fs = require("fs")
 
 // CONEXIÓN ACTIVA: DESARROLLO LOCAL (sin SSL)
 const config = {
-    host: process.env.PG_HOST,
-    port: process.env.PG_PORT,
-    user: process.env.PG_USER,
-    database: process.env.PG_DB_NAME,
-    password: process.env.PG_PASSWORD,
-    ssl: false,
-}
-console.log('DB Client config: ', config)
-const client = new Client(config)
-
-client.connect()
-    .then(() => console.log('Conectado a postgres -> ' + client.host + ':' + client.database + ' user ' + client.user))
-    .catch(err => console.log('error de conexion a la DB', err.stack))
-
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
+  user: process.env.PG_USER,
+  database: process.env.PG_DB_NAME,
+  password: process.env.PG_PASSWORD,
+  ssl: false
+};
+console.log('DB Client config: ', config);
+const client = new Client(config);
+client.connect().then(() => console.log('Conectado a postgres -> ' + client.host + ':' + client.database + ' user ' + client.user)).catch(err => console.log('error de conexion a la DB', err.stack));
 const Db = client;
-
-module.exports = Db
+export default Db;

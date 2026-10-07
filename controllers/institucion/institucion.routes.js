@@ -1,12 +1,7 @@
-/**
- * institucion.routes.js
- * Rutas del módulo de instituciones SAE (tabinst) y sedes (tabinstsede).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./institucionController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./institucionController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Instituciones (public.tabinst) =====
 // Listar instituciones.
 router.post('/instituciones/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.institucionListar);
@@ -26,5 +21,4 @@ router.post('/sedes/registrar', [Auth.isAuth, Auth.Admin_academico], Controller.
 router.post('/sedes/actualizar', [Auth.isAuth, Auth.Admin_academico], Controller.sedeActualizar);
 // Borrar una sede.
 router.post('/sedes/borrar', [Auth.isAuth, Auth.Admin_academico], Controller.sedeBorrar);
-
-module.exports = router;
+export default router;

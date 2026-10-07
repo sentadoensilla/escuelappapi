@@ -1,13 +1,7 @@
-/**
- * configuracion.routes.js
- * Rutas del módulo de configuración académica SAE (escalas, SIE, certificados,
- * constancias, paz y salvo y firmas).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./configuracionController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./configuracionController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Escalas de calificación (public.tabesca) =====
 // Listar escalas por institución.
 router.post('/escalas/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.escalaListar);
@@ -63,5 +57,4 @@ router.post('/firmas/registrar', [Auth.isAuth, Auth.Admin_academico], Controller
 router.post('/firmas/actualizar', [Auth.isAuth, Auth.Admin_academico], Controller.firmaActualizar);
 // Borrar una firma.
 router.post('/firmas/borrar', [Auth.isAuth, Auth.Admin_academico], Controller.firmaBorrar);
-
-module.exports = router;
+export default router;

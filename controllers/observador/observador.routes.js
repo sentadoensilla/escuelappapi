@@ -1,12 +1,7 @@
-/**
- * observador.routes.js
- * Rutas del módulo de observador del estudiante (esquema observador).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./observadorController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./observadorController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Plantilla del observador (observador.tabobsplan) =====
 // Listar plantilla(s) por institución.
 router.post('/plan/listar', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.planListar);
@@ -46,5 +41,4 @@ router.post('/observaciones/borrar', [Auth.isAuth, Auth.isDirector_and_tecaher],
 router.post('/evaluaciones/listar', [Auth.isAuth, Auth.isAcademico_and_estudiante_and_teacher], Controller.evaluacionListar);
 // Registrar una evaluación.
 router.post('/evaluaciones/registrar', [Auth.isAuth, Auth.isDirector_and_tecaher], Controller.evaluacionRegistrar);
-
-module.exports = router;
+export default router;

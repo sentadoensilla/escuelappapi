@@ -1,5 +1,4 @@
 var sesiones = {
-    clientSessionStore:{}
+  clientSessionStore: {}
 };
-    
-module.exports = sesiones;
+export default sesiones;

@@ -1,12 +1,7 @@
-/**
- * notas.routes.js
- * Rutas del módulo de calificaciones SAE (notas, logros, definitivas y promedios).
- */
-const express = require('express');
+import express from "express";
+import Controller from "./notasController.js";
+import Auth from "../../middlware/jwtoken.js";
 const router = express.Router();
-const Controller = require('./notasController');
-const Auth = require('../../middlware/jwtoken');
-
 // ===== Notas (public.tabnota) =====
 // Listar notas por matrícula y/o asignación-curso.
 router.post('/notas/listar', [Auth.isAuth, Auth.isAcademico_and_estudiante_and_teacher], Controller.notaListar);
@@ -58,5 +53,4 @@ router.post('/promedios/registrar', [Auth.isAuth, Auth.Admin_academico], Control
 router.post('/promedios/actualizar', [Auth.isAuth, Auth.Admin_academico], Controller.promoActualizar);
 // Borrar (lógico) un promedio general.
 router.post('/promedios/borrar', [Auth.isAuth, Auth.Admin_academico], Controller.promoBorrar);
-
-module.exports = router;
+export default router;

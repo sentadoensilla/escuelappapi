@@ -1,22 +1,19 @@
-module.exports = {
-    listSubjects:`
+export const listSubjects = `
     -- LISTADO DE ASIGNATURAS PREVIAS
     SELECT * FROM 
     DATA.aeasistencias a
     WHERE a.aeasistencias_docente = $2
     AND aeestudiantes_grupo = $3
     AND aeasignaciones_asignatura = $4
-    AND aeasistencias_fecha = $1;`,
-
-    listTipoNovedad:`
+    AND aeasistencias_fecha = $1;`;
+export const listTipoNovedad = `
     SELECT ctiponoveid as idtiponovedad, ctiponovedesc as tiponovedaddescripcion,
     ctiponoveabre as tiponovedadabreviatura
     FROM public.tabtiponove
     WHERE ctiponoveid NOT IN (2,3,4,5) AND ctiponoveesta=8
     ORDER BY ctiponovedesc;   
-    `,
-
-    listStudents:`
+    `;
+export const listStudents = `
     -- LISTA DE ESTUDIANTES EN UN GRUPO, DE UNA INSTITUCION EN UN ANOLECTIVO
     SELECT 
         aeestudiantes_id as idestudiante,aeusu_id as idusuario, 
@@ -30,9 +27,8 @@ module.exports = {
         AND aeano_id=$2
         AND aeestudiantes_estado=1
     ORDER BY aeestudiantes_grupo,nombreestudiante;  
-    `,
-
-    listAssigments:`
+    `;
+export const listAssigments = `
     -- LISTADO UNICO DE ASIGNATURAS DE UN DOCENTE
     SELECT 
         e.aeasignaciones_asignatura AS asignatura
@@ -44,9 +40,8 @@ module.exports = {
         AND e.aeanol_id=$2 -- ID ANOLECTIVO
         AND e.aedocentes_id=$3 -- ID DOCENTE
     GROUP BY e.aeasignaciones_asignatura
-    ORDER BY e.aeasignaciones_asignatura;`,
-
-    listExcusasDate:`
+    ORDER BY e.aeasignaciones_asignatura;`;
+export const listExcusasDate = `
     -- EXCUSAS EN UN GRUPO Y UNA FECHA DETERMINADA
     -- $1: anolectivo $2: idinstitucion $3: group $4 date
     SELECT 
@@ -67,13 +62,19 @@ module.exports = {
         t.aetipoexcusa_id<>0 AND 
         $4::date BETWEEN e.aeexcusas_desde AND e.aeexcusas_hasta 
         -- TO_CHAR($4::date, 'MM') = TO_CHAR(e.aeexcusas_desde, 'MM')
-    ORDER BY nombreestudiante;`,
-
-    deleteAttendanceDate:`
+    ORDER BY nombreestudiante;`;
+export const deleteAttendanceDate = `
         DELETE FROM data.aeasistencias
         WHERE aeasistencias_docente = $3
         AND aeestudiantes_grupo = $2
         AND aeasignaciones_asignatura = $4
         AND aeasistencias_fecha = $1;   
-    `,
-}
+    `;
+export default {
+  listSubjects: listSubjects,
+  listTipoNovedad: listTipoNovedad,
+  listStudents: listStudents,
+  listAssigments: listAssigments,
+  listExcusasDate: listExcusasDate,
+  deleteAttendanceDate: deleteAttendanceDate
+};

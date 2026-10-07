@@ -1,13 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
-
 const fileSchema = new Schema({
-    _id: mongoose.Schema.Types.ObjectId,
-    imagesArray: {
-        type: Array
-    }
+  _id: mongoose.Schema.Types.ObjectId,
+  imagesArray: {
+    type: Array
+  }
 }, {
-    collection: 'files'
-})
-
-module.exports = mongoose.model('File', fileSchema)
+  collection: 'files'
+});
+export default mongoose.model('File', fileSchema);
