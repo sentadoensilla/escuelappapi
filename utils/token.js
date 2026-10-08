@@ -38,7 +38,7 @@ export async function createtoken(sub) {
       typ: "JWT"
     }) //ALGORITMO Y TIPO DE ENCRIPCION 
     .setIssuedAt() //TIEMPO DE CREACION
-    .setExpirationTime('2m').sign(encoder.encode(process.env.JWT_PRIVATE_key)); //CLAVE PRIVADA PARA ENCRIPTAR
+    .setExpirationTime('8h').sign(encoder.encode(process.env.JWT_PRIVATE_key)); //CLAVE PRIVADA PARA ENCRIPTAR
     return await jwt;
   } catch (err) {
     return await err;
@@ -88,7 +88,7 @@ export async function notificationShow(req, res, next) {
   }
 }
 export async function logsteps(req, res, next) {
-  try {
+  /*try {
     let query = {
       text: queryes.migadepan,
       values: req
@@ -100,7 +100,7 @@ export async function logsteps(req, res, next) {
     if (res && typeof res.status === 'function') {
       res.status(400).send(error);
     }
-  }
+  }*/
 }
 export async function paginate(arr, size) {
   return arr.reduce((acc, val, i) => {

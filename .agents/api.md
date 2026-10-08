@@ -191,7 +191,7 @@ El menú del login se arma con **esquema `logic`**: `logic.tabmenu` (menús) + `
 | Matrículas | `routes/matriculas.js` | `MatriculasController`, `matricula.data` | sql/matricula | data.aematriculas_* | ✅ |
 | Datos generales/catálogos | `routes/datosgenerales.js`, `general.js`, `linkables.js` | `DatosGeneralesController`, `generalData`, `linkables` | sql/datosGenerales, generalData | catálogos data.* | ✅ (parcial) |
 | Año lectivo | `routes/anolectivo.js` | `anolectivoController` | sql/anolectivo | data.aeano | ✅ |
-| Áreas | `routes/areas.js` | `AreasController` | sql/areas | public.tabarea | ⚠️ solo listado |
+| Áreas | `routes.js` | `AreasController` | sql/areas | public.tabarea | ⚠️ solo listado |
 | Emisor WhatsApp | `routes/emisor.js` | `EmisorController` | sql/whatsapp | contact.emisor | ⚠️ parcial |
 | Estadísticas/dashboards | `routes/estadisticas.js`, `stats.js` | `StatisticsController`, `TotalController` | sql/statistical, total | data.* | ✅ (parcial) |
 | Scheduler/calendario | `routes/scheduler.js` | scheduler/controller | Sequelize | calendar.scheduleevents | ⚠️ |

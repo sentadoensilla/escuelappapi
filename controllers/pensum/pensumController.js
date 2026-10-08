@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
  * contenidos programáticos, contenidos por asignación-curso y configuración de áreas.
  */
 require('dotenv').config();
-const ESTADO_INACTIVO = 9;
+const ESTADO_ELIMINADO = 2;
 export async function areaListar(req, res) {
   try {
     const resp = await Db.query({
@@ -119,7 +119,7 @@ export async function areaBorrar(req, res) {
     });
     await Db.query({
       text: sql.areaBorrar,
-      values: [token.decriptar(idregistro), ESTADO_INACTIVO]
+      values: [token.decriptar(idregistro), ESTADO_ELIMINADO]
     });
     res.send({
       status: 'success',
@@ -727,7 +727,7 @@ export async function areaconfBorrar(req, res) {
     });
     await Db.query({
       text: sql.areaconfBorrar,
-      values: [token.decriptar(idregistro), ESTADO_INACTIVO]
+      values: [token.decriptar(idregistro), ESTADO_ELIMINADO]
     });
     res.send({
       status: 'success',

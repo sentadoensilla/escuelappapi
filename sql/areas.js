@@ -4,6 +4,7 @@ export const areasList = `
             careaid AS areaid, careadesc AS areadescripcion, 
             careacome AS areacomentario, careaesta AS areaestado
         FROM public.tabarea
+        WHERE careaesta = 8
         ORDER BY careadesc;`;
 export const areasInsert = "";
 export const areasUpdate = "";

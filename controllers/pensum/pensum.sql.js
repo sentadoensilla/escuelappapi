@@ -1,7 +1,8 @@
 export const areaListar = `
         SELECT careaid AS idregistro, careadesc AS descripcion, careacome AS comentario,
                careaesta AS idestado
-        FROM public.tabarea ORDER BY careadesc;`;
+        FROM public.tabarea WHERE careaesta = 8
+        ORDER BY careadesc;`;
 export const areaRegistrar = `
         INSERT INTO public.tabarea (careaid, careadesc, careacome, careaesta)
         VALUES ((SELECT COALESCE(MAX(careaid)+1, 1) FROM public.tabarea), $1, $2, $3)
