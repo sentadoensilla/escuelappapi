@@ -9,6 +9,22 @@ Documento de referencia para que una IA (o cualquier desarrollador) comprenda en
 
 > **Meta del proyecto:** migrar ambos sistemas a una única aplicación **NodeJS + ReactJS** (backend/frontend), versión web responsive, con notificaciones a través de **WhatsApp**. Este documento describe el modelo de datos de partida.
 
+**Última actualización del documento:** _(fecha — actualizar tras cada cambio)_
+
+## 0. Documentos relacionados
+
+Este es el documento canónico de la base de datos del proyecto Escuelapp. Para el resto del contexto:
+
+| Documento | Ubicación | Contenido |
+|---|---|---|
+| Guía maestra del proyecto | `AGENTS.md` (esta carpeta) | Objetivos, roles, mapa de subproyectos, arranque y convenciones globales. |
+| Backend (Node/Express) | `ARQUITECTURA.md` (esta carpeta) | Controladores, acceso a BD, módulos, cómo agregar CRUD. |
+| Frontend (React) | `../escuelappvenus/ARQUITECTURA.md` | CRUD genérico, rutas, menú dinámico y su relación con `logic`/`engine`. |
+| Interfaz (controles/widgets) | `../escuelappvenus/CATALOGO_CONTROLES.md` | Documento único de interfaz; léelo antes de construir/modificar la UI. |
+| API WhatsApp (Baileys) | `../apibaileys/ARQUITECTURA.md` | Colas, sesiones y tablas `contact.emisor`, `public.sessions`, `data.log_envios`. |
+
+Los esquemas `engine` (Escuelapp) y `logic` (SAE) son la fuente de los **menús y privilegios** que consume el frontend; ver §3.2 y §5.
+
 ## 1. Conexión a la base de datos
 
 ```env
@@ -6353,7 +6369,7 @@ Las claves primarias que usan `nextval()` se respaldan con secuencias por tabla 
 # Consolidación de Schemas — bdsae2
 
 > Análisis de los schemas duplicados/solapados `data` vs `public` y `engine` vs `logic`.
-> Este documento describe el modelo de partida y la estrategia. Las operaciones SQL de consolidación **sí se ejecutaron** (2026-08): ver estado real y evals en `.agents/evals/consolidacion.md`.
+> Este documento describe el modelo de partida y la estrategia. Las operaciones SQL de consolidación **sí se ejecutaron** (2026-08); el estado real (tablas `migracion.map_*`, decisiones y rollback) se describe en el apartado **"Resultados de la Consolidación (Alternativa A) — EJECUTADA"** al final de este documento.
 
 ---
 
@@ -6691,9 +6707,16 @@ No hay archivos PHP en este repositorio (el SAE PHP es externo). Referencias enc
 3. **Menús/privilegios `logic`** → `engine`: los roles 207/208 ya tienen privilegios (copiados del 201); el resto de usuarios migrados aún no los tiene asignados.
 4. **Compat VIEWS** para código PHP legacy (no hay PHP en este repo; el consumidor activo es Node).
 5. **Retiro progresivo** de tablas legacy: NO antes de validar en staging.
-6. **Código electoral legacy eliminado** (2026-08-16): los módulos `sql/generalData.js`, `sql/votantessql.js` y derivados fueron retirados del código (ver `.agents/api.md`). Los schemas `temporal` y `varios` **se conservan** (parte de SAE; se revisarán cuando se disponga del código PHP).
+6. **Código electoral legacy eliminado** (2026-08-16): los módulos `sql/generalData.js`, `sql/votantessql.js` y derivados fueron retirados del código (ver `ARQUITECTURA.md`, esta carpeta). Los schemas `temporal` y `varios` **se conservan** (parte de SAE; se revisarán cuando se disponga del código PHP).
 
 ## Rollback
 
 - Respaldo: `/tmp/opencode/backup/bdsae2_backup_<timestamp>.dump`.
 - Las tablas legacy permanecen intactas; los registros migrados son **aditivos** (se pueden identificar por `map_*` y por IDs nuevos).
+
+---
+
+## ⚠️ NOTA NO NEGOCIABLE PARA EL AGENTE CODER
+
+> **Es OBLIGATORIO actualizar este archivo `BASE_DATOS.md` después de CADA cambio o modificación** que afecte la base de datos: nueva tabla, columna, índice, constraint, catálogo, relación, cambio de estado/valor, nueva migración, etc.
+> Un cambio **no se considera terminado** hasta que este documento refleje el estado real del modelo de datos. Antes de cerrar cualquier tarea: compara con la BD real, corrige lo desactualizado de este `.md` y actualiza la fecha en el encabezado.

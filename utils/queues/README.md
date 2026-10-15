@@ -30,3 +30,11 @@ Passing a dynamic processor to dynamic created instance :
 **Processor will require dynamic process and run it(have look in `./process/parallelQueueProcessor.js`)**
 
 `parallelQueue.js` is responsible to return an instance of your queue, if not there will create it
+
+---
+
+## ⚠️ NOTA NO NEGOCIABLE PARA EL AGENTE CODER
+
+> **Es OBLIGATORIO actualizar este `README.md` después de CADA cambio** en esta librería de colas
+> (nuevos procesadores, contrato de jobs, configuración de Redis, etc.). Un cambio **no se considera
+> terminado** hasta que este documento refleje el estado real del código.
