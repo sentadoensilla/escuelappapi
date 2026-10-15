@@ -204,6 +204,36 @@ export function currency(buck) {
     return 0;
   }
 }
+/**
+ * statsColor: devuelve los colores (texto/fondo) según el "semáforo" de desempeño.
+ * Mismo comportamiento que tool.statsColor del frontend.
+ * @param {string} type  'hex' | 'light' | (otro ⇒ clases Bootstrap)
+ * @param {number|string} valor  desempeño (p. ej. 0.73)
+ * @returns {{text:string, background:string}}
+ */
+export function statsColor(type, valor) {
+  valor = parseFloat(valor);
+  switch (type) {
+    case 'hex':
+      if (valor < 0.5) return { text: '#F1F1F1', background: '#F25961' };
+      if (valor >= 0.5 && valor < 0.85) return { text: '#F1F1F1', background: '#FF9E27' };
+      if (valor >= 0.85 && valor <= 1) return { text: '#F1F1F1', background: '#2BB930' };
+      if (valor > 1) return { text: '#F1F1F1', background: '#48ABf7' };
+      break;
+    case 'light':
+      if (valor < 0.5) return { text: 'white', background: 'red' };
+      if (valor >= 0.5 && valor < 0.85) return { text: 'black', background: 'orange' };
+      if (valor >= 0.85 && valor <= 1) return { text: 'white', background: 'green' };
+      if (valor > 1) return { text: 'white', background: 'blue' };
+      break;
+    default:
+      if (valor < 0.5) return { text: 'white', background: 'danger' };
+      if (valor >= 0.5 && valor < 0.85) return { text: 'dark', background: 'warning' };
+      if (valor >= 0.85 && valor <= 1) return { text: 'white', background: 'success' };
+      if (valor > 1) return { text: 'white', background: 'info' };
+      break;
+  }
+}
 export function validEmail(email) {
   return String(email).toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
 }
@@ -341,6 +371,7 @@ export default {
   fileExists: fileExists,
   randomString: randomString,
   currency: currency,
+  statsColor: statsColor,
   validEmail: validEmail,
   stringSimilarity: stringSimilarity,
   editDistance: editDistance,
