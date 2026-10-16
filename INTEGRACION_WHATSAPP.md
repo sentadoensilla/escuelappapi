@@ -131,3 +131,24 @@ Si falla, no se encola y se registra el motivo.
 - Riesgos documentados: apibaileys no es drop-in (SQL a reescribir); "encriptación" = base64 (usar código
   de un solo uso con expiración, no exponer IDs internos); consentimiento legal (Ley 1581/2012 + políticas
   Meta — borrador a validar); canal no oficial (riesgo de ban; la velocidad no elude límites).
+
+---
+
+## 8. Configuración y despliegue
+
+Los tres servicios deben apuntar a la **misma** base de datos (`bdsae2`) y coordinarse por URL local:
+
+| Servicio | Puerto | Base de datos | Referencia `.env` |
+|---|---|---|---|
+| `escuelappapi` | 4004 | `sae12.com/bdsae2` | `PG_HOST=sae12.com`, `PG_DB_NAME=bdsae2`, `PG_USER=adminit4_saeroot` |
+| `apibaileys` | 4088 | `sae12.com/bdsae2` | `PG_*` idem; `APP_API_BACKEND_MASTER/APP_API_BACKEND=http://localhost:4004`, `WP_API_BACKEND=http://localhost:4088`, `APP_API_FRONT=http://localhost:3000`, `WP_API_ENABLE_CRON=true` |
+| `escuelappvenus` | 3000 | — | `REACT_APP_BACKEND_URL=http://localhost:4004` |
+
+Requisitos: **Redis** local (para las colas de `apibaileys`) y migraciones `sql/migrations/001` y `002`
+aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.rollback.sql`).
+
+## 9. Documentación relacionada
+
+- [`CONSENTIMIENTO_WHATSAPP.md`](CONSENTIMIENTO_WHATSAPP.md) — borrador de términos/consentimiento (v1.0).
+- [`PRUEBAS_WHATSAPP.md`](PRUEBAS_WHATSAPP.md) — checklist de pruebas (FASE 5).
+- [`BASE_DATOS.md`](BASE_DATOS.md) — modelo completo de `bdsae2` (actualizar tras cambios de esquema).
