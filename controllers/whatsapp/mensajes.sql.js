@@ -9,4 +9,22 @@ export const mensajesBase = `
   LEFT JOIN data.aetipo_envio t ON (t.aetipoenvio_id = l.tipo)
 `;
 
-export default { mensajesBase };
+// Mensajes enviados/fallidos por día (últimos N días) — institución.
+export const mensajesPorDiaInstitucion = `
+  SELECT to_char(fecharegistro, 'YYYY-MM-DD') AS dia,
+         COUNT(*) FILTER (WHERE status = 'sent')   AS enviados,
+         COUNT(*) FILTER (WHERE status = 'failed') AS fallidos
+  FROM data.aelog_envios
+  WHERE idempresa = $1 AND fecharegistro >= now() - ($2 || ' days')::interval
+  GROUP BY dia ORDER BY dia;`;
+
+// Mensajes enviados/fallidos por día (últimos N días) — global (Admin).
+export const mensajesPorDiaGlobal = `
+  SELECT to_char(fecharegistro, 'YYYY-MM-DD') AS dia,
+         COUNT(*) FILTER (WHERE status = 'sent')   AS enviados,
+         COUNT(*) FILTER (WHERE status = 'failed') AS fallidos
+  FROM data.aelog_envios
+  WHERE fecharegistro >= now() - ($1 || ' days')::interval
+  GROUP BY dia ORDER BY dia;`;
+
+export default { mensajesBase, mensajesPorDiaInstitucion, mensajesPorDiaGlobal };

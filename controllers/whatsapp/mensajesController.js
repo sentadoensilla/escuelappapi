@@ -56,4 +56,24 @@ export async function mensajesConsultar(req, res) {
   }
 }
 
-export default { mensajesConsultar };
+// Mensajes enviados/fallidos por día (para el gráfico de la institución o global).
+export async function mensajesEstadisticas(req, res) {
+  try {
+    const { esAdmin, aeinst_id } = await alcance(req);
+    const dias = Math.min(parseInt(req.body.dias) || 14, 90);
+    let r;
+    if (esAdmin && !req.body.idempresa) {
+      r = await Db.query({ text: sql.mensajesPorDiaGlobal, values: [String(dias)] });
+    } else {
+      const idempresa = esAdmin ? parseInt(req.body.idempresa) : aeinst_id;
+      if (idempresa == null) return res.send({ status: "error", statusCode: 400, message: "Institución no resuelta", rows: [] });
+      r = await Db.query({ text: sql.mensajesPorDiaInstitucion, values: [idempresa, String(dias)] });
+    }
+    res.send({ status: "success", statusCode: 200, message: r.rows.length + " días", rows: r.rows });
+  } catch (error) {
+    console.log("mensajesEstadisticas:", error);
+    res.send({ status: "error", statusCode: 400, message: "No se pudieron consultar las estadísticas", rows: [] });
+  }
+}
+
+export default { mensajesConsultar, mensajesEstadisticas };
