@@ -16,6 +16,50 @@ export function rolDe(req) {
   }
 }
 
+// Resuelve el `aeinst_id` (data.aeinstituciones) a partir del `cinstid` SAE.
+// 1) mapeo directo (migracion.map_institucion); 2) por NIT; 3) por nombre.
+// Si lo resuelve por fallback, guarda el mapeo para próximas veces.
+async function resolverAeinstId(cinstid) {
+  let r = await Db.query({
+    text: "SELECT aeinst_id FROM migracion.map_institucion WHERE cinstid = $1 LIMIT 1",
+    values: [cinstid],
+  });
+  if (r.rows[0]?.aeinst_id != null) return r.rows[0].aeinst_id;
+
+  // Fallback por NIT
+  r = await Db.query({
+    text: `SELECT ai.aeinst_id
+           FROM public.tabinst ti
+           JOIN data.aeinstituciones ai ON (trim(ai.aeinst_nit) = trim(ti.cinstnit))
+           WHERE ti.cinstid = $1 AND ti.cinstnit IS NOT NULL AND trim(ti.cinstnit) <> ''
+           LIMIT 1`,
+    values: [cinstid],
+  });
+  let found = r.rows[0]?.aeinst_id ?? null;
+
+  // Fallback por nombre
+  if (found == null) {
+    r = await Db.query({
+      text: `SELECT ai.aeinst_id
+             FROM public.tabinst ti
+             JOIN data.aeinstituciones ai ON (lower(trim(ai.aeinst_nombre)) = lower(trim(ti.cinstnomb)))
+             WHERE ti.cinstid = $1
+             LIMIT 1`,
+      values: [cinstid],
+    });
+    found = r.rows[0]?.aeinst_id ?? null;
+  }
+
+  if (found != null) {
+    await Db.query({
+      text: `INSERT INTO migracion.map_institucion (cinstid, aeinst_id) VALUES ($1, $2)
+             ON CONFLICT (cinstid) DO UPDATE SET aeinst_id = EXCLUDED.aeinst_id`,
+      values: [cinstid, found],
+    }).catch(() => {});
+  }
+  return found;
+}
+
 // Resuelve { rol, esAdmin, aeinst_id, cinstid } para el usuario autenticado.
 // El emisor se liga a `aeinst_id` (data.aeinstituciones); el JWT trae `cinstid`
 // (SAE), que se mapea con migracion.map_institucion.
@@ -33,11 +77,8 @@ export async function alcance(req) {
   }
   if (cinstid == null) return { rol, esAdmin, aeinst_id: null, cinstid };
 
-  const r = await Db.query({
-    text: "SELECT aeinst_id FROM migracion.map_institucion WHERE cinstid = $1",
-    values: [cinstid],
-  });
-  return { rol, esAdmin, aeinst_id: r.rows[0]?.aeinst_id ?? null, cinstid };
+  const aeinst_id = await resolverAeinstId(cinstid);
+  return { rol, esAdmin, aeinst_id, cinstid };
 }
 
 // Guarda de rol: solo Administrador (0) o Institución (3).

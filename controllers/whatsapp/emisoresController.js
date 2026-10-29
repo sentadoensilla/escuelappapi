@@ -31,8 +31,11 @@ export async function emisorListar(req, res) {
 export async function emisorVincular(req, res) {
   try {
     const { esAdmin, aeinst_id } = await alcance(req);
-    if (esAdmin || aeinst_id == null) {
-      return res.send({ status: "error", statusCode: 400, message: "La vinculación debe realizarse desde una institución", rows: {} });
+    if (esAdmin) {
+      return res.send({ status: "error", statusCode: 400, message: "La vinculación del emisor la realiza la institución (no el administrador).", rows: {} });
+    }
+    if (aeinst_id == null) {
+      return res.send({ status: "error", statusCode: 400, message: "No se pudo resolver la institución de Escuelapp para tu cuenta (falta el vínculo institución SAE ↔ Escuelapp). Contacta al administrador.", rows: {} });
     }
     const numero = normalizarNumero(req.body.numero || req.body.emisor);
     if (!/^\d{10,15}$/.test(numero)) {
