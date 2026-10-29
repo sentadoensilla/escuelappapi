@@ -10,6 +10,8 @@ router.post("/emisores/listar", [Auth.isAuth, whatsappGuard], Controller.emisorL
 router.post("/emisores/vincular", [Auth.isAuth, whatsappGuard], Controller.emisorVincular);
 // QR vigente de la sesión del emisor.
 router.post("/emisores/qr", [Auth.isAuth, whatsappGuard], Controller.emisorQr);
+// Iniciar (crear o recuperar) la sesión Baileys del emisor de la institución.
+router.post("/emisores/sesion/iniciar", [Auth.isAuth, whatsappGuard], Controller.sesionIniciar);
 // Eliminar emisor (conserva historial de mensajes).
 router.post("/emisores/eliminar", [Auth.isAuth, whatsappGuard], Controller.emisorEliminar);
 

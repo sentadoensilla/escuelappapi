@@ -2,6 +2,7 @@ import Db from "../../database/conex.js";
 import token from "../../utils/token.js";
 import sql from "./emisores.sql.js";
 import { alcance, normalizarNumero, auditar } from "./helpers.js";
+import axios from "axios";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 require("dotenv").config();
@@ -65,6 +66,35 @@ export async function emisorVincular(req, res) {
   }
 }
 
+// Inicia (crea o recupera) la sesión Baileys del emisor de la institución.
+// Delega en apibaileys (WP_API_BACKEND); el QR queda en contact.sessions.last_qr.
+export async function sesionIniciar(req, res) {
+  try {
+    const { esAdmin, aeinst_id } = await alcance(req);
+    if (esAdmin || aeinst_id == null) {
+      return res.send({ status: "error", statusCode: 400, message: "La sesión la inicia la institución.", rows: {} });
+    }
+    const r = await Db.query({ text: sql.emisorDeInstitucion, values: [aeinst_id] });
+    const emisor = r.rows[0];
+    if (!emisor || !emisor.numero) {
+      return res.send({ status: "error", statusCode: 400, message: "Primero vincula el número del emisor.", rows: {} });
+    }
+
+    const wp = (process.env.WP_API_BACKEND || "http://localhost:4088").replace(/\/$/, "");
+    const resp = await axios.post(`${wp}/wp/sessions/iniciar`, { sessionId: emisor.numero }, { timeout: 15000 });
+    const data = resp.data || {};
+    res.send({
+      status: data.status === "success" ? "success" : "error",
+      statusCode: data.statusCode || 400,
+      message: data.message,
+      rows: {},
+    });
+  } catch (error) {
+    console.log("sesionIniciar:", error.message);
+    res.send({ status: "error", statusCode: 400, message: "No se pudo iniciar la sesión. ¿Está corriendo apibaileys?", rows: {} });
+  }
+}
+
 // Devuelve el QR vigente (guardado por apibaileys en contact.sessions.last_qr) si existe.
 export async function emisorQr(req, res) {
   try {
@@ -113,4 +143,4 @@ export async function emisorEliminar(req, res) {
   }
 }
 
-export default { emisorListar, emisorVincular, emisorQr, emisorEliminar };
+export default { emisorListar, emisorVincular, emisorQr, emisorEliminar, sesionIniciar };
