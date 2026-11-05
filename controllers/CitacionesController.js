@@ -1,6 +1,7 @@
 import Db from "../database/conex.js";
 import token from "../utils/token.js";
 import queryes from "../sql/citaciones.js";
+import { enviarWhatsApp, aeinstIdDeCinstid } from "./whatsapp/envio.js";
 import moment from "moment";
 import * as __mod0 from "../database/pgpromise.js";
 import { createRequire } from "module";
@@ -103,7 +104,37 @@ export async function citacionesRegistrar(req, res) {
 
         // SEND NOTIFICATIONS AFTER INSERT
         if (result.rowCount > 0) {
-          // SEND WHATSAPP AND MAILS TO PARENTS
+          // Notificar a los acudientes (núcleo: valida LID / modo test)
+          try {
+            const aeinst_id = await aeinstIdDeCinstid(id_institucion);
+            if (aeinst_id) {
+              const est = await Db.query({
+                text: `SELECT * FROM engine.contacto_student_one($1, $2, $3);`,
+                values: [ano_lectivo, id_institucion, misEstudiantes],
+              });
+              for (const e of est.rows) {
+                const telefonos = (e.contactos && e.contactos[0]) || [];
+                for (const tel of telefonos) {
+                  if (String(tel).length > 9) {
+                    await enviarWhatsApp({
+                      idempresa: aeinst_id,
+                      personaTipo: 'acudiente',
+                      destino: tel,
+                      tipo: 1, // COMUNICADO / CITACIÓN
+                      tipoMensaje: 'text',
+                      payload: {
+                        text: `Citación para ${e.estudiante || ''} el ${fecha}${lugar ? ' en ' + lugar : ''}. ${descripcion || ''}`,
+                      },
+                      idreferencia: 0,
+                      aeestudiantes_id: e.aeestudiantes_id || 0,
+                    });
+                  }
+                }
+              }
+            }
+          } catch (err) {
+            console.log('citacionWA:', err.message);
+          }
         }
         res.send({
           status: "success",
