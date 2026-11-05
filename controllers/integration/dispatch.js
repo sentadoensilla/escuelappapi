@@ -1,8 +1,9 @@
 import Db from "../../database/conex.js";
-import tokens from "./tokens.js";
-import sql from "./integration.sql.js";
+import { enviarWhatsApp, aeinstIdDeCinstid } from "../whatsapp/envio.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
+require('dotenv').config();
+
 // Tipos de envío (data.aetipo_envio)
 const TIPO = {
   COMUNICADO: 1,
@@ -18,93 +19,54 @@ const TIPO = {
 };
 
 /**
- * resolverEmisor: busca el número de WhatsApp de la institución SAE (cinstid)
- * usando el mapeo migracion.map_institucion → contact.emisor.
- * @param {number|string} idempresa cinstid (institución SAE)
- * @returns {string} número de WhatsApp o ''
- */
-async function resolverEmisor(idempresa) {
-  try {
-    if (!idempresa) return '';
-    const resp = await Db.query({
-      text: sql.resolverEmisor,
-      values: [idempresa]
-    });
-    return resp.rows[0] && resp.rows[0].numero || '';
-  } catch (err) {
-    console.log('resolverEmisor: ', err.message);
-    return '';
-  }
-}
-
-/**
- * enviaNotificacion: registra y (si es posible) encola un WhatsApp.
- * @param {object} p { tipo, idreferencia, idempresa, emisor, aeestudiantes_id, destino, mensaje, enlace, acudiente }
+ * enviaNotificacion: registra un envío de WhatsApp en el outbox (data.aelog_envios)
+ * usando el núcleo de envío (validación LID / modo test). El envío físico lo hace
+ * apibaileys (cron → Bull → Baileys).
+ *
+ * `idempresa` puede venir como aeinst_id (Escuelapp) o cinstid (SAE); se resuelve.
+ * @returns {number|null} idlogenvios o null si fue bloqueado/error.
  */
 async function enviaNotificacion(p) {
-  // 0) Si no viene emisor, resolverlo por institución SAE.
-  const emisor = p.emisor || (await resolverEmisor(p.idempresa));
-
-  // 1) Insertar el registro de envío (historial de comunicación)
-  const registro = {
-    text: `INSERT INTO data.aelog_envios
-                 (idlogenvios, idreferencia, idempresa, emisor, aeestudiantes_id, destino, tipo, fecharegistro, sent, enviosdetalles)
-               VALUES ((SELECT COALESCE(MAX(idlogenvios)+1, 1) FROM data.aelog_envios), $1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7, $8)
-               RETURNING idlogenvios`,
-    values: [p.idreferencia || 0,
-    // NOT NULL
-    p.idempresa || 0,
-    // NOT NULL
-    emisor,
-    // NOT NULL; '' = pendiente de mapeo
-    p.aeestudiantes_id || 0,
-    // NOT NULL
-    p.destino || '',
-    // NOT NULL
-    p.tipo || TIPO.COMUNICADO, false, JSON.stringify({
-      mensaje: p.mensaje,
-      enlace: p.enlace,
-      acudiente: p.acudiente || null
-    })]
-  };
-  const resp = await Db.query(registro);
-  const idlogenvios = resp.rows[0].idlogenvios;
-
-  // 2) Intento de encolado en WhatsApp (Bull). No fatal: si la infra
-  //    no está operativa, el envío queda pendiente (sent=false).
   try {
-    const parallelQueue = require('../../utils/queues/parallelQueue');
-    const cola = await parallelQueue.getInstance('queue' + (p.idempresa || 0));
-    await cola.add({
-      sessionId: emisor || '',
-      to: p.destino,
-      type: 'text',
-      payload: {
-        text: (p.mensaje || '') + '\n' + (p.enlace || '')
-      }
+    let aeinst_id = null;
+    if (p.idempresa) {
+      const direct = await Db.query({
+        text: "SELECT 1 FROM contact.emisor WHERE idempresa = $1 LIMIT 1",
+        values: [p.idempresa],
+      });
+      aeinst_id = direct.rows[0] ? p.idempresa : await aeinstIdDeCinstid(p.idempresa);
+    }
+
+    const texto = [p.mensaje || "", p.enlace || ""].filter(Boolean).join("\n");
+    const r = await enviarWhatsApp({
+      idempresa: aeinst_id,
+      destino: p.destino,
+      tipo: p.tipo || TIPO.COMUNICADO,
+      tipoMensaje: "text",
+      payload: { text: texto },
+      idreferencia: p.idreferencia || 0,
+      aeestudiantes_id: p.aeestudiantes_id || 0,
     });
-    // Marcar como enviado (la cola confirmó la aceptación).
-    await Db.query({
-      text: `UPDATE data.aelog_envios SET sent = true WHERE idlogenvios = $1`,
-      values: [idlogenvios]
-    });
-  } catch (err) {
-    // La cola no está disponible → el envío queda pendiente para reintento.
-    console.log('dispatch: WhatsApp no disponible, envío queda pendiente ->', err.message);
+
+    if (!r.ok) {
+      console.log("enviaNotificacion (bloqueado):", r.motivo);
+      return null;
+    }
+    return r.idlogenvios;
+  } catch (e) {
+    console.log("enviaNotificacion:", e.message);
+    return null;
   }
-  return idlogenvios;
 }
 
 /**
  * mensajeEnlace: devuelve la URL del enlace seguro que consulta el evento.
- * Apunta a la página pública del frontend (/vista/:token), que valida contra
- * el backend (/integration/enlace/:token).
- * @param {string} token token firmado
  */
-const urlEnlace = token => {
-  const base = process.env.APP_API_FRONT || 'http://localhost:3000';
+const urlEnlace = (token) => {
+  const base = process.env.APP_API_FRONT || "http://localhost:3000";
   return `${base}/vista/${token}`;
 };
+
 export { enviaNotificacion };
 export { urlEnlace };
 export { TIPO };

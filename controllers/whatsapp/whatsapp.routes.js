@@ -4,6 +4,7 @@ import configuracion from "./configuracion.routes.js";
 import colas from "./colas.routes.js";
 import mensajes from "./mensajes.routes.js";
 import vinculacion from "./vinculacion.routes.js";
+import envio from "./envio.routes.js";
 
 // Router agregado del módulo WhatsApp. Se monta en /whatsapp desde routes/index.js.
 const router = express.Router();
@@ -12,5 +13,6 @@ router.use("/", configuracion);
 router.use("/", colas);
 router.use("/", mensajes);
 router.use("/", vinculacion);
+router.use("/", envio);
 
 export default router;
