@@ -1,6 +1,8 @@
 import Db from "../../database/conex.js";
 import token from "../../utils/token.js";
 import sql from "./avisos.sql.js";
+import { enviarMasivo, aeinstIdDeCinstid } from "../../whatsapp/envio.js";
+import { resolverAudiencia } from "../../whatsapp/destinatarios.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 /**
@@ -59,6 +61,34 @@ export async function avisorollRegistrar(req, res) {
       text: sql.avisorollRegistrar,
       values: [b.idautor ? parseInt(token.decriptar(b.idautor)) : null, b.titulo, b.contenido, imagen, b.idestado ? parseInt(token.decriptar(b.idestado)) : 8]
     });
+
+    // Notificar por WhatsApp (núcleo: valida LID / modo test).
+    // Por defecto a todos los docentes; o a la audiencia indicada en b.audiencia.
+    try {
+      if (String(b.notificar) !== 'false') {
+        let cinstid = null;
+        try { cinstid = parseInt(token.decriptar(b.id_institucion || '')); } catch (e) { cinstid = null; }
+        const aeinst_id = cinstid ? await aeinstIdDeCinstid(cinstid) : null;
+        if (aeinst_id && cinstid) {
+          let audiencia = { tipo: 'docentes', ids: [] };
+          if (b.audiencia) { try { audiencia = JSON.parse(b.audiencia); } catch (e) { /* usar docentes */ } }
+          const ano = b.idano ? parseInt(token.decriptar(b.idano)) : null;
+          const destinatarios = await resolverAudiencia({ audiencia, cinstid, anolectivo: ano });
+          if (destinatarios.length > 0) {
+            await enviarMasivo(destinatarios, {
+              idempresa: aeinst_id,
+              tipo: 1, // COMUNICADO
+              tipoMensaje: 'text',
+              payload: { text: `${b.titulo}\n${b.contenido}` },
+              idreferencia: resp.rows[0].idregistro,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.log('avisorollRegistrar WhatsApp:', e.message);
+    }
+
     res.send({
       status: 'success',
       statusCode: 200,
