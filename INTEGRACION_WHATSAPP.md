@@ -152,3 +152,42 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
 - [`CONSENTIMIENTO_WHATSAPP.md`](CONSENTIMIENTO_WHATSAPP.md) — borrador de términos/consentimiento (v1.0).
 - [`PRUEBAS_WHATSAPP.md`](PRUEBAS_WHATSAPP.md) — checklist de pruebas (FASE 5).
 - [`BASE_DATOS.md`](BASE_DATOS.md) — modelo completo de `bdsae2` (actualizar tras cambios de esquema).
+
+## 10. Envío de mensajes: núcleo y casos de uso
+
+### 10.1 Núcleo (`controllers/whatsapp/envio.js`)
+- `validarLid()` — función **independiente** que permite/bloquea por vinculación `ACTIVE`.
+- `modoTestActivo()` — `APP_WP_NUMBERTEST` (todo va a ese número y se omite el LID).
+- `enviarWhatsApp()` / `enviarMasivo()` → `data.aelog_envios` (`pending`); el envío físico lo hace apibaileys.
+- Endpoints: `POST /whatsapp/enviar`, `/whatsapp/lid/validar`, `/whatsapp/notificar`, `/whatsapp/instituciones`.
+
+### 10.2 Audiencias (`/whatsapp/notificar`)
+`audiencia.tipo`: `docentes` · `estudiantes` (ids) · `grupos` (ids) · `todos` (todos los acudientes) ·
+`instituciones` (Admin; ids o todas).
+
+### 10.3 Casos de uso cableados
+| Rol | Caso | Implementación |
+|---|---|---|
+| Docente | Observación (checkbox) | `ObservadorController.observacionesSend` + `observador` SAE + `observacionesAdd` |
+| Docente | Inasistencia | `asistenciasController.saveAttendance` |
+| Docente | Tarea / Examen | `AcademicController.CreateTask` / `createExam` |
+| Docente/Coordinador | Citación | `CitacionesController.citacionesRegistrar` |
+| Estudiante/Acudiente | Consulta al docente | `comunicationController.sendQuestionTeacher` |
+| Estudiante/Acudiente | Consulta a la institución (PQRS) | `pqrsController.pqrRegistrar` |
+| Institución | Aviso a docentes / segmentado | `avisosController.avisorollRegistrar` (+ `b.audiencia`) |
+| Institución | Comunicación masiva / boletines | `WhatsappInstitucion` → `/notificar` (`docentes` / `todos`) |
+| Administrador | Mantenimiento / pagos / colegios | `WhatsappAdmin` → `/notificar` (`instituciones`) |
+| Institución (cron) | Horario de mañana | `utils/scheduler.js` (18:00, `WP_CRON_ESCUELAPP=true`, primeros 2 meses) |
+
+### 10.4 Pendiente
+- **Multimedia** (imagen/video) en avisos: hoy se envía texto; falta construir la URL pública del adjunto.
+- **Cron de calendario** y **boletines automáticos** (el calendario aún no se programa; boletines hoy manual).
+
+---
+
+## ⚠️ NOTA NO NEGOCIABLE PARA EL AGENTE CODER
+
+> **Es OBLIGATORIO actualizar este `INTEGRACION_WHATSAPP.md` después de CADA cambio** en la integración
+> (endpoints, tablas, casos de uso, variables de entorno, cron). Un cambio **no se considera terminado**
+> hasta que este documento refleje el estado real. Actualiza también [`BASE_DATOS.md`](BASE_DATOS.md) si
+> cambia el esquema.
