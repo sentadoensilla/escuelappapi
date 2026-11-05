@@ -123,8 +123,36 @@ export const horariosSendPapas_nueva = `
         GROUP BY a.aeanol_id, a.aeinst_id, a.aeasignaciones_dia, a.aeasignaciones_grupo
         ORDER BY NULLIF(regexp_replace(a.aeasignaciones_grupo, '[^0-9]*','','g'), '')::numeric;
         `;
+export const horarioManana = `
+        -- HORARIO DE MAÑANA (por institución y año lectivo), con contactos de acudientes/estudiantes
+        SELECT
+          a.aeasignaciones_grupo AS grupo,
+          ARRAY_AGG(TO_CHAR(a.aeasignaciones_hora,'HH24:MI') || ' ' || UPPER(a.aeasignaciones_asignatura)
+                    ORDER BY a.aeasignaciones_hora) AS asignaturas,
+          (
+            SELECT ARRAY_AGG(DISTINCT x.whatsapp)
+            FROM (
+              SELECT e.aeestudiantes_grupo, p.aeestudiantes_telefonoacudiente AS whatsapp
+              FROM data.aeestudiantes e
+              LEFT JOIN data.aeacudientes p ON (e.aeestudiantes_id = p.aeestudiantes_id)
+              WHERE e.aeinstitucion_id = $1 AND e.aeano_id = $2
+                AND p.aeestudiantes_telefonoacudiente IS NOT NULL
+              UNION
+              SELECT e.aeestudiantes_grupo, e.aeestudiantes_telefono AS whatsapp
+              FROM data.aeestudiantes e
+              WHERE e.aeinstitucion_id = $1 AND e.aeano_id = $2
+                AND e.aeestudiantes_telefono IS NOT NULL
+            ) x
+            WHERE x.aeestudiantes_grupo = a.aeasignaciones_grupo
+          ) AS contactos
+        FROM data.aeasignaciones a
+        WHERE a.aeinst_id = $1 AND a.aeanol_id = $2
+          AND (a.aeasignaciones_dia - 1) = extract(dow from (CURRENT_DATE + INTERVAL '1 day'))
+        GROUP BY a.aeanol_id, a.aeinst_id, a.aeasignaciones_dia, a.aeasignaciones_grupo`;
+
 export default {
   horarios: horarios,
   horariosSeguimiento: horariosSeguimiento,
-  horariosSendPapas_nueva: horariosSendPapas_nueva
+  horariosSendPapas_nueva: horariosSendPapas_nueva,
+  horarioManana: horarioManana
 };
