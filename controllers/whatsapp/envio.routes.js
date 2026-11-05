@@ -6,6 +6,8 @@ const router = express.Router();
 
 // Encolar envío(s) de WhatsApp (valida LID salvo modo test APP_WP_NUMBERTEST).
 router.post("/enviar", [Auth.isAuth, whatsappGuard], Controller.enviar);
+// Notificar a una audiencia (docentes / estudiantes / grupos).
+router.post("/notificar", [Auth.isAuth, whatsappGuard], Controller.notificar);
 // Validar LID/consentimiento de un destinatario (función independiente).
 router.post("/lid/validar", [Auth.isAuth, whatsappGuard], Controller.validar);
 

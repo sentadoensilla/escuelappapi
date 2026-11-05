@@ -1,5 +1,6 @@
 import { alcance, auditar } from "./helpers.js";
 import { enviarMasivo, validarLid, modoTestActivo } from "./envio.js";
+import { resolverAudiencia } from "./destinatarios.js";
 
 // Encola un envío de WhatsApp (uno o varios destinatarios).
 export async function enviar(req, res) {
@@ -60,4 +61,43 @@ export async function validar(req, res) {
   }
 }
 
-export default { enviar, validar };
+// Notifica a una audiencia (docentes, estudiantes o grupos) resolviendo sus teléfonos.
+export async function notificar(req, res) {
+  try {
+    const { esAdmin, aeinst_id, cinstid } = await alcance(req);
+    if (aeinst_id == null) {
+      return res.send({ status: "error", statusCode: 400, message: "Institución no resuelta", rows: {} });
+    }
+    const instCinst = esAdmin ? (parseInt(req.body.cinstid) || null) : cinstid;
+    if (instCinst == null) {
+      return res.send({ status: "error", statusCode: 400, message: "Institución (SAE) no resuelta", rows: {} });
+    }
+
+    const destinatarios = await resolverAudiencia({
+      audiencia: req.body.audiencia,
+      cinstid: instCinst,
+      anolectivo: req.body.anolectivo,
+    });
+    if (!destinatarios.length) {
+      return res.send({ status: "error", statusCode: 400, message: "La audiencia no tiene destinatarios con teléfono", rows: {} });
+    }
+
+    const r = await enviarMasivo(destinatarios, {
+      idempresa: aeinst_id,
+      tipo: req.body.tipo || 1,
+      tipoMensaje: req.body.tipoMensaje || "text",
+      payload: req.body.payload || { text: req.body.mensaje || "" },
+      idreferencia: req.body.idreferencia || 0,
+    });
+    await auditar(req, "notificar", "success", {
+      idempresa: aeinst_id, audiencia: req.body.audiencia?.tipo, total: r.total, enviados: r.enviados, bloqueados: r.bloqueados,
+    });
+
+    res.send({ status: "success", statusCode: 200, message: `${r.enviados} encolados, ${r.bloqueados} bloqueados`, rows: r });
+  } catch (e) {
+    console.log("whatsapp/notificar:", e.message);
+    res.send({ status: "error", statusCode: 400, message: "No se pudo notificar", rows: {} });
+  }
+}
+
+export default { enviar, validar, notificar };
