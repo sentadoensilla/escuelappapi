@@ -9,6 +9,7 @@ import fs from "fs";
 import util from "util";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
+import { enviarWhatsApp, aeinstIdDeCinstid } from "./whatsapp/envio.js";
 import * as __mod0 from "whatsapp-web.js";
 import moment from "moment-timezone";
 import * as __mod1 from "console";
@@ -29,6 +30,48 @@ const {
 moment.tz.setDefault("America/Bogota");
 //const ahora = moment().format('YYYY-MM-DD HH:mm:ss');
 const ahora = moment().format();
+
+// Notifica por WhatsApp (núcleo: valida LID / modo test) a los acudientes de los
+// estudiantes/grupos indicados. Devuelve cuántas notificaciones se encolaron.
+async function notificarObservacionWA({ ano_lectivo, id_institucion, asignatura, observacion, idreferencia, estudiantes, grupos }) {
+  try {
+    const aeinst_id = await aeinstIdDeCinstid(id_institucion);
+    if (!aeinst_id) {
+      console.log('observacionWA: institución sin aeinst_id (mapeo)');
+      return 0;
+    }
+    const usarEstudiantes = Array.isArray(estudiantes) && estudiantes.length > 0;
+    const resp = await Db.query({
+      text: usarEstudiantes ? observacionesQueryes.contactoStudentOne : observacionesQueryes.contactoStudent,
+      values: [ano_lectivo, id_institucion, usarEstudiantes ? estudiantes : grupos],
+    });
+    const texto = `Observación en ${asignatura || ''}: ${observacion}`;
+    let enviados = 0;
+    for (const est of resp.rows) {
+      const telefonos = (est.contactos && est.contactos[0]) || [];
+      for (const tel of telefonos) {
+        if (String(tel).length > 9) {
+          const r = await enviarWhatsApp({
+            idempresa: aeinst_id,
+            personaTipo: 'acudiente',
+            destino: tel,
+            tipo: 10, // OBSERVACION
+            tipoMensaje: 'text',
+            payload: { text: texto },
+            idreferencia,
+            aeestudiantes_id: est.aeestudiantes_id || 0,
+          });
+          if (r.ok) enviados++;
+        }
+      }
+    }
+    return enviados;
+  } catch (e) {
+    console.log('notificarObservacionWA:', e.message);
+    return 0;
+  }
+}
+
 export async function observacionesSend(req, res) {
   let tok = null;
   let {
@@ -46,7 +89,7 @@ export async function observacionesSend(req, res) {
   try {
     tok = 'La observación no fue registrada, cierre sesion e intente de nuevo';
     const frontRoutesVeiwObservation = process.env.APP_API_FRONT + '/observadorshow/';
-    aviso = aviso === 'true'; //CONVERTIR EN BOOLEAN
+    aviso = aviso === 'true' || aviso === '1' || aviso === 1 || aviso === true; //CONVERTIR EN BOOLEAN
     const id_usuario = parseInt(token.decriptar(req.user.usuarioId));
     const id_institucion = parseInt(token.decriptar(req.user.usuarioEmpresaId));
     const id_docente = parseInt(token.decriptar(req.user.academicoId));
@@ -73,6 +116,20 @@ export async function observacionesSend(req, res) {
         values: [fecha, id_usuario, id_institucion, ano_lectivo, misGrupos, misEstudiantes, asignatura, aviso, observacion]
       });
       if (aviso) {
+        // Notificar vía núcleo WhatsApp (valida LID / modo test) y terminar aquí.
+        {
+          const enviados = await notificarObservacionWA({
+            ano_lectivo, id_institucion, asignatura, observacion,
+            idreferencia: resp.rows[0].aebitacora_id,
+            estudiantes: misEstudiantes, grupos: misGrupos,
+          });
+          return res.send({
+            status: 'success',
+            statusCode: 200,
+            message: `La observación fue registrada, ${enviados} notificaciones de WhatsApp encoladas`,
+            rows: [],
+          });
+        }
         // console.log('La aviso: ', typeof aviso, aviso)
         //ANYWAY students or groups
         let contactoEstudiantes = {};
