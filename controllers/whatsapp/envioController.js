@@ -1,3 +1,4 @@
+import Db from "../../database/conex.js";
 import { alcance, auditar } from "./helpers.js";
 import { enviarMasivo, validarLid, modoTestActivo } from "./envio.js";
 import { resolverAudiencia } from "./destinatarios.js";
@@ -106,4 +107,24 @@ export async function notificar(req, res) {
   }
 }
 
-export default { enviar, validar, notificar };
+// Lista de instituciones (para que el Admin seleccione a quién notificar).
+export async function instituciones(req, res) {
+  try {
+    const { esAdmin } = await alcance(req);
+    if (!esAdmin) return res.send({ status: "error", statusCode: 403, message: "Solo el administrador", rows: [] });
+    const r = await Db.query({
+      text: `SELECT i.cinstid, i.cinstnomb AS nombre, i.cinsttele AS telefono, m.aeinst_id
+             FROM public.tabinst i
+             JOIN migracion.map_institucion m ON (m.cinstid = i.cinstid)
+             WHERE i.cinstesta = 8
+             ORDER BY i.cinstnomb`,
+      values: [],
+    });
+    res.send({ status: "success", statusCode: 200, message: r.rows.length + " instituciones", rows: r.rows });
+  } catch (e) {
+    console.log("whatsapp/instituciones:", e.message);
+    res.send({ status: "error", statusCode: 400, message: "No se pudo consultar", rows: [] });
+  }
+}
+
+export default { enviar, validar, notificar, instituciones };
