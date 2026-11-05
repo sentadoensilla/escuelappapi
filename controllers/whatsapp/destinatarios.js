@@ -1,4 +1,5 @@
 import Db from "../../database/conex.js";
+import { aeinstIdDeCinstid } from "./envio.js";
 
 /**
  * destinatarios.js — resuelve audiencias a una lista de destinatarios para WhatsApp.
@@ -62,6 +63,25 @@ export async function resolverAudiencia({ audiencia, cinstid, anolectivo }) {
     const r = await Db.query({
       text: `SELECT * FROM engine.contacto_student($1, $2, $3);`,
       values: [anolectivo || null, cinstid, ids],
+    });
+    return aplanarAcudientes(r.rows);
+  }
+
+  // Todos los acudientes de la institución (avisos masivos, boletines).
+  if (tipo === "todos") {
+    const aeinst_id = await aeinstIdDeCinstid(cinstid);
+    if (!aeinst_id) return [];
+    const g = await Db.query({
+      text: `SELECT DISTINCT aeasignaciones_grupo AS grupo
+             FROM data.aeasignaciones
+             WHERE aeinst_id = $1 ${anolectivo ? "AND aeanol_id = $2" : ""}`,
+      values: anolectivo ? [aeinst_id, anolectivo] : [aeinst_id],
+    });
+    const grupos = g.rows.map((x) => x.grupo).filter(Boolean);
+    if (!grupos.length) return [];
+    const r = await Db.query({
+      text: `SELECT * FROM engine.contacto_student($1, $2, $3);`,
+      values: [anolectivo || null, cinstid, grupos],
     });
     return aplanarAcudientes(r.rows);
   }
