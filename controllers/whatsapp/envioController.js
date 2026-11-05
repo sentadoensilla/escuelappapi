@@ -65,16 +65,22 @@ export async function validar(req, res) {
 export async function notificar(req, res) {
   try {
     const { esAdmin, aeinst_id, cinstid } = await alcance(req);
-    if (aeinst_id == null) {
+    const audiencia = req.body.audiencia || {};
+    const esInstituciones = audiencia.tipo === "instituciones";
+    if (esAdmin) {
+      if (!esInstituciones) {
+        return res.send({ status: "error", statusCode: 400, message: "El administrador solo notifica a instituciones (audiencia.tipo='instituciones')", rows: {} });
+      }
+    } else if (aeinst_id == null) {
       return res.send({ status: "error", statusCode: 400, message: "Institución no resuelta", rows: {} });
     }
-    const instCinst = esAdmin ? (parseInt(req.body.cinstid) || null) : cinstid;
-    if (instCinst == null) {
+    const instCinst = esAdmin ? null : cinstid;
+    if (!esAdmin && instCinst == null) {
       return res.send({ status: "error", statusCode: 400, message: "Institución (SAE) no resuelta", rows: {} });
     }
 
     const destinatarios = await resolverAudiencia({
-      audiencia: req.body.audiencia,
+      audiencia,
       cinstid: instCinst,
       anolectivo: req.body.anolectivo,
     });

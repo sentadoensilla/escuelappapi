@@ -66,6 +66,25 @@ export async function resolverAudiencia({ audiencia, cinstid, anolectivo }) {
     return aplanarAcudientes(r.rows);
   }
 
+  // Administrador: notificar a una o varias instituciones (teléfono institucional).
+  if (tipo === "instituciones") {
+    const r = await Db.query({
+      text: `SELECT i.cinstid, i.cinstnomb AS nombre, i.cinsttele AS telefono, m.aeinst_id
+             FROM public.tabinst i
+             JOIN migracion.map_institucion m ON (m.cinstid = i.cinstid)
+             WHERE i.cinstesta = 8
+               AND i.cinsttele IS NOT NULL AND trim(i.cinsttele) <> ''
+               ${ids.length ? "AND i.cinstid = ANY($1)" : ""}`,
+      values: ids.length ? [ids] : [],
+    });
+    return r.rows.map((x) => ({
+      idempresa: x.aeinst_id,
+      destino: String(x.telefono),
+      personaTipo: "institucion",
+      personaId: x.cinstid,
+    }));
+  }
+
   return [];
 }
 
