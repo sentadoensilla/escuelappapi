@@ -81,7 +81,7 @@ export async function citacionesRegistrar(req, res) {
     let ano_lectivo = parseInt(token.decriptar(req.user.usuarioAnoId));
     let id_institucion = parseInt(token.decriptar(req.user.usuarioEmpresaId));
     let rol = parseInt(token.decriptar(req.user.usuarioRollId));
-    let docente = rol == 2 || rol == 202 ? parseInt(token.decriptar(req.user.usuarioId)) : null;
+    let docente = [2, 202, 6, 207].includes(rol) ? parseInt(token.decriptar(req.user.usuarioId)) : null;
 
     // PROCESOS
     const DIR = 'p/c/' + id_institucion + '/';
