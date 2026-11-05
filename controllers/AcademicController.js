@@ -10,6 +10,7 @@ import fs from "fs";
 import util from "util";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
+import { enviarWhatsApp } from "./whatsapp/envio.js";
 import * as __mod1 from "whatsapp-web.js";
 import moment from "moment-timezone";
 import * as __mod2 from "express";
@@ -129,6 +130,23 @@ export async function createExam(req, res) {
           email: correos.rows[j].correoacudiente,
           message: messageAcu
         }); //correos.rows[j].correoacudiente
+
+        // WhatsApp (núcleo: valida LID / modo test)
+        const telefonosEx = (correos.rows[j].contactos && correos.rows[j].contactos[0]) || [];
+        for (const telEx of telefonosEx) {
+          if (String(telEx).length > 9) {
+            await enviarWhatsApp({
+              idempresa: id_institucion,
+              personaTipo: 'acudiente',
+              destino: telEx,
+              tipo: 6, // EVALUACION
+              tipoMensaje: 'text',
+              payload: { text: `Nueva evaluación programada: ${name_exam} (${materia}) el ${date_init}. Estudiante: ${correos.rows[j].estudiante}.` },
+              idreferencia: resp.rows[0].aecue_id,
+              aeestudiantes_id: correos.rows[j].aeestudiantes_id || 0,
+            });
+          }
+        }
       }
     }
     let resul = {
@@ -3154,6 +3172,23 @@ export async function CreateTask(req, res) {
         destNames.push(correos.rows[j].estudiante);
         if (correos.rows[j].tokenestudiante != null) {
           destTokens.push(correos.rows[j].tokenestudiante);
+        }
+
+        // WhatsApp (núcleo: valida LID / modo test)
+        const telefonosT = (correos.rows[j].contactos && correos.rows[j].contactos[0]) || [];
+        for (const telT of telefonosT) {
+          if (String(telT).length > 9) {
+            await enviarWhatsApp({
+              idempresa: id_institucion,
+              personaTipo: 'acudiente',
+              destino: telT,
+              tipo: 5, // TAREA
+              tipoMensaje: 'text',
+              payload: { text: `Nueva tarea: ${name_work} (${materia}) con plazo ${date_finish}. Estudiante: ${correos.rows[j].estudiante}.` },
+              idreferencia: resp.rows[0].aetar_id,
+              aeestudiantes_id: correos.rows[j].aeestudiantes_id || 0,
+            });
+          }
         }
       }
       //destMail.push('sentadoensilla@gmail.com')
