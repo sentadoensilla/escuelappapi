@@ -10,6 +10,8 @@ import fs from "fs";
 import util from "util";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
+import { enviarWhatsApp, aeinstIdDeCinstid } from "./whatsapp/envio.js";
+import { telefonosDeContactos, aeanoIdDe } from "./whatsapp/destinatarios.js";
 import * as __mod1 from "whatsapp-web.js";
 import moment from "moment-timezone";
 import { createRequire } from "module";
@@ -344,9 +346,12 @@ export async function saveAttendance(req, res) {
           destination: 'excusas',
           text: ' Enviar excusa '
         });
+        // contacto_student_one espera (aeano_id, aeinst_id, ids), no los ids SAE.
+        const aeinst_id = await aeinstIdDeCinstid(id_institucion);
+        const anoAe = aeinst_id ? await aeanoIdDe(ano_lectivo, aeinst_id) : null;
         let contactoEstudiantes = {
           text: `SELECT * FROM engine.contacto_student_one($1, $2, $3);`,
-          values: [ano_lectivo, id_institucion, noVinieron]
+          values: [anoAe, aeinst_id, noVinieron]
         };
         ////console.log('La query contactos: ', contactoEstudiantes)
         listContactoEstudiantes = await Db.query(contactoEstudiantes);
@@ -380,56 +385,30 @@ export async function saveAttendance(req, res) {
           destUsu.push(listContactoEstudiantes.rows[i].aeusu_id);
           destMail.push(listContactoEstudiantes.rows[i].correoestudiante); //
           destToken.push(listContactoEstudiantes.rows[i].contactos);
-          let notificacionQuery = {
-            text: wpQueryes.saveNotifications,
-            values: [id_usuario, destUsu, ahora, payload.notification.title, payload.notification.body, 'data.aeasistencias', listContactoEstudiantes.rows[i].aeusu_id, payload.data]
-          };
-          let respnotificacionQuery = await Db.query(notificacionQuery);
-          avisados += parseInt(respnotificacionQuery.rowCount);
+          avisados++;
         }
 
-        //LIST DATABASE EMISOR
-        await Db.query({
-          text: wpQueryes.myWPSessionsExtend,
-          values: [ano_lectivo, [id_institucion]]
-        }).then(async elEmisor => {
-          elEmisor.rows[0].emisorlist.map(async (esteEmisor, e) => {
-            if (esteEmisor != null && esteEmisor != "") {
-              let enlace = 'https://colarqui.edu.co';
-              let preLogo = path.join(__dirname, '../', '/public/images/android-chrome-512x512.png');
-              const miLogo = MessageMedia.fromFilePath(preLogo);
-              destToken.map(async (preContact, p) => {
-                preContact[0].map(async (contact, c) => {
-                  console.log('esteEmisor - contact: ', esteEmisor, contact);
-                  if (contact.length > 9) {
-                    await wpSender.isRegistered({
-                      emisor: esteEmisor,
-                      number: contact
-                    }).then(async verificado => {
-                      if (verificado._serialized !== "" && verificado._serialized !== null && typeof verificado._serialized !== "undefined") {
-                        console.log('id_institucion - verificado._serialized: ', id_institucion, verificado._serialized);
-                        await wpSender.sendLinkOne({
-                          emisor: esteEmisor,
-                          sessionId: esteEmisor,
-                          idcosa: id_docente,
-                          idvotantes: destStudentId[p],
-                          number: verificado._serialized,
-                          message: `${payload.notification.title} para ${destStudent[p]} \n${payload.notification.body} \n\nMensaje enviado por el servidor de colarqui.edu.co, no lo responda, mejor ingresar a colarqui.edu.co para agregar la excusa correspondiente -> ${enlace}`,
-                          type: 2,
-                          image: miLogo,
-                          campana: id_institucion,
-                          link: enlace
-                        });
-                      }
-                    });
-                  }
-                });
-              });
+        // Notificar por WhatsApp vía núcleo (valida LID / modo test)
+        {
+          if (aeinst_id) {
+            for (const est of listContactoEstudiantes.rows) {
+              for (const contact of telefonosDeContactos(est.contactos)) {
+                if (String(contact).length > 9) {
+                  await enviarWhatsApp({
+                    idempresa: aeinst_id,
+                    personaTipo: 'acudiente',
+                    destino: contact,
+                    tipo: 2, // ASISTENCIA
+                    tipoMensaje: 'text',
+                    payload: { titulo: 'INASISTENCIA', cuerpo: `Inasistencia registrada en ${asignatura}. Ingresa a la agenda para más detalles.` },
+                    idreferencia: id_docente || 0,
+                    aeestudiantes_id: est.aeestudiantes_id || 0,
+                  });
+                }
+              }
             }
-          });
-        }).catch(async erroreo => {
-          console.log('Error myWPSessionsExtend: ', erroreo);
-        });
+          }
+        }
         totalMessages = await alerta.send({
           name: destNames,
           email: destMail,

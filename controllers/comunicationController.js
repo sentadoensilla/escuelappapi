@@ -6,6 +6,7 @@ import generate from "../utils/notifications/mail/alerta.js";
 import generateButton from "../utils/buttons.js";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
+import { enviarWhatsApp, resolverIdempresa } from "./whatsapp/envio.js";
 import * as __mod0 from "whatsapp-web.js";
 import moment from "moment";
 import { createRequire } from "module";
@@ -922,51 +923,22 @@ export async function sendQuestionTeacher(req, res) {
           index: token.encriptar(resp.rows[0].aeconsultasdocentes_id.toString())
         }
       };
-      let notificacionQuery = {
-        text: wpQueryes.saveNotifications,
-        values: [id_usuario, destUsu, ahora, payload.notification.title, comunicate, 'data.aeconsultasdocentes', resp.rows[0].aeconsultasdocentes_id, payload.data]
-      };
-      let respnotificacionQuery = await Db.query(notificacionQuery);
-
-      //LIST DATABASE EMISOR
-      await Db.query({
-        text: wpQueryes.myWPSessionsExtend,
-        values: [ano_lectivo, [id_institucion]]
-      }).then(async elEmisor => {
-        elEmisor.rows[0].emisorlist.map(async (esteEmisor, e) => {
-          if (esteEmisor != null && esteEmisor != "") {
-            // console.log('esteEmisor: ', esteEmisor, contactoEstudiantes) 
-            let enlace = 'https://colarqui.edu.co';
-            let preLogo = path.join(__dirname, '../', '/public/images/android-chrome-512x512.png');
-            const miLogo = MessageMedia.fromFilePath(preLogo);
-            destToken.map(async contact => {
-              if (contact.length > 9) {
-                await wpSender.isRegistered({
-                  emisor: esteEmisor,
-                  number: contact
-                }).then(async verificado => {
-                  if (verificado._serialized !== "" && verificado._serialized !== null && typeof verificado._serialized !== "undefined") {
-                    await wpSender.sendLinkOne({
-                      emisor: esteEmisor,
-                      sessionId: esteEmisor,
-                      idcosa: resp.rows[0].aeconsultasdocentes_id,
-                      idvotantes: id_academico,
-                      number: verificado._serialized,
-                      message: `${payload.notification.title} \n${payload.notification.body} \n\nMensaje enviado por colarqui.edu.co, para responder ingrese a ${enlace}`,
-                      type: 8,
-                      image: miLogo,
-                      campana: id_institucion,
-                      link: enlace
-                    });
-                  }
-                });
-              }
-            });
-          }
-        });
-      }).catch(async erroreo => {
-        console.log('Error myWPSessionsExtend: ', erroreo);
-      });
+      // Notificar al docente por WhatsApp (núcleo: valida LID / modo test)
+      const aeinstWA = await resolverIdempresa(id_institucion);
+      for (const contact of destToken) {
+        if (String(contact).length > 9) {
+          await enviarWhatsApp({
+            idempresa: aeinstWA,
+            personaTipo: 'docente',
+            personaId: id_docente,
+            destino: contact,
+            tipo: 8, // CONSULTA
+            tipoMensaje: 'text',
+            payload: { titulo: payload.notification.title, cuerpo: payload.notification.body },
+            idreferencia: resp.rows[0].aeconsultasdocentes_id,
+          });
+        }
+      }
       totalMessages = await generate.send({
         name: destNames,
         email: destMail,

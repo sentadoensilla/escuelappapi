@@ -86,6 +86,13 @@ La integración entre ambos la describe `integration.tabenla` (mapeo de entidade
 
 Escuelapp — Agenda Escolar Digital. Gestiona los datos de las cuentas de WhatsApp (emisores), plantillas y variables de los mensajes a enviar.
 
+> **Integración WhatsApp (rama `integrar_whatsapp`):** se añadieron 6 tablas (ver `sql/migrations/001_whatsapp_integracion.sql`):
+> `sessions_status` (catálogo 1–7), `sessions` (estado de sesión Baileys), `whatsapp_auth` (credenciales),
+> `emisor_config` (velocidad/control por emisor), `vinculacion_whatsapp` (LID/consentimiento) y
+> `auditoria_whatsapp` (trazabilidad). Además se añadieron columnas aditivas a `data.aelog_envios`
+> (`status, attempts, last_error, payload, type, lid, destino_efectivo, updated_at`).
+> Detalle en [`INTEGRACION_WHATSAPP.md`](INTEGRACION_WHATSAPP.md).
+
 Tablas/objetos: **5**
 
 #### `contact.aetempmess` — tabla

@@ -10,6 +10,9 @@ import fs from "fs";
 import util from "util";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
+import { enviarWhatsApp, resolverIdempresa } from "./whatsapp/envio.js";
+import { telefonosDeContactos, aeanoIdDe } from "./whatsapp/destinatarios.js";
+import { alcance } from "./whatsapp/helpers.js";
 import * as __mod1 from "whatsapp-web.js";
 import moment from "moment-timezone";
 import * as __mod2 from "express";
@@ -90,6 +93,9 @@ export async function createExam(req, res) {
                 aeinst_cue_fechafin, aeinst_cue_duracion, aeinst_cue_intentos, 
                 aeinst_cue_tipointento, aeinst_cue_ordenado,aeinst_cue_resultadominimo, aeinst_cue_estado)
                 VALUES ((SELECT MAX(aeinst_cue_id)+1 FROM data.inst_cue),$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,$14)RETURNING aeinst_cue_id`;
+    // La institución del JWT manda; el body puede traer cinstid o venir vacío.
+    const aeinstWA = (await alcance(req))?.aeinst_id || await resolverIdempresa(id_institucion);
+    const anoAe = aeinstWA ? await aeanoIdDe(ano_lectivo, aeinstWA) : null;
     for (let i in groups) {
       query2 = {
         text: consul2,
@@ -100,7 +106,7 @@ export async function createExam(req, res) {
       //NOTIFICACIONES POR CORREO DE LA NUEVA EVALUACION
       let queryinfo = {
         text: `SELECT * FROM engine.contacto_student($1, $2, $3)`,
-        values: [ano_lectivo, id_institucion, [groups[i]]]
+        values: [anoAe, aeinstWA, [groups[i]]]
       };
       let correos = await Db.query(queryinfo);
       for (let j in correos.rows) {
@@ -129,6 +135,22 @@ export async function createExam(req, res) {
           email: correos.rows[j].correoacudiente,
           message: messageAcu
         }); //correos.rows[j].correoacudiente
+
+        // WhatsApp (núcleo: valida LID / modo test)
+        for (const telEx of telefonosDeContactos(correos.rows[j].contactos)) {
+          if (String(telEx).length > 9) {
+            await enviarWhatsApp({
+              idempresa: aeinstWA,
+              personaTipo: 'acudiente',
+              destino: telEx,
+              tipo: 6, // EVALUACION
+              tipoMensaje: 'text',
+              payload: { titulo: 'NUEVA EVALUACIÓN', cuerpo: `${name_exam} (${materia}) el ${date_init}.\nEstudiante: ${correos.rows[j].estudiante}.` },
+              idreferencia: resp.rows[0].aecue_id,
+              aeestudiantes_id: correos.rows[j].aeestudiantes_id || 0,
+            });
+          }
+        }
       }
     }
     let resul = {
@@ -3106,6 +3128,9 @@ export async function CreateTask(req, res) {
     //console.log('INSERT INTO data.aetar', query)
 
     let resp = await Db.query(query);
+    // Institución/año para las notificaciones (JWT manda sobre el body).
+    const aeinstWA = (await alcance(req))?.aeinst_id || await resolverIdempresa(id_institucion);
+    const anoAe = aeinstWA ? await aeanoIdDe(ano_lectivo, aeinstWA) : null;
     for (let i in groups) {
       let query2 = {
         text: `INSERT INTO data.aetar_pro(
@@ -3143,7 +3168,7 @@ export async function CreateTask(req, res) {
       };
       let queryinfo = {
         text: `SELECT * FROM engine.contacto_student($1, $2, $3)`,
-        values: [ano_lectivo, id_institucion, [groups[i]]]
+        values: [anoAe, aeinstWA, [groups[i]]]
       };
       var correos = await Db.query(queryinfo);
       ////console.log('FROM engine.contacto_student', correos.rows)
@@ -3154,6 +3179,22 @@ export async function CreateTask(req, res) {
         destNames.push(correos.rows[j].estudiante);
         if (correos.rows[j].tokenestudiante != null) {
           destTokens.push(correos.rows[j].tokenestudiante);
+        }
+
+        // WhatsApp (núcleo: valida LID / modo test)
+        for (const telT of telefonosDeContactos(correos.rows[j].contactos)) {
+          if (String(telT).length > 9) {
+            await enviarWhatsApp({
+              idempresa: aeinstWA,
+              personaTipo: 'acudiente',
+              destino: telT,
+              tipo: 5, // TAREA
+              tipoMensaje: 'text',
+              payload: { titulo: 'NUEVA TAREA', cuerpo: `${name_work} (${materia}) con plazo ${date_finish}.\nEstudiante: ${correos.rows[j].estudiante}.` },
+              idreferencia: resp.rows[0].aetar_id,
+              aeestudiantes_id: correos.rows[j].aeestudiantes_id || 0,
+            });
+          }
         }
       }
       //destMail.push('sentadoensilla@gmail.com')

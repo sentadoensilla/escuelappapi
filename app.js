@@ -6,6 +6,7 @@ import express from "express";
 import bodyparser from "body-parser";
 import useragent from "express-useragent";
 import indexrouter from "./routes/index.js";
+import { startScheduler } from "./utils/scheduler.js";
 import cors from "cors";
 import multer from "multer";
 import path from "path";
@@ -179,6 +180,8 @@ global.io.on('connection', socket => {
 
 httpServer.listen(PORT, "0.0.0.0", elserver => {
   console.log('HTTPS Server running on port: ' + PORT, elserver);
+  // Tareas programadas (horario de mañana, etc.). Se habilita con WP_CRON_ESCUELAPP=true.
+  startScheduler();
   console.log('claveestudiante, clavedocente, claveinstitucion, 12: ', token.encriptar('Estudiante.2000'), token.encriptar('Docente.2000'), token.encriptar('Institucion.2000'), token.encriptar('12'));
   // console.log('La ruta desde app es: ', app)
 });

@@ -1,6 +1,8 @@
 import Db from "../database/conex.js";
 import token from "../utils/token.js";
 import queryes from "../sql/citaciones.js";
+import { enviarWhatsApp, aeinstIdDeCinstid } from "./whatsapp/envio.js";
+import { telefonosDeContactos, aeanoIdDe } from "./whatsapp/destinatarios.js";
 import moment from "moment";
 import * as __mod0 from "../database/pgpromise.js";
 import { createRequire } from "module";
@@ -80,7 +82,7 @@ export async function citacionesRegistrar(req, res) {
     let ano_lectivo = parseInt(token.decriptar(req.user.usuarioAnoId));
     let id_institucion = parseInt(token.decriptar(req.user.usuarioEmpresaId));
     let rol = parseInt(token.decriptar(req.user.usuarioRollId));
-    let docente = rol == 2 || rol == 202 ? parseInt(token.decriptar(req.user.usuarioId)) : null;
+    let docente = [2, 202, 6, 207].includes(rol) ? parseInt(token.decriptar(req.user.usuarioId)) : null;
 
     // PROCESOS
     const DIR = 'p/c/' + id_institucion + '/';
@@ -103,7 +105,38 @@ export async function citacionesRegistrar(req, res) {
 
         // SEND NOTIFICATIONS AFTER INSERT
         if (result.rowCount > 0) {
-          // SEND WHATSAPP AND MAILS TO PARENTS
+          // Notificar a los acudientes (núcleo: valida LID / modo test)
+          try {
+            const aeinst_id = await aeinstIdDeCinstid(id_institucion);
+            if (aeinst_id) {
+              const anoAe = await aeanoIdDe(ano_lectivo, aeinst_id);
+              const est = await Db.query({
+                text: `SELECT * FROM engine.contacto_student_one($1, $2, $3);`,
+                values: [anoAe, aeinst_id, misEstudiantes],
+              });
+              for (const e of est.rows) {
+                for (const tel of telefonosDeContactos(e.contactos)) {
+                  if (String(tel).length > 9) {
+                    await enviarWhatsApp({
+                      idempresa: aeinst_id,
+                      personaTipo: 'acudiente',
+                      destino: tel,
+                      tipo: 1, // COMUNICADO / CITACIÓN
+                      tipoMensaje: 'text',
+                      payload: {
+                        titulo: 'CITACIÓN',
+                        cuerpo: `Citación para ${e.estudiante || ''} el ${fecha}${lugar ? ' en ' + lugar : ''}.\n${descripcion || ''}`,
+                      },
+                      idreferencia: 0,
+                      aeestudiantes_id: e.aeestudiantes_id || 0,
+                    });
+                  }
+                }
+              }
+            }
+          } catch (err) {
+            console.log('citacionWA:', err.message);
+          }
         }
         res.send({
           status: "success",

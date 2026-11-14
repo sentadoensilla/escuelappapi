@@ -1,6 +1,8 @@
 import Db from "../../database/conex.js";
 import token from "../../utils/token.js";
 import sql from "./observador.sql.js";
+import { alcance } from "../whatsapp/helpers.js";
+import { enviarWhatsApp } from "../whatsapp/envio.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 /**
@@ -338,6 +340,33 @@ export async function observacionListar(req, res) {
     });
   }
 }
+// Notifica a los acudientes del estudiante (WhatsApp). Best-effort.
+async function notificarObservacion(req, cmatrid, descripcion) {
+  try {
+    const { aeinst_id } = await alcance(req);
+    if (!aeinst_id) return { ok: false, motivo: 'Institución no resuelta' };
+    const acu = await Db.query({ text: sql.acudientesDeMatricula, values: [cmatrid] });
+    if (!acu.rows.length) return { ok: false, motivo: 'Sin acudiente con teléfono' };
+    const detalle = [];
+    for (const a of acu.rows) {
+      const r = await enviarWhatsApp({
+        idempresa: aeinst_id,
+        personaTipo: 'acudiente',
+        personaId: a.idacudiente,
+        destino: a.telefono,
+        tipo: 10, // OBSERVACION
+        tipoMensaje: 'text',
+        payload: { titulo: 'OBSERVACIÓN', cuerpo: `Estudiante: ${a.estudiante}\n${descripcion}` },
+        idreferencia: 0,
+      });
+      detalle.push(r);
+    }
+    return { ok: detalle.some((r) => r.ok), detalle };
+  } catch (e) {
+    return { ok: false, motivo: e.message };
+  }
+}
+
 export async function observacionRegistrar(req, res) {
   try {
     const b = req.body;
@@ -347,16 +376,23 @@ export async function observacionRegistrar(req, res) {
       message: 'Falta información',
       rows: []
     });
+    const cmatrid = parseInt(token.decriptar(b.idmatricula));
     const resp = await Db.query({
       text: sql.observacionRegistrar,
-      values: [parseInt(token.decriptar(b.idresponsabilidad)), b.idperiodo ? parseInt(token.decriptar(b.idperiodo)) : null, parseInt(token.decriptar(b.idmatricula)), b.descripcion, b.fecha, b.historial, b.idestado ? parseInt(token.decriptar(b.idestado)) : 8]
+      values: [parseInt(token.decriptar(b.idresponsabilidad)), b.idperiodo ? parseInt(token.decriptar(b.idperiodo)) : null, cmatrid, b.descripcion, b.fecha, b.historial, b.idestado ? parseInt(token.decriptar(b.idestado)) : 8]
     });
+
+    // Notificar por WhatsApp salvo que el checkbox venga desmarcado.
+    const desmarcado = b.notificar === false || String(b.notificar).toLowerCase() === 'false';
+    const notificacion = desmarcado ? { ok: false, motivo: 'No notificar' } : await notificarObservacion(req, cmatrid, b.descripcion);
+
     res.send({
       status: 'success',
       statusCode: 200,
       message: 'Observación registrada',
       rows: {
-        idregistro: token.encriptar(resp.rows[0].idregistro)
+        idregistro: token.encriptar(resp.rows[0].idregistro),
+        notificacion
       }
     });
   } catch (error) {

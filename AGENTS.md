@@ -3,7 +3,7 @@
 Guía de referencia para agentes de programación y desarrolladores. Explica **qué** es el proyecto,
 **cómo está organizado**, **cómo se levanta** y **qué convenciones** seguir para seguir codificando.
 
-**Última actualización:** _(fecha — actualizar tras cada cambio)_
+**Última actualización:** 2026-11-14
 
 ---
 
@@ -198,6 +198,10 @@ Puertos habituales: frontend **3000**, backend según `PORT` del `.env` (CORS ac
   `utils/datasource.js`, Sequelize del calendario y `pg-promise` legacy). El estándar nuevo es el Client/Pool.
 - El subsistema de **colas del backend** (`utils/queues/`) está **dormido/roto**; el envío real de WhatsApp
   hoy está centralizado en `apibaileys`.
+- La **integración de WhatsApp** está implementada en `controllers/whatsapp/` (núcleo de envío, transformación
+  HTML→WhatsApp, audiencias, colas, emisores y mensajes) y en el frontend (`pages/whatsapp/`: cola con
+  nombre/grupo, semáforo, modal de detalle con vista previa y gráfico ECharts). Ver
+  [`INTEGRACION_WHATSAPP.md`](INTEGRACION_WHATSAPP.md) y [`PRUEBAS_WHATSAPP.md`](PRUEBAS_WHATSAPP.md).
 - El frontend conserva **archivos por defecto de CRA**, dependencias sin usar y algunas rutas/páginas
   huérfanas (ver deuda detallada en cada `ARQUITECTURA.md`).
 - Detalle por repo en cada `ARQUITECTURA.md`; detalle de datos en [`BASE_DATOS.md`](BASE_DATOS.md).

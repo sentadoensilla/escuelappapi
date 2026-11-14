@@ -66,6 +66,14 @@ export const evaluacionRegistrar = `
         INSERT INTO observador.tabrespeval (crespevalid, cperiid, cmatrid, crespsubid, cevalsubid, crespevalfech, crespevalhist, crespevalesta)
         VALUES ((SELECT COALESCE(MAX(crespevalid)+1, 1) FROM observador.tabrespeval), $1, $2, $3, $4, $5, $6, $7)
         RETURNING crespevalid AS idregistro;`;
+export const acudientesDeMatricula = `
+        SELECT a.cestuacudid AS idacudiente, a.cestuacudtele AS telefono,
+               e.cestunomb || ' ' || e.cestuapel AS estudiante
+        FROM public.tabestuacud a
+        JOIN public.tabmatr m ON (m.cmatrid = a.cmatrid)
+        JOIN public.tabestu e ON (e.cestuid = m.cestuid)
+        WHERE a.cmatrid = $1 AND a.cestuacudesta = 8
+          AND a.cestuacudtele IS NOT NULL AND trim(a.cestuacudtele) <> '';`;
 export default {
   planListar: planListar,
   planRegistrar: planRegistrar,
@@ -81,7 +89,8 @@ export default {
   observacionRegistrar: observacionRegistrar,
   observacionBorrar: observacionBorrar,
   evaluacionListar: evaluacionListar,
-  evaluacionRegistrar: evaluacionRegistrar
+  evaluacionRegistrar: evaluacionRegistrar,
+  acudientesDeMatricula: acudientesDeMatricula
 };
 /**
  * observador.sql.js

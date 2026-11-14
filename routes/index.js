@@ -43,6 +43,7 @@ import pqrs from "../controllers/pqrs/pqrs.routes.js";
 import configapp from "../controllers/configapp/configapp.routes.js";
 import templates from "../controllers/templates/templates.routes.js";
 import migracion from "../controllers/migracion/migracion.routes.js";
+import whatsapp from "../controllers/whatsapp/whatsapp.routes.js";
 const router = express.Router();
 // const webpush = require('../utils/webpush');
 
@@ -94,4 +95,5 @@ router.use('/pqrs', pqrs); // PQRS Escuelapp (data.aepqr*)
 router.use('/configapp', configapp); // ayuda, condiciones, solicitudes, mediciones, tipos certificado, avisos internos, tipos citación
 router.use('/templates', templates); // plantillas de mensajería (contact.aetempmess*)
 router.use('/migracion', migracion); // mapeo de identidad SAE <-> Escuelapp (migracion.map_*)
+router.use('/whatsapp', whatsapp); // WhatsApp multiinstitución (emisores, sesiones, colas, config, mensajes, vinculación)
 export default router;

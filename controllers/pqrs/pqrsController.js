@@ -1,6 +1,7 @@
 import Db from "../../database/conex.js";
 import token from "../../utils/token.js";
 import sql from "./pqrs.sql.js";
+import { enviarWhatsApp, resolverIdempresa } from "../whatsapp/envio.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 /**
@@ -164,10 +165,42 @@ export async function pqrRegistrar(req, res) {
       message: 'Falta nombre o contenido',
       rows: []
     });
+    const idinstitucion = b.idinstitucion ? parseInt(token.decriptar(b.idinstitucion)) : null;
     const resp = await Db.query({
       text: sql.pqrRegistrar,
-      values: [b.nombre, b.telefono || null, b.email || null, b.idusuario ? parseInt(token.decriptar(b.idusuario)) : null, b.idtiposolicitud ? parseInt(token.decriptar(b.idtiposolicitud)) : null, b.contenido, b.idinstitucion ? parseInt(token.decriptar(b.idinstitucion)) : null, b.adjunto || null, b.idano ? parseInt(token.decriptar(b.idano)) : null, b.idestado ? parseInt(token.decriptar(b.idestado)) : 1]
+      values: [b.nombre, b.telefono || null, b.email || null, b.idusuario ? parseInt(token.decriptar(b.idusuario)) : null, b.idtiposolicitud ? parseInt(token.decriptar(b.idtiposolicitud)) : null, b.contenido, idinstitucion, b.adjunto || null, b.idano ? parseInt(token.decriptar(b.idano)) : null, b.idestado ? parseInt(token.decriptar(b.idestado)) : 1]
     });
+
+    // Notificar a la institución por WhatsApp (núcleo: valida LID / modo test)
+    try {
+      if (idinstitucion) {
+        const aeinstPQRS = await resolverIdempresa(idinstitucion);
+        const inst = await Db.query({
+          text: `SELECT COALESCE(NULLIF(TRIM(t.cinsttele), ''), NULLIF(TRIM(i.aeinst_telefono), '')) AS telefono
+                 FROM data.aeinstituciones i
+                 LEFT JOIN migracion.map_institucion m ON (m.aeinst_id = i.aeinst_id)
+                 LEFT JOIN public.tabinst t ON (t.cinstid = m.cinstid)
+                 WHERE i.aeinst_id = $1 LIMIT 1`,
+          values: [aeinstPQRS],
+        });
+        const tel = inst.rows[0] && inst.rows[0].telefono;
+        if (tel && String(tel).length > 9) {
+          await enviarWhatsApp({
+            idempresa: aeinstPQRS,
+            personaTipo: 'institucion',
+            personaId: idinstitucion,
+            destino: String(tel),
+            tipo: 8, // CONSULTA
+            tipoMensaje: 'text',
+            payload: { titulo: 'PQRS', cuerpo: `Consulta de ${b.nombre}: ${b.contenido}` },
+            idreferencia: resp.rows[0].idregistro,
+          });
+        }
+      }
+    } catch (e) {
+      console.log('pqrRegistrar WhatsApp:', e.message);
+    }
+
     res.send({
       status: 'success',
       statusCode: 200,
