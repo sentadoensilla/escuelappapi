@@ -13,8 +13,11 @@ import Db from "../../database/conex.js";
 
 // Devuelve el número de pruebas (string) si el modo test está activo; si no, null.
 export function modoTestActivo() {
-  const n = String(process.env.APP_WP_NUMBERTEST || "").trim();
-  return n !== "" ? n : null;
+  const raw = String(process.env.APP_WP_NUMBERTEST || "").trim();
+  if (!raw) return null;
+  // Normaliza a solo dígitos (tolera formatos tipo "573...@c.us").
+  const digits = raw.replace(/\D/g, "");
+  return digits || null;
 }
 
 /**
@@ -95,8 +98,17 @@ export async function enviarWhatsApp(p) {
     if (!emisor) return { ok: false, motivo: "La institución no tiene emisor de WhatsApp" };
 
     const testNum = modoTestActivo();
+
+    // Normaliza el destino a un teléfono E.164 (solo dígitos; primer número si vienen varios).
+    // La columna data.aelog_envios.destino es varchar(20), así que debe quedar corto.
+    const destinoRaw = String(destino || "").trim();
+    const primerNumero = (destinoRaw.split(/[^0-9]+/).find(Boolean) || "");
+    let destinoGuardar = primerNumero;
+    if (/^\d{10}$/.test(destinoGuardar)) destinoGuardar = "57" + destinoGuardar;
+    if (destinoGuardar.length > 20) destinoGuardar = destinoGuardar.slice(0, 20);
+
     let lid = null;
-    let to = destino;
+    let to = destinoGuardar;
     let destinoEfectivo = null;
 
     if (testNum) {
@@ -104,11 +116,15 @@ export async function enviarWhatsApp(p) {
       to = testNum;
       destinoEfectivo = testNum;
     } else {
-      const chk = await validarLid({ idempresa, personaTipo, personaId, destino });
+      const chk = await validarLid({ idempresa, personaTipo, personaId, destino: destinoGuardar });
       if (!chk.ok) return { ok: false, motivo: chk.motivo };
       lid = chk.lid;
     }
 
+    if (to) {
+      const s = String(to).trim();
+      to = s.endsWith("@c.us") ? s.replace("@c.us", "") : s;
+    }
     if (!to) return { ok: false, motivo: "Sin número destino" };
 
     const r = await Db.query({
@@ -124,9 +140,9 @@ export async function enviarWhatsApp(p) {
         idempresa,
         emisor,
         aeestudiantes_id || 0,
-        destino || "",
+        destinoGuardar,
         tipo || 1,
-        JSON.stringify({ mensaje: payload?.text || "", original: destino || null }),
+        JSON.stringify({ mensaje: payload?.text || payload?.caption || "", original: destinoRaw || null }),
         tipoMensaje,
         JSON.stringify(payload || {}),
         lid,
