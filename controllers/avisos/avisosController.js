@@ -1,8 +1,8 @@
 import Db from "../../database/conex.js";
 import token from "../../utils/token.js";
 import sql from "./avisos.sql.js";
-import { enviarMasivo, aeinstIdDeCinstid } from "../../whatsapp/envio.js";
-import { resolverAudiencia } from "../../whatsapp/destinatarios.js";
+import { enviarMasivo, aeinstIdDeCinstid } from "../whatsapp/envio.js";
+import { resolverAudiencia } from "../whatsapp/destinatarios.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 /**
