@@ -53,6 +53,62 @@ export async function validarLid({ idempresa, personaTipo, personaId, destino })
   }
 }
 
+// Nombre de la institución para el pie del mensaje (caché 5 min).
+const nombresInstitucion = new Map();
+export async function nombreInstitucion(idempresa) {
+  if (!idempresa) return null;
+  const c = nombresInstitucion.get(idempresa);
+  if (c && Date.now() - c.ts < 300000) return c.nombre;
+  try {
+    const r = await Db.query({
+      text: "SELECT aeinst_nombre FROM data.aeinstituciones WHERE aeinst_id = $1 LIMIT 1",
+      values: [idempresa],
+    });
+    const nombre = r.rows[0]?.aeinst_nombre || null;
+    nombresInstitucion.set(idempresa, { nombre, ts: Date.now() });
+    return nombre;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Formato único de mensaje:
+ *
+ *   TÍTULO
+ *
+ *   cuerpo…
+ *
+ *   [Nombre del colegio]
+ *   Enviado desde escuelapp
+ */
+export function construirMensaje({ titulo = "", cuerpo = "", institucion = "" } = {}) {
+  const bloques = [];
+  if (String(titulo).trim()) bloques.push(String(titulo).trim());
+  if (String(cuerpo).trim()) bloques.push(String(cuerpo).trim());
+  const pie = [String(institucion || "").trim(), "Enviado desde escuelapp"].filter(Boolean).join("\n");
+  bloques.push(pie);
+  return bloques.join("\n\n");
+}
+
+// Aplica el formato al payload según el tipo de mensaje (texto o multimedia).
+async function componerPayload(idempresa, tipoMensaje, payload) {
+  const institucion = await nombreInstitucion(idempresa);
+  const cuerpo = payload?.cuerpo ?? payload?.text ?? payload?.caption ?? "";
+  const texto = construirMensaje({ titulo: payload?.titulo, cuerpo, institucion });
+  switch (tipoMensaje) {
+    case "image":
+      return { ...payload, imageUrl: payload?.imageUrl, caption: texto };
+    case "video":
+    case "video_enlace":
+      return { ...payload, videoUrl: payload?.videoUrl, caption: texto };
+    case "audio":
+      return { ...payload, audioUrl: payload?.audioUrl, caption: texto, text: texto };
+    default:
+      return { ...payload, text: texto };
+  }
+}
+
 export async function resolverEmisor(idempresa) {
   if (!idempresa) return null;
   const r = await Db.query({
@@ -127,6 +183,9 @@ export async function enviarWhatsApp(p) {
     }
     if (!to) return { ok: false, motivo: "Sin número destino" };
 
+    // Formato único: título + cuerpo + colegio + "Enviado desde escuelapp".
+    const payloadFinal = await componerPayload(idempresa, tipoMensaje, payload);
+
     const r = await Db.query({
       text: `INSERT INTO data.aelog_envios
         (idlogenvios, idreferencia, idempresa, emisor, aeestudiantes_id, destino, tipo,
@@ -142,9 +201,9 @@ export async function enviarWhatsApp(p) {
         aeestudiantes_id || 0,
         destinoGuardar,
         tipo || 1,
-        JSON.stringify({ mensaje: payload?.text || payload?.caption || "", original: destinoRaw || null }),
+        JSON.stringify({ mensaje: payloadFinal?.text || payloadFinal?.caption || "", original: destinoRaw || null }),
         tipoMensaje,
-        JSON.stringify(payload || {}),
+        JSON.stringify(payloadFinal || {}),
         lid,
         destinoEfectivo,
       ],
@@ -172,4 +231,7 @@ export async function enviarMasivo(destinatarios, p) {
   return resumen;
 }
 
-export default { modoTestActivo, validarLid, resolverEmisor, aeinstIdDeCinstid, enviarWhatsApp, enviarMasivo };
+export default {
+  modoTestActivo, validarLid, resolverEmisor, aeinstIdDeCinstid,
+  enviarWhatsApp, enviarMasivo, nombreInstitucion, construirMensaje,
+};

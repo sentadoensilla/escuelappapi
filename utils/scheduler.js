@@ -62,7 +62,7 @@ export async function enviarHorarioManana() {
         const r = await Db.query({ text: horarios.horarioManana, values: [aeinst_id, anol] });
         for (const row of r.rows) {
           const contactos = row.contactos || [];
-          const texto = `Horario de mañana (${row.grupo}):\n` + (row.asignaturas || []).join("\n");
+          const texto = `Grupo ${row.grupo}:\n` + (row.asignaturas || []).join("\n");
           for (const tel of contactos) {
             if (tel && String(tel).length > 9) {
               await enviarWhatsApp({
@@ -71,7 +71,7 @@ export async function enviarHorarioManana() {
                 destino: String(tel),
                 tipo: 3, // HORARIO
                 tipoMensaje: "text",
-                payload: { text: texto },
+                payload: { titulo: "Horario escolar de mañana", cuerpo: texto },
                 idreferencia: anol,
               });
             }

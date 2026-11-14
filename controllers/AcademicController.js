@@ -141,7 +141,7 @@ export async function createExam(req, res) {
               destino: telEx,
               tipo: 6, // EVALUACION
               tipoMensaje: 'text',
-              payload: { text: `Nueva evaluación programada: ${name_exam} (${materia}) el ${date_init}. Estudiante: ${correos.rows[j].estudiante}.` },
+              payload: { titulo: 'NUEVA EVALUACIÓN', cuerpo: `${name_exam} (${materia}) el ${date_init}.\nEstudiante: ${correos.rows[j].estudiante}.` },
               idreferencia: resp.rows[0].aecue_id,
               aeestudiantes_id: correos.rows[j].aeestudiantes_id || 0,
             });
@@ -3184,7 +3184,7 @@ export async function CreateTask(req, res) {
               destino: telT,
               tipo: 5, // TAREA
               tipoMensaje: 'text',
-              payload: { text: `Nueva tarea: ${name_work} (${materia}) con plazo ${date_finish}. Estudiante: ${correos.rows[j].estudiante}.` },
+              payload: { titulo: 'NUEVA TAREA', cuerpo: `${name_work} (${materia}) con plazo ${date_finish}.\nEstudiante: ${correos.rows[j].estudiante}.` },
               idreferencia: resp.rows[0].aetar_id,
               aeestudiantes_id: correos.rows[j].aeestudiantes_id || 0,
             });

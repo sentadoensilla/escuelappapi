@@ -356,7 +356,7 @@ async function notificarObservacion(req, cmatrid, descripcion) {
         destino: a.telefono,
         tipo: 10, // OBSERVACION
         tipoMensaje: 'text',
-        payload: { text: `Observación para ${a.estudiante}: ${descripcion}` },
+        payload: { titulo: 'OBSERVACIÓN', cuerpo: `Estudiante: ${a.estudiante}\n${descripcion}` },
         idreferencia: 0,
       });
       detalle.push(r);

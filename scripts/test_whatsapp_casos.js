@@ -62,36 +62,36 @@ async function main() {
   const dAll = await docentes(1000);
   const c1 = await enviar(dAll, {
     tipo: 1, personaTipo: 'docente',
-    payload: { text: `AVISO IMPORTANTE\n\n${LOREM}\n\nVideo: ${VIDEO}` },
+    payload: { titulo: 'AVISO IMPORTANTE', cuerpo: `${LOREM}\n\nVideo: ${VIDEO}` },
   });
   console.log('1) Docentes (AVISO IMPORTANTE):', c1);
 
   // 2) Eventos del calendario (simulado): 20 estudiantes + 10 docentes
   const e20 = await estudiantesPorGrupos(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'], 20);
   const d10 = await docentes(10);
-  const c2a = await enviar(e20, { tipo: 7, personaTipo: 'acudiente', payload: { text: `Próximos eventos del colegio\n\n${LOREM}` } });
-  const c2b = await enviar(d10, { tipo: 7, personaTipo: 'docente', payload: { text: `Próximos eventos del colegio\n\n${LOREM}` } });
+  const c2a = await enviar(e20, { tipo: 7, personaTipo: 'acudiente', payload: { titulo: 'Próximos eventos del colegio', cuerpo: LOREM } });
+  const c2b = await enviar(d10, { tipo: 7, personaTipo: 'docente', payload: { titulo: 'Próximos eventos del colegio', cuerpo: LOREM } });
   console.log('2) Eventos calendario (estudiantes/docentes):', c2a, c2b);
 
   // 3) Horario de mañana: 20 estudiantes + 10 docentes
   const e20b = await estudiantesPorGrupos(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'], 20);
   const d10b = await docentes(10);
-  const c3a = await enviar(e20b, { tipo: 3, personaTipo: 'acudiente', payload: { text: `Horario escolar de mañana\n\n${LOREM}` } });
-  const c3b = await enviar(d10b, { tipo: 3, personaTipo: 'docente', payload: { text: `Horario escolar de mañana\n\n${LOREM}` } });
+  const c3a = await enviar(e20b, { tipo: 3, personaTipo: 'acudiente', payload: { titulo: 'Horario escolar de mañana', cuerpo: LOREM } });
+  const c3b = await enviar(d10b, { tipo: 3, personaTipo: 'docente', payload: { titulo: 'Horario escolar de mañana', cuerpo: LOREM } });
   console.log('3) Horario de mañana (estudiantes/docentes):', c3a, c3b);
 
   // 4) Boletines: estudiantes de 2 grupos distintos
   const eg1 = await estudiantesPorGrupos(['1'], 1000);
   const eg2 = await estudiantesPorGrupos(['2'], 1000);
-  const c4a = await enviar(eg1, { tipo: 1, personaTipo: 'acudiente', payload: { text: `BOLETIN 3er PERIODO\n\n${LOREM}` } });
-  const c4b = await enviar(eg2, { tipo: 1, personaTipo: 'acudiente', payload: { text: `BOLETIN 3er PERIODO\n\n${LOREM}` } });
+  const c4a = await enviar(eg1, { tipo: 1, personaTipo: 'acudiente', payload: { titulo: 'BOLETIN 3er PERIODO', cuerpo: LOREM } });
+  const c4b = await enviar(eg2, { tipo: 1, personaTipo: 'acudiente', payload: { titulo: 'BOLETIN 3er PERIODO', cuerpo: LOREM } });
   console.log('4) Boletines (2 grupos):', c4a, c4b);
 
   // 5) Aviso a grados 1..5 (con imagen)
   const e15 = await estudiantesPorGrupos(['1', '2', '3', '4', '5'], 1000);
   const c5 = await enviar(e15, {
     tipo: 1, personaTipo: 'acudiente', tipoMensaje: 'image',
-    payload: (x) => ({ imageUrl: IMAGEN, caption: `COMUNICADO IMPORTANTE\n\n${LOREM}` }),
+    payload: { titulo: 'COMUNICADO IMPORTANTE', cuerpo: LOREM, imageUrl: IMAGEN },
   });
   console.log('5) Aviso grados 1-5 (imagen):', c5);
 

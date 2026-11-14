@@ -398,7 +398,7 @@ export async function saveAttendance(req, res) {
                     destino: contact,
                     tipo: 2, // ASISTENCIA
                     tipoMensaje: 'text',
-                    payload: { text: `Inasistencia registrada en ${asignatura}. Ingresa a la agenda para más detalles.` },
+                    payload: { titulo: 'INASISTENCIA', cuerpo: `Inasistencia registrada en ${asignatura}. Ingresa a la agenda para más detalles.` },
                     idreferencia: id_docente || 0,
                     aeestudiantes_id: est.aeestudiantes_id || 0,
                   });

@@ -933,7 +933,7 @@ export async function sendQuestionTeacher(req, res) {
             destino: contact,
             tipo: 8, // CONSULTA
             tipoMensaje: 'text',
-            payload: { text: `${payload.notification.title}\n${payload.notification.body}` },
+            payload: { titulo: payload.notification.title, cuerpo: payload.notification.body },
             idreferencia: resp.rows[0].aeconsultasdocentes_id,
           });
         }

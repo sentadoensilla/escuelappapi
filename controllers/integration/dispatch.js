@@ -43,7 +43,7 @@ async function enviaNotificacion(p) {
       destino: p.destino,
       tipo: p.tipo || TIPO.COMUNICADO,
       tipoMensaje: "text",
-      payload: { text: texto },
+      payload: { cuerpo: texto },
       idreferencia: p.idreferencia || 0,
       aeestudiantes_id: p.aeestudiantes_id || 0,
     });

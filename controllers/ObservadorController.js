@@ -57,7 +57,7 @@ async function notificarObservacionWA({ ano_lectivo, id_institucion, asignatura,
             destino: tel,
             tipo: 10, // OBSERVACION
             tipoMensaje: 'text',
-            payload: { text: texto },
+            payload: { titulo: 'OBSERVACIÓN', cuerpo: texto },
             idreferencia,
             aeestudiantes_id: est.aeestudiantes_id || 0,
           });

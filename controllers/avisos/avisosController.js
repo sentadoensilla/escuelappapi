@@ -75,11 +75,25 @@ export async function avisorollRegistrar(req, res) {
           const ano = b.idano ? parseInt(token.decriptar(b.idano)) : null;
           const destinatarios = await resolverAudiencia({ audiencia, cinstid, anolectivo: ano });
           if (destinatarios.length > 0) {
+            // Multimedia: si el aviso trae imagen/video, se envía con vista previa.
+            const ext = (String(imagen || '').match(/\.([a-z0-9]+)(?:\?.*)?$/i) || [])[1]?.toLowerCase();
+            const tipoMedia = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+              ? 'image'
+              : (['mp4', 'mov', 'webm', 'm4v'].includes(ext) ? 'video' : null);
+            const base = String(process.env.APP_API_BACKEND || '').replace(/\/+$/, '');
+            const mediaUrl = imagen
+              ? (String(imagen).startsWith('http') ? String(imagen) : (base ? `${base}/${String(imagen).replace(/^\/+/, '')}` : null))
+              : null;
+
+            const payload = { titulo: b.titulo, cuerpo: b.contenido };
+            if (tipoMedia === 'image' && mediaUrl) payload.imageUrl = mediaUrl;
+            if (tipoMedia === 'video' && mediaUrl) payload.videoUrl = mediaUrl;
+
             await enviarMasivo(destinatarios, {
               idempresa: aeinst_id,
               tipo: 1, // COMUNICADO
-              tipoMensaje: 'text',
-              payload: { text: `${b.titulo}\n${b.contenido}` },
+              tipoMensaje: tipoMedia && mediaUrl ? tipoMedia : 'text',
+              payload,
               idreferencia: resp.rows[0].idregistro,
             });
           }

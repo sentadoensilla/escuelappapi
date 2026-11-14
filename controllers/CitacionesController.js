@@ -123,7 +123,8 @@ export async function citacionesRegistrar(req, res) {
                       tipo: 1, // COMUNICADO / CITACIÓN
                       tipoMensaje: 'text',
                       payload: {
-                        text: `Citación para ${e.estudiante || ''} el ${fecha}${lugar ? ' en ' + lugar : ''}. ${descripcion || ''}`,
+                        titulo: 'CITACIÓN',
+                        cuerpo: `Citación para ${e.estudiante || ''} el ${fecha}${lugar ? ' en ' + lugar : ''}.\n${descripcion || ''}`,
                       },
                       idreferencia: 0,
                       aeestudiantes_id: e.aeestudiantes_id || 0,

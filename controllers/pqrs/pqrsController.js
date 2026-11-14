@@ -187,7 +187,7 @@ export async function pqrRegistrar(req, res) {
             destino: String(tel),
             tipo: 8, // CONSULTA
             tipoMensaje: 'text',
-            payload: { text: `Nueva consulta PQRS de ${b.nombre}: ${b.contenido}` },
+            payload: { titulo: 'PQRS', cuerpo: `Consulta de ${b.nombre}: ${b.contenido}` },
             idreferencia: resp.rows[0].idregistro,
           });
         }
