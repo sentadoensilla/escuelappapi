@@ -177,6 +177,16 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
 `audiencia.tipo`: `docentes` · `estudiantes` (ids) · `grupos` (ids) · `todos` (todos los acudientes) ·
 `instituciones` (Admin; ids o todas).
 
+- El resolutor recibe `cinstid` (SAE) y lo mapea a `aeinst_id`; el año del JWT es `canolid`
+  y se mapea a `aeano_id` (`aeanoIdDe`).
+- Los destinatarios se construyen directo desde `data.aeestudiantes` + `data.aeacudientes`
+  (teléfono del acudiente y del estudiante, sin duplicados). La función `engine.contacto_student`
+  descartaba el contacto cuando faltaba uno de los dos teléfonos.
+- `instituciones` lista las instituciones con emisor y usa `tabinst.cinsttele` (o
+  `aeinstituciones.aeinst_telefono` como respaldo).
+- La grilla de la cola muestra **nombre + teléfono + grupo** del destinatario (`persona_nombre`,
+  `grupo`) y el error solo como tooltip sobre el badge de estado.
+
 ### 10.3 Casos de uso cableados
 | Rol | Caso | Implementación |
 |---|---|---|
