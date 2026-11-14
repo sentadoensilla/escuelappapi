@@ -6,7 +6,7 @@ import generate from "../utils/notifications/mail/alerta.js";
 import generateButton from "../utils/buttons.js";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
-import { enviarWhatsApp } from "./whatsapp/envio.js";
+import { enviarWhatsApp, resolverIdempresa } from "./whatsapp/envio.js";
 import * as __mod0 from "whatsapp-web.js";
 import moment from "moment";
 import { createRequire } from "module";
@@ -924,10 +924,11 @@ export async function sendQuestionTeacher(req, res) {
         }
       };
       // Notificar al docente por WhatsApp (núcleo: valida LID / modo test)
+      const aeinstWA = await resolverIdempresa(id_institucion);
       for (const contact of destToken) {
         if (String(contact).length > 9) {
           await enviarWhatsApp({
-            idempresa: id_institucion,
+            idempresa: aeinstWA,
             personaTipo: 'docente',
             personaId: id_docente,
             destino: contact,

@@ -10,6 +10,7 @@ import util from "util";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
 import { enviarWhatsApp, aeinstIdDeCinstid } from "./whatsapp/envio.js";
+import { telefonosDeContactos, aeanoIdDe } from "./whatsapp/destinatarios.js";
 import * as __mod0 from "whatsapp-web.js";
 import moment from "moment-timezone";
 import * as __mod1 from "console";
@@ -41,15 +42,15 @@ async function notificarObservacionWA({ ano_lectivo, id_institucion, asignatura,
       return 0;
     }
     const usarEstudiantes = Array.isArray(estudiantes) && estudiantes.length > 0;
+    const anoAe = await aeanoIdDe(ano_lectivo, aeinst_id);
     const resp = await Db.query({
       text: usarEstudiantes ? observacionesQueryes.contactoStudentOne : observacionesQueryes.contactoStudent,
-      values: [ano_lectivo, id_institucion, usarEstudiantes ? estudiantes : grupos],
+      values: [anoAe, aeinst_id, usarEstudiantes ? estudiantes : grupos],
     });
     const texto = `Observación en ${asignatura || ''}: ${observacion}`;
     let enviados = 0;
     for (const est of resp.rows) {
-      const telefonos = (est.contactos && est.contactos[0]) || [];
-      for (const tel of telefonos) {
+      for (const tel of telefonosDeContactos(est.contactos)) {
         if (String(tel).length > 9) {
           const r = await enviarWhatsApp({
             idempresa: aeinst_id,

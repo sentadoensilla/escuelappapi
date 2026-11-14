@@ -2,6 +2,7 @@ import Db from "../database/conex.js";
 import token from "../utils/token.js";
 import queryes from "../sql/citaciones.js";
 import { enviarWhatsApp, aeinstIdDeCinstid } from "./whatsapp/envio.js";
+import { telefonosDeContactos, aeanoIdDe } from "./whatsapp/destinatarios.js";
 import moment from "moment";
 import * as __mod0 from "../database/pgpromise.js";
 import { createRequire } from "module";
@@ -108,13 +109,13 @@ export async function citacionesRegistrar(req, res) {
           try {
             const aeinst_id = await aeinstIdDeCinstid(id_institucion);
             if (aeinst_id) {
+              const anoAe = await aeanoIdDe(ano_lectivo, aeinst_id);
               const est = await Db.query({
                 text: `SELECT * FROM engine.contacto_student_one($1, $2, $3);`,
-                values: [ano_lectivo, id_institucion, misEstudiantes],
+                values: [anoAe, aeinst_id, misEstudiantes],
               });
               for (const e of est.rows) {
-                const telefonos = (e.contactos && e.contactos[0]) || [];
-                for (const tel of telefonos) {
+                for (const tel of telefonosDeContactos(e.contactos)) {
                   if (String(tel).length > 9) {
                     await enviarWhatsApp({
                       idempresa: aeinst_id,

@@ -1,7 +1,7 @@
 import Db from "../../database/conex.js";
 import token from "../../utils/token.js";
 import sql from "./pqrs.sql.js";
-import { enviarWhatsApp } from "../whatsapp/envio.js";
+import { enviarWhatsApp, resolverIdempresa } from "../whatsapp/envio.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 /**
@@ -174,14 +174,19 @@ export async function pqrRegistrar(req, res) {
     // Notificar a la institución por WhatsApp (núcleo: valida LID / modo test)
     try {
       if (idinstitucion) {
+        const aeinstPQRS = await resolverIdempresa(idinstitucion);
         const inst = await Db.query({
-          text: `SELECT aeinst_telefono FROM data.aeinstituciones WHERE aeinst_id = $1`,
-          values: [idinstitucion],
+          text: `SELECT COALESCE(NULLIF(TRIM(t.cinsttele), ''), NULLIF(TRIM(i.aeinst_telefono), '')) AS telefono
+                 FROM data.aeinstituciones i
+                 LEFT JOIN migracion.map_institucion m ON (m.aeinst_id = i.aeinst_id)
+                 LEFT JOIN public.tabinst t ON (t.cinstid = m.cinstid)
+                 WHERE i.aeinst_id = $1 LIMIT 1`,
+          values: [aeinstPQRS],
         });
-        const tel = inst.rows[0] && inst.rows[0].aeinst_telefono;
+        const tel = inst.rows[0] && inst.rows[0].telefono;
         if (tel && String(tel).length > 9) {
           await enviarWhatsApp({
-            idempresa: idinstitucion,
+            idempresa: aeinstPQRS,
             personaTipo: 'institucion',
             personaId: idinstitucion,
             destino: String(tel),

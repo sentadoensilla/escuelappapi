@@ -113,11 +113,14 @@ export async function instituciones(req, res) {
     const { esAdmin } = await alcance(req);
     if (!esAdmin) return res.send({ status: "error", statusCode: 403, message: "Solo el administrador", rows: [] });
     const r = await Db.query({
-      text: `SELECT i.cinstid, i.cinstnomb AS nombre, i.cinsttele AS telefono, m.aeinst_id
-             FROM public.tabinst i
-             JOIN migracion.map_institucion m ON (m.cinstid = i.cinstid)
-             WHERE i.cinstesta = 8
-             ORDER BY i.cinstnomb`,
+      text: `SELECT DISTINCT ON (i.aeinst_id)
+                    i.aeinst_id, m.cinstid, i.aeinst_nombre AS nombre,
+                    COALESCE(NULLIF(TRIM(t.cinsttele), ''), NULLIF(TRIM(i.aeinst_telefono), '')) AS telefono
+             FROM contact.emisor e
+             JOIN data.aeinstituciones i ON (i.aeinst_id = e.idempresa)
+             LEFT JOIN migracion.map_institucion m ON (m.aeinst_id = i.aeinst_id)
+             LEFT JOIN public.tabinst t ON (t.cinstid = m.cinstid)
+             ORDER BY i.aeinst_id, m.cinstid`,
       values: [],
     });
     res.send({ status: "success", statusCode: 200, message: r.rows.length + " instituciones", rows: r.rows });

@@ -131,6 +131,18 @@ export async function aeinstIdDeCinstid(cinstid) {
   return r.rows[0]?.aeinst_id ?? null;
 }
 
+// Acepta indistintamente aeinst_id o cinstid y devuelve el aeinst_id correcto.
+// Útil en controladores legacy que reciben `id_institucion` sin contrato claro.
+export async function resolverIdempresa(id) {
+  if (!id) return null;
+  const r = await Db.query({
+    text: "SELECT 1 FROM contact.emisor WHERE idempresa = $1 LIMIT 1",
+    values: [id],
+  });
+  if (r.rows[0]) return parseInt(id);
+  return (await aeinstIdDeCinstid(id)) ?? parseInt(id);
+}
+
 /**
  * Registra un envío de WhatsApp en el outbox.
  * @param {object} p { idempresa (aeinst_id), personaTipo, personaId, destino,
@@ -236,7 +248,7 @@ export async function enviarMasivo(destinatarios, p) {
 }
 
 export default {
-  modoTestActivo, validarLid, resolverEmisor, aeinstIdDeCinstid,
+  modoTestActivo, validarLid, resolverEmisor, aeinstIdDeCinstid, resolverIdempresa,
   enviarWhatsApp, enviarMasivo, nombreInstitucion, construirMensaje,
   htmlAWhatsApp, tituloEnNegrita,
 };

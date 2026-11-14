@@ -11,6 +11,7 @@ import util from "util";
 import wpSender from "../utils/notifications/whatsapp/wpRomote.js";
 import wpQueryes from "../sql/whatsapp.js";
 import { enviarWhatsApp, aeinstIdDeCinstid } from "./whatsapp/envio.js";
+import { telefonosDeContactos, aeanoIdDe } from "./whatsapp/destinatarios.js";
 import * as __mod1 from "whatsapp-web.js";
 import moment from "moment-timezone";
 import { createRequire } from "module";
@@ -345,9 +346,12 @@ export async function saveAttendance(req, res) {
           destination: 'excusas',
           text: ' Enviar excusa '
         });
+        // contacto_student_one espera (aeano_id, aeinst_id, ids), no los ids SAE.
+        const aeinst_id = await aeinstIdDeCinstid(id_institucion);
+        const anoAe = aeinst_id ? await aeanoIdDe(ano_lectivo, aeinst_id) : null;
         let contactoEstudiantes = {
           text: `SELECT * FROM engine.contacto_student_one($1, $2, $3);`,
-          values: [ano_lectivo, id_institucion, noVinieron]
+          values: [anoAe, aeinst_id, noVinieron]
         };
         ////console.log('La query contactos: ', contactoEstudiantes)
         listContactoEstudiantes = await Db.query(contactoEstudiantes);
@@ -386,11 +390,9 @@ export async function saveAttendance(req, res) {
 
         // Notificar por WhatsApp vía núcleo (valida LID / modo test)
         {
-          const aeinst_id = await aeinstIdDeCinstid(id_institucion);
           if (aeinst_id) {
             for (const est of listContactoEstudiantes.rows) {
-              const telefonos = (est.contactos && est.contactos[0]) || [];
-              for (const contact of telefonos) {
+              for (const contact of telefonosDeContactos(est.contactos)) {
                 if (String(contact).length > 9) {
                   await enviarWhatsApp({
                     idempresa: aeinst_id,
