@@ -66,14 +66,22 @@ async function main() {
   const pares = orden.map((id, i) => ({ id, fecha: fechas[i] }));
 
   await Db.query({ text: "SET TIME ZONE 'America/Bogota'", values: [] });
-  const upd = await Db.query({
-    text: `UPDATE data.aelog_envios e
-           SET fecharegistro = v.fecha::timestamp,
-               updated_at = v.fecha::timestamp AT TIME ZONE 'America/Bogota'
-           FROM (SELECT unnest($1::int[]) AS id, unnest($2::text[]) AS fecha) v
-           WHERE e.idlogenvios = v.id`,
-    values: [pares.map((p) => p.id), pares.map((p) => p.fecha)],
-  });
+  // El trigger trg_aelog_envios_updated fuerza updated_at = now(); se desactiva
+  // solo para esta sesión mientras se reescriben las fechas de prueba.
+  await Db.query({ text: "SET session_replication_role = replica", values: [] });
+  let upd;
+  try {
+    upd = await Db.query({
+      text: `UPDATE data.aelog_envios e
+             SET fecharegistro = v.fecha::timestamp,
+                 updated_at = v.fecha::timestamp AT TIME ZONE 'America/Bogota'
+             FROM (SELECT unnest($1::int[]) AS id, unnest($2::text[]) AS fecha) v
+             WHERE e.idlogenvios = v.id`,
+      values: [pares.map((p) => p.id), pares.map((p) => p.fecha)],
+    });
+  } finally {
+    await Db.query({ text: "SET session_replication_role = origin", values: [] });
+  }
 
   console.log(`Total: ${total} mensajes · ${dias} días (${fechaLocal(inicio)} → ${fechaLocal(hoy)}) · actualizados: ${upd.rowCount}`);
   const dist = await Db.query({
