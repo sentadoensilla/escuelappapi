@@ -189,6 +189,9 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
 - Al hacer clic en una fila se abre una modal con el detalle completo y una **vista previa tipo
   WhatsApp** (texto con `*negrita*`, `_cursiva_`, media, hora y estado); incluye payload JSON y
   el error completo si el envío falló.
+- `POST /whatsapp/mensajes/estadisticas { todo: true }` devuelve la **serie diaria completa**
+  (también los días sin envíos, en 0). El frontend la grafica con `echarts-for-react`
+  (“Uso en el tiempo”) en lugar del sparkline anterior.
 
 ### 10.3 Casos de uso cableados
 | Rol | Caso | Implementación |

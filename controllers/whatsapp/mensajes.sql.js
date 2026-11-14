@@ -47,6 +47,36 @@ export const mensajesBase = `
   LEFT JOIN data.aetipo_envio t ON (t.aetipoenvio_id = l.tipo)
 `;
 
+// Mensajes enviados/fallidos por día — TODO el historial de la institución.
+// Genera la serie completa (también los días sin mensajes) desde el primer envío.
+export const mensajesPorDiaInstitucionTodo = `
+  WITH rango AS (
+    SELECT COALESCE(MIN(fecharegistro)::date, CURRENT_DATE) AS desde,
+           CURRENT_DATE AS hasta
+    FROM data.aelog_envios WHERE idempresa = $1
+  )
+  SELECT to_char(d.dia, 'YYYY-MM-DD') AS dia,
+         COUNT(l.*) FILTER (WHERE l.status = 'sent')   AS enviados,
+         COUNT(l.*) FILTER (WHERE l.status = 'failed') AS fallidos
+  FROM rango, generate_series(rango.desde, rango.hasta, interval '1 day') AS d(dia)
+  LEFT JOIN data.aelog_envios l
+    ON (l.idempresa = $1 AND l.fecharegistro::date = d.dia)
+  GROUP BY d.dia ORDER BY d.dia;`;
+
+// Mensajes enviados/fallidos por día — TODO el historial global (Admin).
+export const mensajesPorDiaGlobalTodo = `
+  WITH rango AS (
+    SELECT COALESCE(MIN(fecharegistro)::date, CURRENT_DATE) AS desde,
+           CURRENT_DATE AS hasta
+    FROM data.aelog_envios
+  )
+  SELECT to_char(d.dia, 'YYYY-MM-DD') AS dia,
+         COUNT(l.*) FILTER (WHERE l.status = 'sent')   AS enviados,
+         COUNT(l.*) FILTER (WHERE l.status = 'failed') AS fallidos
+  FROM rango, generate_series(rango.desde, rango.hasta, interval '1 day') AS d(dia)
+  LEFT JOIN data.aelog_envios l ON (l.fecharegistro::date = d.dia)
+  GROUP BY d.dia ORDER BY d.dia;`;
+
 // Mensajes enviados/fallidos por día (últimos N días) — institución.
 export const mensajesPorDiaInstitucion = `
   SELECT to_char(fecharegistro, 'YYYY-MM-DD') AS dia,
@@ -65,4 +95,8 @@ export const mensajesPorDiaGlobal = `
   WHERE fecharegistro >= now() - ($1 || ' days')::interval
   GROUP BY dia ORDER BY dia;`;
 
-export default { mensajesBase, mensajesPorDiaInstitucion, mensajesPorDiaGlobal };
+export default {
+  mensajesBase,
+  mensajesPorDiaInstitucion, mensajesPorDiaGlobal,
+  mensajesPorDiaInstitucionTodo, mensajesPorDiaGlobalTodo,
+};

@@ -61,13 +61,19 @@ export async function mensajesEstadisticas(req, res) {
   try {
     const { esAdmin, aeinst_id } = await alcance(req);
     const dias = Math.min(parseInt(req.body.dias) || 14, 90);
+    // todo=true → serie completa (todos los mensajes), con días sin envíos en 0.
+    const todo = req.body.todo === true || req.body.todo === 'true';
     let r;
     if (esAdmin && !req.body.idempresa) {
-      r = await Db.query({ text: sql.mensajesPorDiaGlobal, values: [String(dias)] });
+      r = todo
+        ? await Db.query({ text: sql.mensajesPorDiaGlobalTodo, values: [] })
+        : await Db.query({ text: sql.mensajesPorDiaGlobal, values: [String(dias)] });
     } else {
       const idempresa = esAdmin ? parseInt(req.body.idempresa) : aeinst_id;
       if (idempresa == null) return res.send({ status: "error", statusCode: 400, message: "Institución no resuelta", rows: [] });
-      r = await Db.query({ text: sql.mensajesPorDiaInstitucion, values: [idempresa, String(dias)] });
+      r = todo
+        ? await Db.query({ text: sql.mensajesPorDiaInstitucionTodo, values: [idempresa] })
+        : await Db.query({ text: sql.mensajesPorDiaInstitucion, values: [idempresa, String(dias)] });
     }
     res.send({ status: "success", statusCode: 200, message: r.rows.length + " días", rows: r.rows });
   } catch (error) {
