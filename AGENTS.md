@@ -3,7 +3,7 @@
 Guía de referencia para agentes de programación y desarrolladores. Explica **qué** es el proyecto,
 **cómo está organizado**, **cómo se levanta** y **qué convenciones** seguir para seguir codificando.
 
-**Última actualización:** _(fecha — actualizar tras cada cambio)_
+**Última actualización:** 2026-11-14
 
 ---
 

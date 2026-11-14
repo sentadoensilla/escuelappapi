@@ -158,7 +158,10 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
 ### 10.1 Núcleo (`controllers/whatsapp/envio.js`)
 - `validarLid()` — función **independiente** que permite/bloquea por vinculación `ACTIVE`.
 - `modoTestActivo()` — `APP_WP_NUMBERTEST` (todo va a ese número y se omite el LID).
+  Debe definirse en **ambos** servicios: `escuelappapi` fija `destino_efectivo` al encolar y
+  `apibaileys` lo vuelve a forzar en el cron/worker (por si el job llegara con otro destino).
 - `enviarWhatsApp()` / `enviarMasivo()` → `data.aelog_envios` (`pending`); el envío físico lo hace apibaileys.
+  El gateway envía a `COALESCE(destino_efectivo, destino)` y registra el número usado en `enviosdetalles`.
 - Endpoints: `POST /whatsapp/enviar`, `/whatsapp/lid/validar`, `/whatsapp/notificar`, `/whatsapp/instituciones`.
 
 ### 10.2 Audiencias (`/whatsapp/notificar`)
