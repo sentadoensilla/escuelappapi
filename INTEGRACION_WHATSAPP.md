@@ -186,6 +186,9 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
   `aeinstituciones.aeinst_telefono` como respaldo).
 - La grilla de la cola muestra **nombre + teléfono + grupo** del destinatario (`persona_nombre`,
   `grupo`) y el error solo como tooltip sobre el badge de estado.
+- Al hacer clic en una fila se abre una modal con el detalle completo y una **vista previa tipo
+  WhatsApp** (texto con `*negrita*`, `_cursiva_`, media, hora y estado); incluye payload JSON y
+  el error completo si el envío falló.
 
 ### 10.3 Casos de uso cableados
 | Rol | Caso | Implementación |
