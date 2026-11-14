@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "devel": "nodemon app.js",
-    "start": "nodemon app.js",
+    "start": "bash ./tunel_db.sh",
     "stop": "nodemon stop app.js",
     "startcluster": "nodemon appCluster.js",
     "whatsapp-web.js": "1.22.1",
