@@ -1,4 +1,5 @@
 import Db from "../../database/conex.js";
+import { htmlAWhatsApp, tituloEnNegrita } from "./texto.js";
 
 /**
  * envio.js — núcleo de envío de WhatsApp de Escuelapp.
@@ -84,8 +85,11 @@ export async function nombreInstitucion(idempresa) {
  */
 export function construirMensaje({ titulo = "", cuerpo = "", institucion = "" } = {}) {
   const bloques = [];
-  if (String(titulo).trim()) bloques.push(String(titulo).trim());
-  if (String(cuerpo).trim()) bloques.push(String(cuerpo).trim());
+  // Transformación obligatoria: HTML del editor → formato WhatsApp.
+  const t = tituloEnNegrita(titulo);
+  if (t) bloques.push(t);
+  const c = htmlAWhatsApp(cuerpo);
+  if (c) bloques.push(c);
   const pie = [String(institucion || "").trim(), "Enviado desde escuelapp"].filter(Boolean).join("\n");
   bloques.push(pie);
   return bloques.join("\n\n");
@@ -234,4 +238,5 @@ export async function enviarMasivo(destinatarios, p) {
 export default {
   modoTestActivo, validarLid, resolverEmisor, aeinstIdDeCinstid,
   enviarWhatsApp, enviarMasivo, nombreInstitucion, construirMensaje,
+  htmlAWhatsApp, tituloEnNegrita,
 };

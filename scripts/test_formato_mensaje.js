@@ -25,7 +25,10 @@ async function main() {
   const texto = await enviarWhatsApp({
     idempresa: AEINST_ID, personaTipo: 'docente', personaId: docente.personaid,
     destino: docente.telefono, tipo: 1, tipoMensaje: 'text',
-    payload: { titulo: 'AVISO IMPORTANTE', cuerpo: LOREM },
+    payload: {
+      titulo: '<strong>AVISO IMPORTANTE</strong>',
+      cuerpo: `<p>${LOREM.replace(/\n\n/g, '</p><p>')}</p><ul><li>Primer punto</li><li>Segundo punto</li></ul><p><a href="https://ejemplo.com/video">Ver video</a></p>`,
+    },
   });
   console.log('texto:', texto);
 
