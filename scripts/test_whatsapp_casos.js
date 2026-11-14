@@ -9,7 +9,8 @@ const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do e
 
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
 const VIDEO = 'https://www.w3schools.com/html/mov_bbb.mp4';
-const IMAGEN = 'https://picsum.photos/seed/escuelapp/800/450';
+// URL directa (sin redirecciones ni bloqueo de hotlink) para que Baileys la descargue.
+const IMAGEN = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/JPEG_example_flower.jpg';
 
 async function docentes(limit) {
   const r = await Db.query({
