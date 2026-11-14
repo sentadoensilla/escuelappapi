@@ -219,8 +219,32 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
 El worker consulta `contact.emisor_config` y el estado del registro **antes de cada envío**, por lo
 que pausar/detener también frena los mensajes que ya estaban en la cola de Bull (vuelven a `pending`).
 
-### 10.5 Pendiente
-- **Multimedia** (imagen/video) en avisos: hoy se envía texto; falta construir la URL pública del adjunto.
+### 10.5 Pruebas ejecutadas (2026-11-14, modo test)
+Todas las pruebas se hicieron con `APP_WP_NUMBERTEST` activo; el destino real registrado es
+`destino_efectivo` y coincide con el número de prueba.
+
+| Rol / caso | Resultado |
+|---|---|
+| Institución · aviso a docentes (video) | 81 enviados |
+| Institución · calendario simulado (20+10) | 30 enviados |
+| Institución · horario de mañana (20+10) | 30 enviados |
+| Institución · boletines 2 grupos | 26 enviados |
+| Institución · aviso con imagen (grados 1–5) | 77 enviados (imagen Wikimedia) |
+| Coordinador · docentes a cargo | 10 enviados |
+| Coordinador · acudientes de sus cursos | 20 enviados |
+| Coordinador · citación a padres | 5 enviados |
+| Docente · inasistencia / tarea / examen / observación / citación | 5 cada uno (25) |
+| Estudiante/Acudiente · consulta al docente / a la institución | 2 enviados |
+| Administrador · mantenimiento / pagos / colegios específicos | 3 enviados (institución 34); el resto queda pendiente hasta conectar sus emisores |
+
+**Cola (260 mensajes de prueba):** pausar → 0 enviados en 135 s; reanudar → drena; detener → 0 enviados
+en 135 s; eliminar cola → cancela `pending/queued/sending` (historial conservado); eliminar emisor →
+borra emisor/configuración/sesión/credenciales y se restauró desde respaldo en la prueba. Los 18
+mensajes cancelados por la prueba de “eliminar cola” se reencolaron para completar los 260.
+
+### 10.6 Pendiente
+- **Multimedia** en avisos: ya se detecta y envía imagen/video con URL pública (`APP_API_BACKEND`);
+  falta validar tamaños/límites reales de WhatsApp y adjuntos alojados en el servidor.
 - **Cron de calendario** y **boletines automáticos** (el calendario aún no se programa; boletines hoy manual).
 
 ---

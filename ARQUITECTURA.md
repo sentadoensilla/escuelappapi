@@ -188,10 +188,15 @@ Conviven **cuatro** mecanismos; el estándar nuevo es Client/Pool:
 - **`notifications/push/`** — FCM (`firebase-admin`); requiere un service-account JSON gitignored (ausente).
 - **`notifications/whatsapp/`** — `wpBaileys.js`, `wpRomote.js` (cliente "emisor remoto" grande) — **legacy**,
   con buena parte del código comentado y funciones referenciadas que ya no existen.
+- **`controllers/whatsapp/`** — integración vigente: `envio.js` (núcleo: LID/modo test, formato y cola),
+  `texto.js` (HTML del editor → formato WhatsApp), `destinatarios.js` (audiencias docentes/estudiantes/
+  grupos/todos/instituciones), `colas`, `emisores`, `mensajes`, `vinculacion` y `envioController`.
+  Rutas montadas en `/whatsapp` (ver `INTEGRACION_WHATSAPP.md`).
 - **`notifications/socket.io/mySockets.js`** — holder global de `io`.
 - **`queues/`** — sistema de colas Bull (`parallelQueue.js`, `redis.js`, `process/`). **Dormido/roto**: ver §14.
 
-> No existe `utils/cron.js`; `node-cron` está declarado pero no se importa.
+> No existe `utils/cron.js`; `utils/scheduler.js` usa `node-cron` para el horario de mañana de
+> WhatsApp (se habilita con `WP_CRON_ESCUELAPP=true`) y `app.js` lo registra al iniciar.
 
 ---
 

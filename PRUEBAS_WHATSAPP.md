@@ -69,7 +69,7 @@ Requisitos: PostgreSQL (`sae12.com`), Redis local, y `WP_API_ENABLE_CRON=true` e
 - [ ] Institución A no ve/opera los emisores/mensajes de B; la API deriva el `idempresa` del JWT. Admin ve todos.
 
 ## 19. Modo de pruebas
-- [ ] Activar con `test_phone` → los mensajes se redirigen al número de prueba y `destino_efectivo` registra el original. Desactivar → vuelve a envío real.
+- [ ] Activar con `APP_WP_NUMBERTEST` en **escuelappapi y apibaileys** → todos los mensajes se redirigen a ese número y `destino_efectivo` lo registra. Alternativa por emisor: `test_phone`/`modo_prueba`. Desactivar → vuelve a envío real.
 
 ## 20. Persistencia tras reinicio
 - [ ] Reiniciar `apibaileys` y/o `escuelappapi` → estados, colas y mensajes siguen en PostgreSQL (no se pierde nada).
@@ -93,3 +93,27 @@ SELECT status, count(*) FROM data.aelog_envios GROUP BY status;
 -- Auditoría
 SELECT accion, resultado, fecha FROM contact.auditoria_whatsapp ORDER BY fecha DESC LIMIT 20;
 ```
+
+---
+
+## Resultados de la ejecución — 2026-11-14 (entorno local)
+
+Base de datos usada: `127.0.0.1:5433/bdsae2`. Emisor de prueba: `573164119133` (institución 34,
+`colpasy@gmail.com`). Destino de prueba: `APP_WP_NUMBERTEST=573178954170`.
+
+- [x] Vinculación/sesión del emisor: sesión `status=4` (conectada).
+- [x] Envío de texto, imagen y enlace de video (Baileys).
+- [x] Formato único: título en negrita + cuerpo + nombre del colegio + “Enviado desde escuelapp”.
+- [x] Transformación HTML del editor → formato WhatsApp (negrita, cursiva, tachado, listas, enlaces).
+- [x] Audiencias: docentes, estudiantes, grupos, todos e instituciones (con `cinstid→aeinst_id` y
+      `canolid→aeano_id`).
+- [x] Casos de uso Institución (5), Coordinador (3), Docente (5), Estudiante/Acudiente (2) y
+      Administrador (3); todos registrados en `data.aelog_envios` y enviados al número de prueba.
+- [x] Cola: pausar (0 envíos durante 135 s), reanudar, detener (0 envíos durante 135 s), eliminar
+      cola (cancela pending/queued/sending) y eliminar emisor (con respaldo/restauración).
+- [x] Lote de 260 mensajes encolados y enviados en modo test.
+- [x] Grilla: nombre/teléfono/grupo, estado semafórico, error en tooltip, columnas ordenables,
+      modal de detalle con vista previa y gráfico ECharts de uso en el tiempo.
+- [x] Idempotencia de fechas: `fecharegistro` y `updated_at` alineados tras la distribución de prueba.
+- [ ] Multimedia desde adjuntos alojados en el servidor (URL pública) a gran escala.
+- [ ] Cron de calendario y boletines automáticos (aún manuales).
