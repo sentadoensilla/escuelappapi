@@ -207,7 +207,19 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
 | Administrador | Mantenimiento / pagos / colegios | `WhatsappAdmin` → `/notificar` (`instituciones`) |
 | Institución (cron) | Horario de mañana | `utils/scheduler.js` (18:00, `WP_CRON_ESCUELAPP=true`, primeros 2 meses) |
 
-### 10.4 Pendiente
+### 10.4 Controles de la cola (`escuelappvenus`)
+| Botón | Endpoint | Efecto |
+|---|---|---|
+| Pausar cola | `POST /whatsapp/colas/pausar` | `emisor_config.paused=true`; el cron no reclama y el worker devuelve los jobs ya encolados a `pending`. |
+| Reanudar cola | `POST /whatsapp/colas/reanudar` | `paused=false, stopped=false`; el cron vuelve a reclamar. |
+| Detener cola | `POST /whatsapp/colas/detener` | `stopped=true`; igual que pausar (los pendientes se conservan). |
+| Eliminar cola | `POST /whatsapp/colas/eliminar` | Cancela `pending/queued/sending` de la institución (historial conservado); el worker ignora los `cancelled`. |
+| Eliminar emisor | `POST /whatsapp/emisores/eliminar` | Borra emisor, configuración, sesión y credenciales; el historial de mensajes se conserva. |
+
+El worker consulta `contact.emisor_config` y el estado del registro **antes de cada envío**, por lo
+que pausar/detener también frena los mensajes que ya estaban en la cola de Bull (vuelven a `pending`).
+
+### 10.5 Pendiente
 - **Multimedia** (imagen/video) en avisos: hoy se envía texto; falta construir la URL pública del adjunto.
 - **Cron de calendario** y **boletines automáticos** (el calendario aún no se programa; boletines hoy manual).
 
