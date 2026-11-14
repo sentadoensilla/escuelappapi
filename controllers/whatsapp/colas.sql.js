@@ -5,7 +5,7 @@ export const colaDetener = `UPDATE contact.emisor_config SET stopped = true WHER
 
 export const colaEliminarPendientes = `
   UPDATE data.aelog_envios SET status = 'cancelled', updated_at = now()
-  WHERE idempresa = $1 AND status = 'pending'
+  WHERE idempresa = $1 AND status IN ('pending', 'queued', 'sending')
   RETURNING idlogenvios;`;
 
 export const idempresaDeEmisor = `SELECT idempresa, emisor FROM contact.emisor WHERE idemisor = $1;`;

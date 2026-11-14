@@ -49,7 +49,7 @@ export async function colaEliminar(req, res) {
 
     const r = await Db.query({ text: sql.colaEliminarPendientes, values: [e.rows[0].idempresa] });
     await auditar(req, "eliminar_cola", "success", { idemisor, cancelados: r.rows.length });
-    res.send({ status: "success", statusCode: 200, message: r.rows.length + " mensajes pendientes cancelados (historial conservado)", rows: { cancelados: r.rows.length } });
+    res.send({ status: "success", statusCode: 200, message: r.rows.length + " mensajes en cola cancelados (historial conservado)", rows: { cancelados: r.rows.length } });
   } catch (error) {
     console.log("colaEliminar:", error);
     res.send({ status: "error", statusCode: 400, message: "No se pudo eliminar la cola", rows: {} });
