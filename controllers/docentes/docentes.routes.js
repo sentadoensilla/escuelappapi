@@ -11,6 +11,10 @@ router.post('/docentes/registrar', [Auth.isAuth, Auth.Admin_academico], Controll
 router.post('/docentes/actualizar', [Auth.isAuth, Auth.Admin_academico], Controller.docenteActualizar);
 // Borrar (lógico) un docente.
 router.post('/docentes/borrar', [Auth.isAuth, Auth.Admin_academico], Controller.docenteBorrar);
+// Auto-gestión pública del docente (sin login): registro de sus datos personales.
+router.post('/docentes/autoregistro', Controller.docenteAutoregistro);
+// Autorización por la institución: activa un docente autogestionado (pendiente).
+router.post('/docentes/autorizar', [Auth.isAuth, Auth.Admin_academico], Controller.docenteAutorizar);
 
 // ===== Contratación (public.tabinstdoce) =====
 // Listar contrataciones por institución/año.

@@ -3,7 +3,42 @@
 Guía de referencia para agentes de programación y desarrolladores. Explica **qué** es el proyecto,
 **cómo está organizado**, **cómo se levanta** y **qué convenciones** seguir para seguir codificando.
 
-**Última actualización:** _(fecha — actualizar tras cada cambio)_
+**Última actualización:** 2026-11-14 — **Módulo docentes** completo: listado filtrado por la institución de
+la sesión (join `tabinstdoce`/`tabcarg` con cargo, jefe de área y estado), **auto-gestión pública**
+(`POST /sae/docentes/autoregistro`, sin login, con institución/año encriptados en el enlace), **autorización
+por la institución** (`POST /sae/docentes/autorizar`, estado 4→8), **foto** guardada como archivo
+(`guardarFoto` escribe en `public/archivos/docentes/` y guarda la ruta en `cdocefoto varchar(100)`), y
+validación de identificación duplicada (`unicaccdocente`). **Catálogos**: endpoint público
+`/catalogos/publico/listar/:tabla` (whitelist) y corrección de `activo` (8→1) para `sexos`, `tipossangre`,
+`tiposdocumento` y `cargos`. **CORS**: permite `localhost`, IPs privadas (LAN) y dominios de producción.
+**Resiliencia**: `database/conex.js` usa `Pool` + manejadores de errores de red; túnel SSH abierto por
+`prestart` de `npm start` (`scripts/asegurar-tunel.js`).
+
+---
+
+## Registro de cambios (trazabilidad)
+
+### 2026-11-14 — Módulo docentes (gestión + auto-gestión + autorización)
+
+- **Listado** (`/gestion/docentes`): ahora solo muestra los docentes de la institución de la sesión activa
+  y expone **cargo**, **email** y **estado** (Activo/Pendiente). Se une `tabdoce` con `tabinstdoce`/`tabcarg`.
+- **Formulario** (`/gestion/docentes/agregar`): campos **foto** (galería/cámara, reducida a carnet 300×400),
+  **tipo de sangre**, **sexo**, **dirección**, **email**, **cargo** y **jefe de área**; con validación de
+  obligatorios y formatos. El cargo/jefe de área se guardan en la contratación (`tabinstdoce`).
+- **Auto-gestión** (`/docentes/autogestion` + `POST /sae/docentes/autoregistro`): formulario público sin
+  login; la institución/año viajan encriptados en el enlace/QR; el docente queda **Pendiente (4)**.
+- **Autorización** (`POST /sae/docentes/autorizar`): el rol institución activa la contratación y el docente
+  (4→8); en el listado aparece el botón **Autorizar** para los pendientes.
+- **Foto**: se guarda como archivo (`public/archivos/docentes/`) y se almacena la ruta (varchar(100)).
+- **Catálogos**: endpoint público y `activo` corregido; la URL correcta es `/catalogos/listar/:tabla`.
+- **CORS**: habilitado para IPs de red privada (celular escaneando el QR) y dominios de producción.
+
+### 2026-11-04 — Túnel SSH y resiliencia de conexión
+
+- `database/conex.js` cambió de `Client` a `Pool` con `keepAlive` y manejador del evento `error`.
+- `app.js` añade manejadores `uncaughtException`/`unhandledRejection` que absorben errores de red.
+- `scripts/asegurar-tunel.js`/`detener-tunel.js` + `prestart` de `package.json` abren el túnel a la BD
+  (`sae12.com`) automáticamente con `npm start`.
 
 ---
 

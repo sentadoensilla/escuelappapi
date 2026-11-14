@@ -58,7 +58,7 @@ const catalogos = {
     pk: 'csexoid',
     columnas: ['csexodesc'],
     estado: 'csexoesta',
-    activo: 8,
+    activo: 1,
     inactivo: 2,
     orderBy: 'csexoid'
   },
@@ -76,7 +76,7 @@ const catalogos = {
     pk: 'ctipodocuid',
     columnas: ['ctipodocudesc'],
     estado: 'ctipodocuesta',
-    activo: 8,
+    activo: 1,
     inactivo: 2,
     orderBy: 'ctipodocuid'
   },
@@ -121,7 +121,7 @@ const catalogos = {
     pk: 'ctiposangid',
     columnas: ['ctiposangdesc'],
     estado: 'ctiposangesta',
-    activo: 8,
+    activo: 1,
     inactivo: 2,
     orderBy: 'ctiposangid'
   },
@@ -139,7 +139,7 @@ const catalogos = {
     pk: 'ccargid',
     columnas: ['ccargdesc'],
     estado: 'ccargesta',
-    activo: 8,
+    activo: 1,
     inactivo: 2,
     orderBy: 'ccargdesc'
   },

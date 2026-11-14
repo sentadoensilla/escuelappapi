@@ -5,6 +5,9 @@ const router = express.Router();
 // Listar los registros de un catálogo (admin académico o administrador).
 router.post('/listar/:tabla', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.catalogosListar);
 
+// Listar un catálogo público (sin login) — solo para el formulario de auto-gestión.
+router.post('/publico/listar/:tabla', Controller.catalogosPublicListar);
+
 // Registrar un nuevo registro en un catálogo (admin académico o administrador).
 router.post('/registrar/:tabla', [Auth.isAuth, Auth.isDirector_and_tecaher_and_admin], Controller.catalogosRegistrar);
 

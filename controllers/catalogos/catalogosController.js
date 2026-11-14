@@ -78,6 +78,21 @@ export async function catalogosListar(req, res) {
     });
   }
 }
+
+// Catálogos disponibles SIN autenticación (para el formulario público de
+// auto-gestión del docente). Sólo se exponen los necesarios; el id sigue encriptado.
+const CATALOGOS_PUBLICOS = ['tiposdocumento', 'sexos', 'tipossangre', 'cargos'];
+export async function catalogosPublicListar(req, res) {
+  if (!CATALOGOS_PUBLICOS.includes(req.params.tabla)) {
+    return res.send({
+      status: 'error',
+      statusCode: 400,
+      message: 'Catálogo no disponible públicamente: ' + req.params.tabla,
+      rows: []
+    });
+  }
+  return catalogosListar(req, res);
+}
 export async function catalogosRegistrar(req, res) {
   const config = resolverConfig(req.params.tabla);
   if (!config) {
@@ -220,6 +235,7 @@ export async function catalogosBorrar(req, res) {
 }
 export default {
   catalogosListar: catalogosListar,
+  catalogosPublicListar: catalogosPublicListar,
   catalogosRegistrar: catalogosRegistrar,
   catalogosActualizar: catalogosActualizar,
   catalogosBorrar: catalogosBorrar

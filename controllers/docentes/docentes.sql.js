@@ -1,13 +1,70 @@
 export const docenteListar = `
-        SELECT cdoceid AS idregistro, cdocenomb AS nombre1, cdocenomb2 AS nombre2,
-               cdoceapel AS apellido1, cdoceapel2 AS apellido2, cdocefnac AS fechanacimiento,
-               cdocesexo AS idsexo, cdocetiposang AS idtiposangre, cdocefoto AS foto,
-               cdocetipoiden AS idtipodocumento, cdoceiden AS identificacion,
-               cdocecelu AS celular, cdocetele AS telefono, cdocedire AS direccion,
-               cdoceemai AS email, cdocefechingr AS fechaingreso, cdocefechregi AS fecharegistro,
-               cdocenombrado AS nombrado, cdoceesta AS idestado, cdocefirm AS firma
-        FROM public.tabdoce
-        ORDER BY cdoceapel, cdocenomb;`;
+        SELECT * FROM (
+            SELECT DISTINCT ON (d.cdoceid)
+                   d.cdoceid AS idregistro, d.cdocenomb AS nombre1, d.cdocenomb2 AS nombre2,
+                   d.cdoceapel AS apellido1, d.cdoceapel2 AS apellido2, d.cdocefnac AS fechanacimiento,
+                   d.cdocesexo AS idsexo, d.cdocetiposang AS idtiposangre, d.cdocefoto AS foto,
+                   d.cdocetipoiden AS idtipodocumento, d.cdoceiden AS identificacion,
+                   d.cdocecelu AS celular, d.cdocetele AS telefono, d.cdocedire AS direccion,
+                   d.cdoceemai AS email, d.cdocefechingr AS fechaingreso, d.cdocefechregi AS fecharegistro,
+                   d.cdocenombrado AS nombrado, d.cdoceesta AS idestado, d.cdocefirm AS firma,
+                   c.ccargdesc AS cargo, i.ccargid AS idcargo, i.cjefearea AS jefearea,
+                   i.cinstid AS idinstitucion, i.cinstdoceesta AS idestadocontratacion
+            FROM public.tabdoce d
+            LEFT JOIN public.tabinstdoce i
+                   ON (i.cdoceid = d.cdoceid AND i.cinstdoceesta IN (4, 8)
+                       AND ($1::integer IS NULL OR i.cinstid = $1))
+            LEFT JOIN public.tabcarg c ON (c.ccargid = i.ccargid)
+            WHERE ($1::integer IS NULL OR i.cdoceid IS NOT NULL)
+            ORDER BY d.cdoceid, i.cinstdoceid DESC
+        ) q
+        ORDER BY q.apellido1, q.nombre1;`;
+// Sincronización de la contratación (cargo y jefe de área) por institución/año.
+export const contratacionExiste = `
+        SELECT cinstdoceid AS id
+        FROM public.tabinstdoce
+        WHERE cdoceid = $1 AND cinstid = $2
+          AND ($3::integer IS NULL OR canolid = $3)
+          AND cinstdoceesta IN (4, 8)
+        ORDER BY cinstdoceid DESC
+        LIMIT 1;`;
+export const contratacionSincronizar = `
+        UPDATE public.tabinstdoce SET ccargid = $2, cjefearea = $3
+        WHERE cinstdoceid = $1;`;
+export const contratacionCrear = `
+        INSERT INTO public.tabinstdoce
+            (cinstdoceid, cinstid, cdoceid, canolid, ccargid, ctipovincid, cjefearea, cinstdocefechregi, cinstdoceesta)
+        VALUES ((SELECT COALESCE(MAX(cinstdoceid)+1, 1) FROM public.tabinstdoce),
+             $1, $2, $3, $4, $5, $6, CURRENT_DATE, 8)
+        RETURNING cinstdoceid AS id;`;
+// Contratación PENDIENTE (auto-gestión): queda a la espera de autorización.
+export const contratacionCrearPendiente = `
+        INSERT INTO public.tabinstdoce
+            (cinstdoceid, cinstid, cdoceid, canolid, ccargid, ctipovincid, cjefearea, cinstdocefechregi, cinstdoceesta)
+        VALUES ((SELECT COALESCE(MAX(cinstdoceid)+1, 1) FROM public.tabinstdoce),
+             $1, $2, $3, $4, $5, $6, CURRENT_DATE, 4)
+        RETURNING cinstdoceid AS id;`;
+// Autorización del docente por la institución.
+export const contratacionPendienteBuscar = `
+        SELECT cinstdoceid AS id
+        FROM public.tabinstdoce
+        WHERE cdoceid = $1 AND cinstid = $2
+          AND ($3::integer IS NULL OR canolid = $3)
+          AND cinstdoceesta = 4
+        ORDER BY cinstdoceid DESC
+        LIMIT 1;`;
+export const contratacionActivar = `
+        UPDATE public.tabinstdoce SET cinstdoceesta = 8
+        WHERE cinstdoceid = $1 RETURNING cinstdoceid AS id;`;
+export const docenteActivar = `
+        UPDATE public.tabdoce SET cdoceesta = 8
+        WHERE cdoceid = $1 RETURNING cdoceid AS id;`;
+// Año lectivo vigente (8 = Activo, 7 = Abierto) como respaldo cuando el enlace
+// no trae año (p.ej. administrador sin año en la sesión).
+export const anoVigente = `
+        SELECT canolid FROM public.tabanol
+        ORDER BY (canolesta = 8) DESC, (canolesta = 7) DESC, canolid DESC
+        LIMIT 1;`;
 export const docenteRegistrar = `
         INSERT INTO public.tabdoce
             (cdoceid, cdocenomb, cdocenomb2, cdoceapel, cdoceapel2, cdocefnac, cdocesexo,
@@ -87,6 +144,14 @@ export default {
   docenteRegistrar: docenteRegistrar,
   docenteActualizar: docenteActualizar,
   docenteBorrar: docenteBorrar,
+  contratacionExiste: contratacionExiste,
+  contratacionSincronizar: contratacionSincronizar,
+  contratacionCrear: contratacionCrear,
+  contratacionCrearPendiente: contratacionCrearPendiente,
+  contratacionPendienteBuscar: contratacionPendienteBuscar,
+  contratacionActivar: contratacionActivar,
+  docenteActivar: docenteActivar,
+  anoVigente: anoVigente,
   contratacionListar: contratacionListar,
   contratacionRegistrar: contratacionRegistrar,
   contratacionActualizar: contratacionActualizar,

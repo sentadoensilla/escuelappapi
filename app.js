@@ -18,6 +18,40 @@ const require = createRequire(import.meta.url);
 import { fileURLToPath } from "url";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 require('dotenv').config();
+
+/*
+ * RESILIENCIA DE LA CONEXION A LA BD (tunel SSH a sae12.com)
+ * ---------------------------------------------------------------------------
+ * La base se alcanza por el tunel SSH (ver D:\VENUS\tunel). Cuando el tunel se
+ * reinicia, el socket de alguna conexion del pool muere con ECONNRESET; si el
+ * error llega sin manejador, Node tumba el proceso completo y la API deja de
+ * responder hasta que alguien la reinicia.
+ * Estos dos manejadores registran el aviso y dejan que el pool reponga las
+ * conexiones solo. Los errores de red no son un fallo de programacion: no se
+ * debe matar el proceso por ellos.
+ */
+const CODIGOS_RED = new Set(['ECONNRESET', 'EPIPE', 'ETIMEDOUT', 'ECONNREFUSED', 'ENETUNREACH', 'EHOSTUNREACH']);
+function esErrorDeRed(err) {
+  if (!err) return false;
+  if (CODIGOS_RED.has(err.code)) return true;
+  const texto = String(err.message || '');
+  return /read ECONNRESET|write EPIPE|ECONNRESET|socket hang up|Connection terminated/i.test(texto);
+}
+process.on('uncaughtException', (err) => {
+  if (esErrorDeRed(err)) {
+    console.log('Aviso: conexion a la BD interrumpida (' + (err.code || err.message) + '). El pool se reconecta solo.');
+    return;
+  }
+  console.error('ERROR NO CAPTURADO:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (motivo) => {
+  if (esErrorDeRed(motivo)) {
+    console.log('Aviso: promesa de BD rechazada por red (' + (motivo.code || motivo.message) + '). Se reintenta en la proxima consulta.');
+    return;
+  }
+  console.error('PROMESA RECHAZADA NO CAPTURADA:', motivo);
+});
 const {
   Client,
   LocalAuth
@@ -43,8 +77,24 @@ const mime = {
   js: 'application/javascript'
 };
 const corsOpts = {
-  origin: ['http://localhost:3000', 'http://localhost:4004', 'https://colarqui.edu.co', 'https://test.colarqui.edu.co', 'https://escuelapp.co', 'https://colegiosarquidiocesanos.edu.co', '*'],
-  //true, //'*', //  
+  // Permite los dominios de producción, localhost (cualquier puerto) y las IPs
+  // de red privada (LAN) para poder probar desde el celular escaneando el QR.
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // mismo origen / server-side / curl
+    const dominios = [
+      'https://colarqui.edu.co',
+      'https://test.colarqui.edu.co',
+      'https://escuelapp.co',
+      'https://colegiosarquidiocesanos.edu.co',
+    ];
+    const esLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+    // Rangos privados: 10.x, 192.168.x, 172.16–31.x
+    const esPrivado = /^https?:\/\/(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(origin);
+    if (dominios.includes(origin) || esLocal || esPrivado) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  },
   credentials: true,
   methods: ['PUT', 'GET', 'POST', 'DELETE', 'HEAD', 'OPTIONS'],
   exposedHeaders: ['X-Locale', 'Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With', 'Access-Control-Request-Method', 'Access-Control-Request-Headers'],

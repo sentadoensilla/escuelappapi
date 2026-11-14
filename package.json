@@ -4,10 +4,16 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "devel": "nodemon app.js",
+    "prestart": "node scripts/asegurar-tunel.js",
     "start": "nodemon app.js",
-    "stop": "nodemon stop app.js",
+    "predevel": "node scripts/asegurar-tunel.js",
+    "devel": "nodemon app.js",
+    "prestartcluster": "node scripts/asegurar-tunel.js",
     "startcluster": "nodemon appCluster.js",
+    "tunel": "node scripts/asegurar-tunel.js",
+    "tunel:stop": "node scripts/detener-tunel.js",
+    "prestop": "node scripts/detener-tunel.js",
+    "stop": "nodemon stop app.js",
     "whatsapp-web.js": "1.22.1",
     "starter": "forever start --minUptime 1000 --spinSleepTime 1000 app.js >> colarquiback.log 2>&1",
     "stoper": "forever stop app.js"

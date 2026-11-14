@@ -3,7 +3,7 @@
 Guía de arquitectura del **backend** de Escuelapp (`escuelappapi`). Permite a cualquier agente de
 programación comprender el código y continuar la codificación sin contexto previo.
 
-**Última actualización:** _(fecha — actualizar tras cada cambio)_
+**Última actualización:** 2026-11-14 — módulo docentes (gestión + auto-gestión + autorización + foto), catálogos públicos, CORS para LAN, resiliencia de BD y túnel SSH (`prestart`). Ver §10 Registro de cambios.
 
 ---
 
@@ -312,6 +312,38 @@ Referenciadas en código pero fuera del `.env.example`: `REDIS_*`, `WP_API_BACKE
 node --check controllers/<modulo>/<modulo>Controller.js
 node --check app.js
 ```
+
+---
+
+## 17. Registro de cambios (trazabilidad)
+
+### 2026-11-14 — Módulo docentes (gestión + auto-gestión + autorización)
+
+**`controllers/docentes/`** (docentesController.js, docentes.sql.js, docentes.routes.js):
+
+- `docenteListar` — filtra por la **institución de la sesión activa** (`req.user.usuarioEmpresaId`) y une
+  `tabdoce` con `tabinstdoce`/`tabcarg` para exponer `cargo`, `email`, `jefearea` y el estado de la
+  contratación. Incluye pendientes (estado 4) y activos (estado 8).
+- `docenteRegistrar`/`docenteActualizar` — sincronizan la **contratación** (`tabinstdoce`) con cargo y
+  jefe de área; resuelven `canolid` (año vigente si no viene), `ccargid` (0 = "Por Asignar") y
+  `ctipovincid` (1) para cumplir las restricciones NOT NULL.
+- `docenteAutoregistro` — **público (sin login)**: crea el docente en estado **Pendiente (4)** y una
+  contratación pendiente con la institución/año que vienen **encriptados en el enlace/QR**.
+- `docenteAutorizar` — **rol institución**: activa la contratación y el docente (4→8).
+- `guardarFoto()` — la foto llega en base64, se escribe en `public/archivos/docentes/` y se guarda la
+  **ruta** en `cdocefoto` (varchar(100)); mensaje claro si la identificación ya existe (`unicaccdocente`).
+
+**`controllers/catalogos/`** — endpoint público `/catalogos/publico/listar/:tabla` (whitelist
+`tiposdocumento`, `sexos`, `tipossangre`, `cargos`) y corrección de `activo` (8→1) para esos catálogos.
+
+**`app.js`** — CORS permite `localhost`, IPs privadas (LAN) y dominios de producción (celular escaneando el QR).
+
+### 2026-11-04 — Resiliencia de BD y túnel SSH
+
+- `database/conex.js` — `Client` → `Pool` con `keepAlive`, `idleTimeoutMillis` y manejador del evento `error`.
+- `app.js` — manejadores `uncaughtException`/`unhandledRejection` que absorben errores de red (ECONNRESET…).
+- `scripts/asegurar-tunel.js`/`detener-tunel.js` + `prestart` en `package.json` — abren el túnel SSH a
+  `sae12.com` automáticamente al ejecutar `npm start`.
 
 ---
 
