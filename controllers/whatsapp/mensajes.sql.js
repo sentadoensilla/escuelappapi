@@ -1,6 +1,6 @@
 // mensajes.sql.js — consulta de mensajes (outbox) con joins.
 export const mensajesBase = `
-  SELECT l.idlogenvios, l.idempresa, i.aeinst_nombre AS institucion, l.emisor, l.destino, l.lid,
+  SELECT l.idlogenvios, l.idempresa, i.aeinst_nombre AS institucion, l.emisor, l.destino, l.destino_efectivo, l.lid,
          l.type, l.tipo, t.aetipoenvio_descripcion AS tipo_nombre, l.status,
          l.fecharegistro AS fecha_creacion, l.updated_at AS fecha_envio,
          l.attempts, l.last_error, l.enviosdetalles
