@@ -162,6 +162,10 @@ aplicadas a `bdsae2` (aditivas y reversibles; ver `001_whatsapp_integracion.roll
   `apibaileys` lo vuelve a forzar en el cron/worker (por si el job llegara con otro destino).
 - `enviarWhatsApp()` / `enviarMasivo()` → `data.aelog_envios` (`pending`); el envío físico lo hace apibaileys.
   El gateway envía a `COALESCE(destino_efectivo, destino)` y registra el número usado en `enviosdetalles`.
+- **Formato único** (`construirMensaje`): `TÍTULO` + cuerpo + `[nombre del colegio]` + `Enviado desde escuelapp`.
+  Los módulos pasan `payload: { titulo, cuerpo }`; en imagen/video/audio el texto se usa como `caption`.
+  El nombre del colegio se resuelve con `nombreInstitucion(idempresa)`. El aviso institucional envía
+  imagen/video si el adjunto lo es, con URL pública `APP_API_BACKEND` + `/p/c/...`.
 - Endpoints: `POST /whatsapp/enviar`, `/whatsapp/lid/validar`, `/whatsapp/notificar`, `/whatsapp/instituciones`.
 
 ### 10.2 Audiencias (`/whatsapp/notificar`)
